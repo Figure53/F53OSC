@@ -34,7 +34,7 @@
     //  A note on the 4s: For OSC, everything is null-terminated and in multiples of 4 bytes. 
     //  If the data is already a multiple of 4 bytes, it needs to have four null bytes appended.
     
-    UInt32 dataSize = [self length];
+    UInt32 dataSize = (UInt32)[self length];
     dataSize = 4 * ( ceil( dataSize / 4.0 ) );
     dataSize = OSSwapHostToBigInt32( dataSize );
     NSMutableData *newData = [NSMutableData dataWithBytes:&dataSize length:sizeof(UInt32)];

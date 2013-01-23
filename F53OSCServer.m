@@ -176,7 +176,7 @@
         NSString *typeTag = [NSString stringWithOSCStringBytes:buffer length:&dataLength];
         buffer += dataLength;
         
-        int numArgs = [typeTag length] - 1;
+        NSInteger numArgs = [typeTag length] - 1;
         if ( numArgs > 0 )
         {
             for ( int i = 1; i < numArgs + 1; i++ )
