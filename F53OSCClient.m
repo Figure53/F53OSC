@@ -55,10 +55,10 @@
     
     // Get buffer from data
     UInt8 *buffer = (UInt8 *)[data bytes];
-    int bufferLength = [data length];
+    NSUInteger bufferLength = [data length];
     
     // Send the data
-    int bytesSent = sendto( udpSocket, buffer, bufferLength, 0, (struct sockaddr *)&address, sizeof( struct sockaddr_in ) );
+    size_t bytesSent = sendto( udpSocket, buffer, bufferLength, 0, (struct sockaddr *)&address, sizeof( struct sockaddr_in ) );
     if ( bytesSent < bufferLength )
     {
         NSLog( @"Error: Unable to send full buffer. Error %s.", strerror( errno ) );
@@ -136,10 +136,10 @@
         return;
     }
     
-    _serverAddress = ([[urlParts objectAtIndex:0] integerValue] << 24) +
-                     ([[urlParts objectAtIndex:1] integerValue] << 16) + 
-                     ([[urlParts objectAtIndex:2] integerValue] <<  8) + 
-                     ([[urlParts objectAtIndex:3] integerValue] <<  0);
+    _serverAddress = ([[urlParts objectAtIndex:0] intValue] << 24) +
+                     ([[urlParts objectAtIndex:1] intValue] << 16) +
+                     ([[urlParts objectAtIndex:2] intValue] <<  8) +
+                     ([[urlParts objectAtIndex:3] intValue] <<  0);
 }
 
 @synthesize serverAddress = _serverAddress;

@@ -69,71 +69,71 @@
 
 - (void) _listenThread
 {
-    if ( _listening )
-        return;
-    
-    _listening = YES;
-    
-    //NSLog( @"OSC server starting..." );
-    
-    NSAutoreleasePool *pool = [NSAutoreleasePool new];
-    
-    // Create the socket
-    int udpSocket = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-    if ( udpSocket == -1 )
-    {
-        NSLog( @"OSC server was unable to create a UDP socket." );
-        _listening = NO;
-        return;
-    }
-    
-    // Set up address structure
-    struct sockaddr_in address;
-    memset( &address, 0, sizeof( struct sockaddr_in ) );
-    address.sin_family = AF_INET;
-    address.sin_port = htons( _serverPort );
-    address.sin_addr.s_addr = htonl( INADDR_ANY );
-    
-    // Bind the port
-    int err = bind( udpSocket, (struct sockaddr *)&address, sizeof( address ) );
-    if ( err == -1 )
-    {
-        NSLog( @"OSC server was unable to bind a socket on port %d.", _serverPort );
-        _listening = NO;
-        close( udpSocket );
-        return;
-    }
-    
-    //NSLog( @"OSC server listening on port %d with maximum length of %d bytes.", _serverPort, maxPacketSize );
-    
-    // Listen
-    while ( _listening )
-    {
-        char buffer[maxPacketSize];
-        struct sockaddr_in remoteAddress;
-        socklen_t sockLen = sizeof( remoteAddress );
-        ssize_t bytes_read = recvfrom( udpSocket, buffer, maxPacketSize, 0, (struct sockaddr *)&remoteAddress, &sockLen );
-        if ( bytes_read == -1 )
+	@autoreleasepool
+	{
+        if ( _listening )
+            return;
+        
+        _listening = YES;
+        
+        //NSLog( @"OSC server starting..." );
+        
+        // Create the socket
+        int udpSocket = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
+        if ( udpSocket == -1 )
         {
-            NSLog( @"OSC server was unable to receive a UDP packet." );
+            NSLog( @"OSC server was unable to create a UDP socket." );
+            _listening = NO;
+            return;
+        }
+        
+        // Set up address structure
+        struct sockaddr_in address;
+        memset( &address, 0, sizeof( struct sockaddr_in ) );
+        address.sin_family = AF_INET;
+        address.sin_port = htons( _serverPort );
+        address.sin_addr.s_addr = htonl( INADDR_ANY );
+        
+        // Bind the port
+        int err = bind( udpSocket, (struct sockaddr *)&address, sizeof( address ) );
+        if ( err == -1 )
+        {
+            NSLog( @"OSC server was unable to bind a socket on port %d.", _serverPort );
             _listening = NO;
             close( udpSocket );
             return;
         }
         
-        // Act on the incoming message only if we're still supposed to be listening
-        if ( _listening )
+        //NSLog( @"OSC server listening on port %d with maximum length of %d bytes.", _serverPort, maxPacketSize );
+        
+        // Listen
+        while ( _listening )
         {
-            [self _receivedBuffer:buffer length:(UInt32)bytes_read fromAddress:remoteAddress];
+            @autoreleasepool
+            {
+                char buffer[maxPacketSize];
+                struct sockaddr_in remoteAddress;
+                socklen_t sockLen = sizeof( remoteAddress );
+                ssize_t bytes_read = recvfrom( udpSocket, buffer, maxPacketSize, 0, (struct sockaddr *)&remoteAddress, &sockLen );
+                if ( bytes_read == -1 )
+                {
+                    NSLog( @"OSC server was unable to receive a UDP packet." );
+                    _listening = NO;
+                    close( udpSocket );
+                    return;
+                }
+                
+                // Act on the incoming message only if we're still supposed to be listening
+                if ( _listening )
+                {
+                    [self _receivedBuffer:buffer length:(UInt32)bytes_read fromAddress:remoteAddress];
+                }
+            }
         }
         
-        // TODO FIXME: drain pool periodically?
-    }
-    
-    //NSLog( @"OSC server closing socket on port %d", _serverPort );
-    close( udpSocket );
-    
-    [pool release];
+        //NSLog( @"OSC server closing socket on port %d", _serverPort );
+        close( udpSocket );    
+	}
 }
 
 - (void) _receivedBuffer:(char *)buffer length:(UInt32)length fromAddress:(struct sockaddr_in)remoteAddress
@@ -176,7 +176,7 @@
         NSString *typeTag = [NSString stringWithOSCStringBytes:buffer length:&dataLength];
         buffer += dataLength;
         
-        int numArgs = [typeTag length] - 1;
+        NSInteger numArgs = [typeTag length] - 1;
         if ( numArgs > 0 )
         {
             for ( int i = 1; i < numArgs + 1; i++ )
