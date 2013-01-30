@@ -26,20 +26,27 @@
 
 #import <Foundation/Foundation.h>
 
-@class F53OSCPacket;
+#import "F53OSCSocket.h"
+#import "F53OSCPacket.h"
 
-@interface F53OSCClient : NSObject <NSCoding>
+@interface F53OSCClient : NSObject <NSCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 {
-    UInt32 _serverAddress;
-    UInt16 _serverPort;
+    NSString *_host;
+    UInt16 _port;
+    BOOL _useTcp;
     id _userData;
+    
+    F53OSCSocket *_socket;
 }
 
-@property (assign) NSString *URL;
-@property (assign) UInt32 serverAddress;
-@property (assign) UInt16 port;
-@property (retain) id userData;
+@property (nonatomic, copy) NSString *host;
+@property (nonatomic, assign) UInt16 port;
+@property (nonatomic, assign) BOOL useTcp;
+@property (nonatomic, retain) id userData;
 @property (readonly) NSString *title;
+
+- (BOOL) connect;
+- (void) disconnect;
 
 - (void) sendPacket:(F53OSCPacket *)packet;
 

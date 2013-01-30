@@ -30,6 +30,6 @@
 @interface NSData (F53OSCBlobAdditions)
 
 - (NSData *) oscBlobData;
-+ (NSData *) dataWithOSCBlobBytes:(char *)buf length:(NSUInteger *)outLength;
++ (NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;
 
 @end

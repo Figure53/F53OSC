@@ -26,12 +26,14 @@
 
 #import <Foundation/Foundation.h>
 
+#import "F53OSCSocket.h"
+
 @interface F53OSCPacket : NSObject <NSCopying>
 {
-    UInt32 _originAddress;  ///< Used by the OSCServer to specify the origin of incoming packets.
+    F53OSCSocket *_replySocket;      ///< If this message was received from a client, this is the socket to use to reply.
 }
 
-@property (assign) UInt32 originAddress;
+@property (retain) F53OSCSocket *replySocket;
 
 - (NSData *) packetData;
 

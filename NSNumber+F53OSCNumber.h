@@ -31,7 +31,7 @@
 
 - (SInt32) oscFloatValue;
 - (SInt32) oscIntValue;
-+ (NSNumber *) numberWithOSCFloatBytes:(char *)buf;
-+ (NSNumber *) numberWithOSCIntBytes:(char *)buf;
++ (NSNumber *) numberWithOSCFloatBytes:(const char *)buf maxLength:(NSUInteger)maxLength;
++ (NSNumber *) numberWithOSCIntBytes:(const char *)buf maxLength:(NSUInteger)maxLength;
 
 @end

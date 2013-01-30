@@ -29,14 +29,22 @@
 
 @implementation F53OSCPacket
 
+- (void) dealloc
+{
+    [_replySocket release];
+    _replySocket = nil;
+    
+    [super dealloc];
+}
+
 - (id) copyWithZone:(NSZone *)zone
 {
     F53OSCPacket *copy = [[self class] allocWithZone:zone];
-    copy->_originAddress = _originAddress;
+    copy->_replySocket = [_replySocket retain];
     return copy;
 }
 
-@synthesize originAddress = _originAddress;
+@synthesize replySocket = _replySocket;
 
 - (NSData *) packetData
 {

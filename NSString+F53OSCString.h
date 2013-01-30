@@ -30,6 +30,6 @@
 @interface NSString (F53OSCStringAdditions)
 
 - (NSData *) oscStringData;
-+ (NSString *) stringWithOSCStringBytes:(char *)buf length:(NSUInteger *)outLength;
++ (NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;
 
 @end

@@ -48,9 +48,23 @@
     return [[newData copy] autorelease];
 }
 
-+ (NSData *) dataWithOSCBlobBytes:(char *)buf length:(NSUInteger *)outLength
++ (NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;
 {
-    UInt32 dataSize = *((UInt32 *)buf);
+    if ( buf == NULL || maxLength == 0 )
+        return nil;
+    
+    for ( NSUInteger index = 0; index < maxLength; index++ )
+    {
+        if ( buf[index] == 0 )
+            goto valid; // Found a null character within the buffer.
+    }
+    return nil; // Buffer wasn't null terminated, so it's not a valid OSC blob.
+    
+    UInt32 dataSize = 0;
+    
+valid:
+    
+    dataSize = *((UInt32 *)buf);
     dataSize = OSSwapBigToHostInt32( dataSize );
     *outLength = dataSize;
     buf += 4;

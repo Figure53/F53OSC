@@ -24,48 +24,40 @@
 //  THE SOFTWARE.
 //
 
-#include <netinet/in.h>
-
 #import "F53OSCClient.h"
-#import "F53OSCPacket.h"
-#import "F53NSString.h"
+
 
 @interface F53OSCClient (Private)
 
-- (void) _sendUDPData:(NSData *)data toAddress:(UInt32)ipAddress port:(UInt16)port;
+- (void) _destroySocket;
+- (void) _createSocket;
 
 @end
 
 
 @implementation F53OSCClient (Private)
 
-- (void) _sendUDPData:(NSData *)data toAddress:(UInt32)ipAddress port:(UInt16)port
+- (void) _destroySocket
 {
-    // Create the socket
-    int udpSocket = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-    if ( udpSocket == -1 )
-        return;
-    
-    // Set up address/port structure
-    struct sockaddr_in address;
-    memset( &address, 0, sizeof( struct sockaddr_in ) );
-    address.sin_family = AF_INET;
-    address.sin_port = htons( port );
-    address.sin_addr.s_addr = htonl( ipAddress );
-    
-    // Get buffer from data
-    UInt8 *buffer = (UInt8 *)[data bytes];
-    NSUInteger bufferLength = [data length];
-    
-    // Send the data
-    size_t bytesSent = sendto( udpSocket, buffer, bufferLength, 0, (struct sockaddr *)&address, sizeof( struct sockaddr_in ) );
-    if ( bytesSent < bufferLength )
+    [_socket disconnect];
+    [_socket autorelease];
+    _socket = nil;
+}
+
+- (void) _createSocket
+{
+    if ( _useTcp )
     {
-        NSLog( @"Error: Unable to send full buffer. Error %s.", strerror( errno ) );
-        return;
+        GCDAsyncSocket *tcpSocket = [[[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+        _socket = [[F53OSCSocket socketWithTcpSocket:tcpSocket] retain];
     }
-    
-    close( udpSocket );
+    else
+    {
+        GCDAsyncUdpSocket *udpSocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+        _socket = [[F53OSCSocket socketWithUdpSocket:udpSocket] retain];
+    }
+    _socket.host = self.host;
+    _socket.port = self.port;
 }
 
 @end
@@ -76,27 +68,35 @@
 - (id) init
 {
     self = [super init];
-    if ( self ) 
+    if ( self )
     {
-        _serverAddress = 0x7f000001; // Default to localhost
-        _serverPort = 53000;         // QLab is 53000, Stagetracker is 57115.
+        _host = @"localhost";
+        _port = 53000;         // QLab is 53000, Stagetracker is 57115.
+        _useTcp = NO;
         _userData = nil;
+        _socket = nil;
     }
     return self;
 }
 
 - (void) dealloc
 {
+    [_host release];
+    _host = nil;
+    
     [_userData release];
     _userData = nil;
+    
+    [self _destroySocket];
     
     [super dealloc];
 }
 
 - (void) encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:[NSNumber numberWithUnsignedInt:_serverAddress] forKey:@"serverAddress"];
-    [coder encodeObject:[NSNumber numberWithUnsignedShort:_serverPort] forKey:@"serverPort"];
+    [coder encodeObject:_host forKey:@"host"];
+    [coder encodeObject:[NSNumber numberWithUnsignedShort:_port] forKey:@"port"];
+    [coder encodeObject:[NSNumber numberWithBool:_useTcp] forKey:@"useTcp"];
     [coder encodeObject:_userData forKey:@"userData"];
 }
 
@@ -105,58 +105,156 @@
     self = [super init];
     if ( self )
     {
-        _serverAddress = [[coder decodeObjectForKey:@"serverAddress"] unsignedIntValue];
-        _serverPort = [[coder decodeObjectForKey:@"serverPort"] unsignedShortValue];
+        _host = [[coder decodeObjectForKey:@"host"] retain];
+        _port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
+        _useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
         _userData = [[coder decodeObjectForKey:@"userData"] retain];
     }
     return self;
 }
 
-- (NSString *) URL
+@synthesize host = _host;
+
+- (void) setHost:(NSString *)host
 {
-    return [NSString stringWithFormat:@"%d.%d.%d.%d",
-            (_serverAddress >> 24) & 0xff,
-            (_serverAddress >> 16) & 0xff,
-            (_serverAddress >>  8) & 0xff,
-            (_serverAddress >>  0) & 0xff];
+    [_host autorelease];
+    _host = [host copy];
+    _socket.host = _host;
 }
 
-- (void) setURL:(NSString *)url
+@synthesize port = _port;
+
+- (void) setPort:(UInt16)port
 {
-    if ( url == nil )
-    {
-        _serverAddress = 0x7f000001;
-        return;
-    }
-    
-    NSArray *urlParts = [url componentsSeparatedByString:@"."];
-    if ( [urlParts count] != 4 || [[urlParts objectAtIndex:0] integerValue] == 0 )
-    {
-        NSLog( @"Error: domain-based URLs not currently supported. Use IP address instead. %@", urlParts );
-        return;
-    }
-    
-    _serverAddress = ([[urlParts objectAtIndex:0] intValue] << 24) +
-                     ([[urlParts objectAtIndex:1] intValue] << 16) +
-                     ([[urlParts objectAtIndex:2] intValue] <<  8) +
-                     ([[urlParts objectAtIndex:3] intValue] <<  0);
+    _port = port;
+    _socket.port = _port;
 }
 
-@synthesize serverAddress = _serverAddress;
+@synthesize useTcp = _useTcp;
 
-@synthesize port = _serverPort;
+- (void) setUseTcp:(BOOL)useTcp
+{
+    if ( _useTcp == useTcp )
+        return;
+    
+    _useTcp = useTcp;
+    
+    [self _destroySocket];
+}
 
 @synthesize userData = _userData;
 
 - (NSString *) title
 {
-    return [NSString stringWithFormat:@"%@ : %u", [NSString addressInDotNotation:_serverAddress], _serverPort ];
+    return [NSString stringWithFormat:@"%@ : %u", _host, _port ];
+}
+
+- (BOOL) connect
+{
+    if ( !_socket )
+        [self _createSocket];
+    if ( _socket )
+        return [_socket connect];
+    return NO;
+}
+
+- (void) disconnect
+{
+    [_socket disconnect];
 }
 
 - (void) sendPacket:(F53OSCPacket *)packet
 {
-    [self _sendUDPData:[packet packetData] toAddress:_serverAddress port:_serverPort];
+    if ( !_socket )
+        [self connect];
+    
+    if ( _socket )
+        [_socket sendPacket:packet];
+    else
+        NSLog( @"Error: F53OSCClient could not send data; no socket available." );
+}
+
+#pragma mark - GCDAsyncSocketDelegate
+
+- (dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
+{
+    return NULL;
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
+{
+    // Client objects do not accept connections, they only send.
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
+{
+    //NSLog( @"client socket %p didConnectToHost %@:%u", sock, host, port );
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+{
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
+{
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
+{
+    //NSLog( @"client socket %p didWriteDataWithTag %li", sock, tag );
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
+{
+}
+
+- (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
+{
+    return 0;
+}
+
+- (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutWriteWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
+{
+    NSLog( @"Warning: F53OSCClient timed out when sending data." );
+    return 0;
+}
+
+- (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
+{
+}
+
+- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
+{
+}
+
+- (void) socketDidSecure:(GCDAsyncSocket *)sock
+{
+}
+
+#pragma mark - GCDAsyncUdpSocketDelegate
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didConnectToAddress:(NSData *)address
+{
+}
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(NSError *)error
+{
+}
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
+{
+}
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error
+{
+}
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)filterContext
+{
+}
+
+- (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *)error
+{
 }
 
 @end
-

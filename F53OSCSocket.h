@@ -1,9 +1,9 @@
 //
-//  F53OSCServer.h
+//  F53OSCSocket.h
 //
-//  Created by Sean Dougall on 3/23/11.
+//  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -26,38 +26,43 @@
 
 #import <Foundation/Foundation.h>
 
-#import "F53OSC.h"
-#import "F53OSCSocket.h"
+#import "GCDAsyncSocket.h"
+#import "GCDAsyncUdpSocket.h"
 
+@class F53OSCPacket;
 
-@protocol F53OSCServerPacketDestination
+///
+///  An F53OSCSocket object represents either a TCP socket or UDP socket, but never both at the same time.
+///
 
-- (void) takeMessage:(F53OSCMessage *)message;
-
-@end
-
-
-@interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
+@interface F53OSCSocket : NSObject
 {
+    GCDAsyncSocket *_tcpSocket;
+    GCDAsyncUdpSocket *_udpSocket;
+    NSString *_host;
     UInt16 _port;
-    UInt16 _udpReplyPort;
-    id <F53OSCServerPacketDestination, NSObject> _destination;
-    F53OSCSocket *_tcpSocket;
-    F53OSCSocket *_udpSocket;
-    NSMutableDictionary *_activeTcpSockets;  // F53OSCSockets keyed by index of when the connection was accepted.
-    NSMutableDictionary *_activeData;        // NSMutableData keyed by index; buffers the incoming data so we can parse out individual messages.
-    NSInteger _activeIndex;
 }
 
-+ (NSString *) validCharsForOSCMethod;
-+ (NSPredicate *) predicateForAttribute:(NSString *)attributeName 
-                     matchingOSCPattern:(NSString *)pattern;
++ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;
++ (F53OSCSocket *) socketWithUdpSocket:(GCDAsyncUdpSocket *)socket;
 
+- (id) initWithTcpSocket:(GCDAsyncSocket *)socket;
+- (id) initWithUdpSocket:(GCDAsyncUdpSocket *)socket;
+
+@property (readonly) GCDAsyncSocket *tcpSocket;
+@property (readonly) GCDAsyncUdpSocket *udpSocket;
+@property (readonly) BOOL isTcpSocket;
+@property (readonly) BOOL isUdpSocket;
+@property (nonatomic, copy) NSString *host;
 @property (nonatomic, assign) UInt16 port;
-@property (nonatomic, assign) UInt16 udpReplyPort;
-@property (retain) id <F53OSCServerPacketDestination, NSObject> destination;
 
 - (BOOL) startListening;
 - (void) stopListening;
+
+- (BOOL) connect;
+- (void) disconnect;
+- (BOOL) isConnected;
+
+- (void) sendPacket:(F53OSCPacket *)packet;
 
 @end

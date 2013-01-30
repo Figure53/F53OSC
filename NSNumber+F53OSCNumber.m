@@ -41,16 +41,22 @@
     return OSSwapHostToBigInt32([self integerValue]);
 }
 
-+ (NSNumber *) numberWithOSCFloatBytes:(char *)buf
++ (NSNumber *) numberWithOSCFloatBytes:(const char *)buf maxLength:(NSUInteger)maxLength
 {
+    if ( buf == NULL || maxLength < sizeof( SInt32 ) )
+        return nil;
+    
     SInt32 intValue = *((SInt32 *)buf);
     intValue = OSSwapBigToHostInt32( intValue );
     Float32 floatValue = *((Float32 *)&intValue);
     return [NSNumber numberWithFloat:floatValue];
 }
 
-+ (NSNumber *) numberWithOSCIntBytes:(char *)buf
++ (NSNumber *) numberWithOSCIntBytes:(const char *)buf maxLength:(NSUInteger)maxLength
 {
+    if ( buf == NULL || maxLength < sizeof( SInt32 ) )
+        return nil;
+    
     SInt32 intValue = *((SInt32 *)buf);
     intValue = OSSwapBigToHostInt32( intValue );
     return [NSNumber numberWithInteger:intValue];

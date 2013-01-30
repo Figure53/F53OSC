@@ -54,7 +54,7 @@
                                     arguments:(NSArray *)arguments;
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern 
                                     arguments:(NSArray *)arguments
-                                originAddress:(UInt32)originAddress;
+                                  replySocket:(F53OSCSocket *)replySocket;
 
 @property (nonatomic, copy) NSString *addressPattern;
 @property (nonatomic, retain) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.

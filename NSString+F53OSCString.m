@@ -50,12 +50,27 @@
     return data;
 }
 
-+ (NSString *) stringWithOSCStringBytes:(char *)buf length:(NSUInteger *)outLength
+///
+///  An OSC string is a sequence of non-null ASCII characters followed by a null,
+///  followed by 0-3 additional null characters to make the total number of bits a multiple of 32.
+///
++ (NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
 {
-    // An OSC string is a sequence of non-null ASCII characters followed by a null,
-    // followed by 0-3 additional null characters to make the total number of bits a multiple of 32.
+    if ( buf == NULL || maxLength == 0 )
+        return nil;
     
-    NSString *result = [NSString stringWithUTF8String:buf];
+    for ( NSUInteger index = 0; index < maxLength; index++ )
+    {
+        if ( buf[index] == 0 )
+            goto valid; // Found a null character within the buffer.
+    }
+    return nil; // Buffer wasn't null terminated, so it's not a valid OSC string.
+    
+    NSString *result = nil;
+    
+valid:
+    
+    result = [NSString stringWithUTF8String:buf];
     *outLength = 4 * ceil( ([result length] + 1) / 4.0 );
     return result;
 }

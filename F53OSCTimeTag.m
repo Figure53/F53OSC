@@ -63,6 +63,9 @@
 
 + (F53OSCTimeTag *) timeTagWithOSCTimeBytes:(char *)buf
 {
+    if ( buf == NULL )
+        return nil;
+    
     UInt32 seconds = *((UInt32 *)buf);
     buf += sizeof( UInt32 );
     UInt32 fraction = *((UInt32 *)buf);

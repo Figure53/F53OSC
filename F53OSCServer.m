@@ -24,24 +24,16 @@
 //  THE SOFTWARE.
 //
 
-#include <netinet/in.h>
-
 #import "F53OSCServer.h"
 #import "F53OSCFoundationAdditions.h"
-
-// UDP is limited to 65,507 bytes of data.
-// See: http://en.wikipedia.org/wiki/User_Datagram_Protocol
-
-#define maxPacketSize 65507
 
 
 @interface F53OSCServer (Private)
 
 + (NSString *) _stringWithSpecialRegexCharactersEscaped:(NSString *)string;
-- (void) _listenThread;
-- (void) _receivedBuffer:(char *)buf length:(UInt32)length fromAddress:(struct sockaddr_in)remoteAddress;
-- (void) _receivedMessageBuffer:(char *)buffer length:(UInt32)length fromAddress:(UInt32)remoteAddress;
-- (void) _receivedBundleBuffer:(char *)buffer length:(UInt32)length fromAddress:(UInt32)remoteAddress;
+- (void) _receivedOSCData:(NSData *)data replyToSocket:(F53OSCSocket *)socket;
+- (void) _receivedMessageData:(NSData *)data replyToSocket:(F53OSCSocket *)socket;
+- (void) _receivedBundleData:(NSData *)data replyToSocket:(F53OSCSocket *)socket;
 
 @end
 
@@ -67,188 +59,204 @@
     return string;
 }
 
-- (void) _listenThread
+- (void) _receivedOSCData:(NSData *)data replyToSocket:(F53OSCSocket *)socket
 {
-	@autoreleasepool
-	{
-        if ( _listening )
-            return;
-        
-        _listening = YES;
-        
-        //NSLog( @"OSC server starting..." );
-        
-        // Create the socket
-        int udpSocket = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP );
-        if ( udpSocket == -1 )
-        {
-            NSLog( @"OSC server was unable to create a UDP socket." );
-            _listening = NO;
-            return;
-        }
-        
-        // Set up address structure
-        struct sockaddr_in address;
-        memset( &address, 0, sizeof( struct sockaddr_in ) );
-        address.sin_family = AF_INET;
-        address.sin_port = htons( _serverPort );
-        address.sin_addr.s_addr = htonl( INADDR_ANY );
-        
-        // Bind the port
-        int err = bind( udpSocket, (struct sockaddr *)&address, sizeof( address ) );
-        if ( err == -1 )
-        {
-            NSLog( @"OSC server was unable to bind a socket on port %d.", _serverPort );
-            _listening = NO;
-            close( udpSocket );
-            return;
-        }
-        
-        //NSLog( @"OSC server listening on port %d with maximum length of %d bytes.", _serverPort, maxPacketSize );
-        
-        // Listen
-        while ( _listening )
-        {
-            @autoreleasepool
-            {
-                char buffer[maxPacketSize];
-                struct sockaddr_in remoteAddress;
-                socklen_t sockLen = sizeof( remoteAddress );
-                ssize_t bytes_read = recvfrom( udpSocket, buffer, maxPacketSize, 0, (struct sockaddr *)&remoteAddress, &sockLen );
-                if ( bytes_read == -1 )
-                {
-                    NSLog( @"OSC server was unable to receive a UDP packet." );
-                    _listening = NO;
-                    close( udpSocket );
-                    return;
-                }
-                
-                // Act on the incoming message only if we're still supposed to be listening
-                if ( _listening )
-                {
-                    [self _receivedBuffer:buffer length:(UInt32)bytes_read fromAddress:remoteAddress];
-                }
-            }
-        }
-        
-        //NSLog( @"OSC server closing socket on port %d", _serverPort );
-        close( udpSocket );    
-	}
-}
-
-- (void) _receivedBuffer:(char *)buffer length:(UInt32)length fromAddress:(struct sockaddr_in)remoteAddress
-{
-    UInt32 address = ntohl( remoteAddress.sin_addr.s_addr );
+    if ( data == nil )
+        return;
+    
+    NSUInteger length = [data length];
+    if ( length == 0 )
+        return;
+    
+    const char *buffer = [data bytes];
     
     if ( buffer[0] == '/' ) // OSC message
     {
-        [self _receivedMessageBuffer:buffer length:length fromAddress:address];
+        [self _receivedMessageData:data replyToSocket:socket];
     }
     else if ( buffer[0] == '#' ) // OSC bundle
     {
-        [self _receivedBundleBuffer:buffer length:length fromAddress:address];
+        [self _receivedBundleData:data replyToSocket:socket];
     }
     else
     {
-        NSLog( @"OSC server received an unrecognized message of length %i.", length );
+        NSLog( @"Error: Unrecognized OSC message of length %lu.", length );
     }
 }
 
-- (void) _receivedMessageBuffer:(char *)buffer length:(UInt32)length fromAddress:(UInt32)remoteAddress
+- (void) _receivedMessageData:(NSData *)data replyToSocket:(F53OSCSocket *)socket;
 {
+    NSUInteger length = [data length];
+    const char *buffer = [data bytes];
+    
+    NSUInteger lengthOfRemainingBuffer = length;
     NSUInteger dataLength = 0;
-    
-    NSString *addressPattern = [NSString stringWithOSCStringBytes:buffer length:&dataLength];
-    NSMutableArray *args = [NSMutableArray array];
-    
-    if ( dataLength <= length )
+    NSString *addressPattern = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+    if ( addressPattern == nil || dataLength == 0 || dataLength > length )
     {
-        buffer += dataLength;
-    }
-    else
-    {
-        NSLog( @"OSC server encountered error parsing message buffer." );
+        NSLog( @"Error: Unable to parse OSC method address." );
         return;
     }
     
-    if ( dataLength != length && buffer[0] == ',' )
+    buffer += dataLength;
+    lengthOfRemainingBuffer -= dataLength;
+    
+    NSMutableArray *args = [NSMutableArray array];
+    BOOL hasArguments = (lengthOfRemainingBuffer > 0);
+    if ( hasArguments && buffer[0] == ',' )
     {
-        NSString *typeTag = [NSString stringWithOSCStringBytes:buffer length:&dataLength];
+        NSString *typeTag = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+        if ( typeTag == nil )
+        {
+            NSLog( @"Error: Unable to parse type tag for OSC method %@", addressPattern );
+            return;
+        }
         buffer += dataLength;
+        lengthOfRemainingBuffer -= dataLength;
         
         NSInteger numArgs = [typeTag length] - 1;
         if ( numArgs > 0 )
         {
             for ( int i = 1; i < numArgs + 1; i++ )
             {
+                NSString *stringArg = nil;
+                NSData *dataArg = nil;
+                NSNumber *numberArg = nil;
+                
                 char type = [typeTag characterAtIndex:i]; // (index starts at 1 because first char is ",")
                 switch ( type )
                 {
                     case 's':
-                        [args addObject:[NSString stringWithOSCStringBytes:buffer length:&dataLength]];
-                        buffer += dataLength;
+                        stringArg = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+                        if ( stringArg )
+                        {
+                            [args addObject:stringArg];
+                            buffer += dataLength;
+                            lengthOfRemainingBuffer -= dataLength;
+                        }
+                        else
+                        {
+                            NSLog( @"Error: Unable to parse string argument for OSC method %@", addressPattern );
+                            return;
+                        }
                         break;
                     case 'b':
-                        [args addObject:[NSData dataWithOSCBlobBytes:buffer length:&dataLength]];
-                        buffer += dataLength + 4;
+                        dataArg = [NSData dataWithOSCBlobBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+                        if ( dataArg )
+                        {
+                            [args addObject:dataArg];
+                            buffer += dataLength + 4;
+                            lengthOfRemainingBuffer -= (dataLength + 4);
+                        }
+                        else
+                        {
+                            NSLog( @"Error: Unable to parse blob argument for OSC method %@", addressPattern );
+                            return;
+                        }
                         break;
                     case 'i':
-                        [args addObject:[NSNumber numberWithOSCIntBytes:buffer]];
-                        buffer += 4;
+                        numberArg = [NSNumber numberWithOSCIntBytes:buffer maxLength:lengthOfRemainingBuffer];
+                        if ( numberArg )
+                        {
+                            [args addObject:numberArg];
+                            buffer += 4;
+                            lengthOfRemainingBuffer -= 4;
+                        }
+                        else
+                        {
+                            NSLog( @"Error: Unable to parse int argument for OSC method %@", addressPattern );
+                            return;
+                        }
                         break;
                     case 'f':
-                        [args addObject:[NSNumber numberWithOSCFloatBytes:buffer]];
-                        buffer += 4;
+                        numberArg = [NSNumber numberWithOSCFloatBytes:buffer maxLength:lengthOfRemainingBuffer];
+                        if ( numberArg )
+                        {
+                            [args addObject:numberArg];
+                            buffer += 4;
+                            lengthOfRemainingBuffer -= 4;
+                        }
+                        else
+                        {
+                            NSLog( @"Error: Unable to parse float argument for OSC method %@", addressPattern );
+                            return;
+                        }
                         break;
                     default:
-                        NSLog( @"Unrecognized type '%c' found in type tag. This may result in undefined behavior.", type );
-                        break;
+                        NSLog( @"Error: Unrecognized type '%c' found in type tag for OSC method %@", type, addressPattern );
+                        return;
                 }
             }
         }
     }
     
-    [_destination takeMessage:[F53OSCMessage messageWithAddressPattern:addressPattern arguments:args originAddress:remoteAddress]];
+    [_destination takeMessage:[F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:socket]];
 }
 
-- (void) _receivedBundleBuffer:(char *)buffer length:(UInt32)length fromAddress:(UInt32)remoteAddress
+- (void) _receivedBundleData:(NSData *)data replyToSocket:(F53OSCSocket *)socket;
 {
-    NSUInteger dataLength = 0;
+    NSUInteger length = [data length];
+    const char *buffer = [data bytes];
     
-    NSString *bundlePrefix = [NSString stringWithOSCStringBytes:buffer length:&dataLength];
+    NSUInteger lengthOfRemainingBuffer = length;
+    NSUInteger dataLength = 0;
+    NSString *bundlePrefix = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+    if ( bundlePrefix == nil || dataLength == 0 || dataLength > length )
+    {
+        NSLog( @"Error: Unable to parse OSC bundle prefix." );
+        return;
+    }
+    
     if ( [bundlePrefix isEqualToString:@"#bundle"] )
     {
         buffer += dataLength;
+        lengthOfRemainingBuffer -= dataLength;
         
-        //F53OSCTimeTag *timetag = [F53OSCTimeTag timeTagWithOSCTimeBytes:buffer];
-        buffer += 8; // We're not currently using the time tag so we just skip it.
-        dataLength += 8;
-        
-        if ( dataLength < length )
+        if ( lengthOfRemainingBuffer > 8 )
         {
-            while( dataLength < length )
+            //F53OSCTimeTag *timetag = [F53OSCTimeTag timeTagWithOSCTimeBytes:buffer];
+            buffer += 8; // We're not currently using the time tag so we just skip it.
+            lengthOfRemainingBuffer -= 8;
+            
+            while ( lengthOfRemainingBuffer > sizeof( UInt32 ) )
             {
                 UInt32 elementLength = *((UInt32 *)buffer);
                 elementLength = OSSwapBigToHostInt32( elementLength );
-                buffer += 4;
+                buffer += sizeof( UInt32 );
+                lengthOfRemainingBuffer -= sizeof( UInt32 );
+                
+                if ( elementLength > lengthOfRemainingBuffer )
+                {
+                    NSLog( @"Error: A message in the OSC bundle claimed to be larger than the bundle itself." );
+                    return;
+                }
                 
                 if ( buffer[0] == '/' ) // OSC message
                 {
-                    [self _receivedMessageBuffer:buffer length:elementLength fromAddress:remoteAddress];
+                    [self _receivedMessageData:[NSData dataWithBytesNoCopy:(void *)buffer length:elementLength freeWhenDone:NO] replyToSocket:socket];
                 }
                 else if ( buffer[0] == '#' ) // OSC bundle
                 {
-                    [self _receivedBundleBuffer:buffer length:elementLength fromAddress:remoteAddress];
+                    [self _receivedBundleData:[NSData dataWithBytesNoCopy:(void *)buffer length:elementLength freeWhenDone:NO] replyToSocket:socket];
+                }
+                else
+                {
+                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", elementLength );
+                    return;
                 }
                 
                 buffer += elementLength;
-                dataLength += elementLength;
+                lengthOfRemainingBuffer -= elementLength;
             }
         }
         else
         {
-            NSLog( @"OSC server received an empty bundle message." );
+            NSLog( @"Warning: Received an empty OSC bundle message." );
         }
+    }
+    else
+    {
+        NSLog( @"Error: Received an invalid OSC bundle message." );
     }
 }
 
@@ -304,9 +312,17 @@
     self = [super init];
     if ( self )
     {
+        GCDAsyncSocket *tcpSocket = [[[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+        GCDAsyncUdpSocket *udpSocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+        
+        _port = 0;
+        _udpReplyPort = 0;
         _destination = nil;
-        _serverPort = 53535;
-        _listening = NO;
+        _tcpSocket = [[F53OSCSocket socketWithTcpSocket:tcpSocket] retain];
+        _udpSocket = [[F53OSCSocket socketWithUdpSocket:udpSocket] retain];
+        _activeTcpSockets = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
+        _activeData = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
+        _activeIndex = 0;
     }
     return self;
 }
@@ -318,22 +334,214 @@
     [_destination release];
     _destination = nil;
     
+    [_tcpSocket release];
+    _tcpSocket = nil;
+    
+    [_udpSocket release];
+    _udpSocket = nil;
+    
+    [_activeTcpSockets release];
+    _activeTcpSockets = nil;
+    
+    [_activeData release];
+    _activeData = nil;
+    
     [super dealloc];
+}
+
+@synthesize port = _port;
+
+- (void) setPort:(UInt16)port
+{
+    _port = port;
+    
+    [_tcpSocket stopListening];
+    [_udpSocket stopListening];
+    _tcpSocket.port = _port;
+    _udpSocket.port = _port;
 }
 
 @synthesize destination = _destination;
 
-@synthesize port = _serverPort;
-
-- (void) startListening
+- (BOOL) startListening
 {
-    [NSThread detachNewThreadSelector:@selector( _listenThread ) toTarget:self withObject:nil];
+    BOOL success;
+    success = [_tcpSocket startListening];
+    if ( success )
+        success = [_udpSocket startListening];
+    return success;
 }
 
 - (void) stopListening
 {
-    // FIXME: this won't ever stop the other thread unless one more message is received...
-    _listening = NO;
+    [_tcpSocket stopListening];
+    [_udpSocket stopListening];
+}
+
+#pragma mark - GCDAsyncSocketDelegate
+
+- (dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
+{
+    return NULL;
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
+{
+    //NSLog( @"server socket %p didAcceptNewSocket %p", sock, newSocket );
+    
+    F53OSCSocket *activeSocket = [F53OSCSocket socketWithTcpSocket:newSocket];
+    activeSocket.host = newSocket.connectedHost;
+    activeSocket.port = newSocket.connectedPort;
+    
+    [_activeTcpSockets setObject:activeSocket forKey:[NSNumber numberWithInteger:_activeIndex]];
+    [_activeData setObject:[NSMutableData data] forKey:[NSNumber numberWithInteger:_activeIndex]];
+    
+    [newSocket readDataWithTimeout:-1 tag:_activeIndex];
+    
+    _activeIndex++;
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
+{
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+{
+    //NSLog( @"server socket %p didReadData of length %lu", sock, [data length] );
+    
+    F53OSCSocket *activeSocket = [_activeTcpSockets objectForKey:[NSNumber numberWithInteger:tag]];
+    NSMutableData *activeData = [_activeData objectForKey:[NSNumber numberWithInteger:tag]];
+    if ( activeSocket && activeData )
+    {
+        [activeData appendData:data];
+        
+        // Incoming OSC messages are expected to be prepended by the length of the message when sent via TCP.
+        // Each time we get more data we look to see if we now have a complete message to process.
+        
+        NSUInteger length = [activeData length];
+        if ( length > sizeof( UInt64 ) )
+        {
+            const char *buffer = [activeData bytes];
+            UInt64 dataSize = *((UInt64 *)buffer);
+            dataSize = OSSwapBigToHostInt64( dataSize );
+            
+            if ( length - sizeof( UInt64 ) >= dataSize )
+            {
+                buffer += sizeof( UInt64 );
+                length -= sizeof( UInt64 );
+                NSData *oscData = [NSData dataWithBytes:buffer length:dataSize];
+                
+                buffer += dataSize;
+                length -= dataSize;
+                NSData *newData = nil;
+                if ( length )
+                    newData = [NSData dataWithBytes:buffer length:length];
+                else
+                    newData = [NSData data];
+                [activeData setData:newData];
+                
+                [self _receivedOSCData:oscData replyToSocket:activeSocket];
+            }
+            else
+            {
+                // TODO: protect against them filling up the buffer with a huge amount of incoming data.
+            }
+        }
+        
+        [sock readDataWithTimeout:-1 tag:tag];
+    }
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
+{
+    //NSLog( @"server socket %p didReadPartialDataOfLength %lu tag: %li", sock, partialLength, tag );
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
+{
+}
+
+- (void) socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
+{
+    //NSLog( @"server socket %p didWritePartialDataOfLength %lu", sock, partialLength );
+}
+
+- (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
+{
+    NSLog( @"Warning: F53OSCServer timed out when reading TCP data." );
+    return 0;
+}
+
+- (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutWriteWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
+{
+    NSLog( @"Warning: F53OSCServer timed out when writing TCP data." );
+    return 0;
+}
+
+- (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
+{
+    NSLog( @"server socket %p didCloseReadStream", sock );
+}
+
+- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
+{
+    //NSLog( @"server socket %p didDisconnect", sock );
+    
+    id keyOfDyingSocket;
+    for ( id key in [_activeTcpSockets allKeys] )
+    {
+        F53OSCSocket *socket = [_activeTcpSockets objectForKey:key];
+        if ( socket.tcpSocket == sock )
+        {
+            keyOfDyingSocket = key;
+            break;
+        }
+    }
+    
+    if ( keyOfDyingSocket )
+    {
+        [_activeTcpSockets removeObjectForKey:keyOfDyingSocket];
+        [_activeData removeObjectForKey:keyOfDyingSocket];
+    }
+    else
+    {
+        NSLog( @"Error: F53OSCServer couldn't find the F53OSCSocket associated with the disconnecting TCP socket." );
+    }
+}
+
+- (void) socketDidSecure:(GCDAsyncSocket *)sock
+{
+}
+
+#pragma mark - GCDAsyncUdpSocketDelegate
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didConnectToAddress:(NSData *)address
+{
+}
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(NSError *)error
+{
+}
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
+{
+}
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error
+{
+}
+
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)filterContext
+{
+    GCDAsyncUdpSocket *rawReplySocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
+    replySocket.port = _udpReplyPort;
+    [self _receivedOSCData:data replyToSocket:replySocket];
+}
+
+- (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *)error
+{
 }
 
 @end

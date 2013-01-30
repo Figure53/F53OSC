@@ -159,17 +159,17 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
                                     arguments:(NSArray *)arguments
 {
-    return [F53OSCMessage messageWithAddressPattern:addressPattern arguments:arguments originAddress:0];
+    return [F53OSCMessage messageWithAddressPattern:addressPattern arguments:arguments replySocket:nil];
 }
 
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern 
                                     arguments:(NSArray *)arguments
-                                originAddress:(UInt32)originAddress
+                                  replySocket:(F53OSCSocket *)replySocket
 {
     F53OSCMessage *msg = [[F53OSCMessage new] autorelease];
     msg.addressPattern = addressPattern;
     msg.arguments = arguments;
-    msg.originAddress = originAddress;
+    msg.replySocket = replySocket;
     return msg;
 }
 
@@ -196,7 +196,6 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
 
 - (void) encodeWithCoder:(NSCoder *)coder
 {
-    // TODO: call super? (F53OSCPacket does not currently support encoding.)
     [coder encodeObject:_addressPattern forKey:@"addressPattern"];
     [coder encodeObject:_typeTagString forKey:@"typeTagString"];
     [coder encodeObject:_arguments forKey:@"arguments"];

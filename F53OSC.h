@@ -25,6 +25,7 @@
 //
 
 #import "F53OSCTimeTag.h"
+#import "F53OSCSocket.h"
 #import "F53OSCPacket.h"
 #import "F53OSCMessage.h"
 #import "F53OSCBundle.h"
