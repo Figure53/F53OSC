@@ -27,14 +27,6 @@
 #import <Foundation/Foundation.h>
 
 #import "F53OSC.h"
-#import "F53OSCSocket.h"
-
-
-@protocol F53OSCServerPacketDestination
-
-- (void) takeMessage:(F53OSCMessage *)message;
-
-@end
 
 
 @interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>

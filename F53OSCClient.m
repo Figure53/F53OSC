@@ -75,6 +75,8 @@
         _useTcp = NO;
         _userData = nil;
         _socket = nil;
+        _readData = [[NSMutableData data] retain];
+        _destination = nil;
     }
     return self;
 }
@@ -88,6 +90,12 @@
     _userData = nil;
     
     [self _destroySocket];
+    
+    [_readData release];
+    _readData = nil;
+    
+    [_destination release];
+    _destination = nil;
     
     [super dealloc];
 }
@@ -161,6 +169,7 @@
 - (void) disconnect
 {
     [_socket disconnect];
+    [_readData setData:[NSData data]];
 }
 
 - (void) sendPacket:(F53OSCPacket *)packet
@@ -193,6 +202,44 @@
 
 - (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
+    //NSLog( @"client socket %p didReadData of length %lu", sock, [data length] );
+    
+    [_readData appendData:data];
+        
+    // Incoming OSC messages are expected to be prepended by the length of the message when sent via TCP.
+    // Each time we get more data we look to see if we now have a complete message to process.
+        
+    NSUInteger length = [_readData length];
+    if ( length > sizeof( UInt64 ) )
+    {
+        const char *buffer = [_readData bytes];
+        UInt64 dataSize = *((UInt64 *)buffer);
+        dataSize = OSSwapBigToHostInt64( dataSize );
+        
+        if ( length - sizeof( UInt64 ) >= dataSize )
+        {
+            buffer += sizeof( UInt64 );
+            length -= sizeof( UInt64 );
+            NSData *oscData = [NSData dataWithBytes:buffer length:dataSize];
+            
+            buffer += dataSize;
+            length -= dataSize;
+            NSData *newData = nil;
+            if ( length )
+                newData = [NSData dataWithBytes:buffer length:length];
+            else
+                newData = [NSData data];
+            [_readData setData:newData];
+            
+            [F53OSCSocket processOscData:oscData forDestination:_destination replyToSocket:_socket];
+        }
+        else
+        {
+            // TODO: protect against them filling up the buffer with a huge amount of incoming data.
+        }
+    }
+    
+    [sock readDataWithTimeout:-1 tag:tag];
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
@@ -210,6 +257,7 @@
 
 - (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
 {
+    NSLog( @"Warning: F53OSCClient timed out when reading data." );
     return 0;
 }
 
@@ -221,10 +269,12 @@
 
 - (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
 {
+    [_readData setData:[NSData data]];
 }
 
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
 {
+    [_readData setData:[NSData data]];
 }
 
 - (void) socketDidSecure:(GCDAsyncSocket *)sock

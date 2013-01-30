@@ -1,9 +1,9 @@
 //
-//  F53OSC.h
+//  F53OSCProtocols.h
 //
-//  Created by Sean Dougall on 1/17/11.
+//  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,11 @@
 //  THE SOFTWARE.
 //
 
-#import "F53OSCProtocols.h"
-#import "F53OSCSocket.h"
-#import "F53OSCPacket.h"
-#import "F53OSCMessage.h"
-#import "F53OSCBundle.h"
-#import "F53OSCClient.h"
-#import "F53OSCServer.h"
-#import "F53OSCTimeTag.h"
+@class F53OSCMessage;
+
+@protocol F53OSCServerPacketDestination
+
+- (void) takeMessage:(F53OSCMessage *)message;
+
+@end
+

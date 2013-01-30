@@ -26,6 +26,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "F53OSCProtocols.h"
 #import "GCDAsyncSocket.h"
 #import "GCDAsyncUdpSocket.h"
 
@@ -45,6 +46,8 @@
 
 + (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;
 + (F53OSCSocket *) socketWithUdpSocket:(GCDAsyncUdpSocket *)socket;
+
++ (void) processOscData:(NSData *)data forDestination:(id <F53OSCServerPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket;
 
 - (id) initWithTcpSocket:(GCDAsyncSocket *)socket;
 - (id) initWithUdpSocket:(GCDAsyncUdpSocket *)socket;

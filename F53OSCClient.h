@@ -26,6 +26,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "F53OSCProtocols.h"
 #import "F53OSCSocket.h"
 #import "F53OSCPacket.h"
 
@@ -37,6 +38,8 @@
     id _userData;
     
     F53OSCSocket *_socket;
+    NSMutableData *_readData;
+    id <F53OSCServerPacketDestination, NSObject> _destination;
 }
 
 @property (nonatomic, copy) NSString *host;
@@ -44,6 +47,7 @@
 @property (nonatomic, assign) BOOL useTcp;
 @property (nonatomic, retain) id userData;
 @property (readonly) NSString *title;
+@property (retain) id <F53OSCServerPacketDestination, NSObject> destination;
 
 - (BOOL) connect;
 - (void) disconnect;
