@@ -127,9 +127,6 @@
 {
     [self stopListening];
     
-    [_destination release];
-    _destination = nil;
-    
     [_tcpSocket release];
     _tcpSocket = nil;
     

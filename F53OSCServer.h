@@ -33,7 +33,7 @@
 {
     UInt16 _port;
     UInt16 _udpReplyPort;
-    id <F53OSCServerPacketDestination, NSObject> _destination;
+    id <F53OSCPacketDestination> _destination;
     F53OSCSocket *_tcpSocket;
     F53OSCSocket *_udpSocket;
     NSMutableDictionary *_activeTcpSockets;  // F53OSCSockets keyed by index of when the connection was accepted.
@@ -47,7 +47,7 @@
 
 @property (nonatomic, assign) UInt16 port;
 @property (nonatomic, assign) UInt16 udpReplyPort;
-@property (retain) id <F53OSCServerPacketDestination, NSObject> destination;
+@property (nonatomic, assign) id <F53OSCPacketDestination> destination;
 
 - (BOOL) startListening;
 - (void) stopListening;

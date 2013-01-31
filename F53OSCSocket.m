@@ -34,14 +34,14 @@
 
 @interface F53OSCSocket (Private)
 
-+ (void) _processMessageData:(NSData *)data forDestination:(id <F53OSCServerPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket;
-+ (void) _processBundleData:(NSData *)data forDestination:(id <F53OSCServerPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) _processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) _processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 
 @end
 
 @implementation F53OSCSocket (private)
 
-+ (void) _processMessageData:(NSData *)data forDestination:(id <F53OSCServerPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) _processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
@@ -150,7 +150,7 @@
     [destination takeMessage:[F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:socket]];
 }
 
-+ (void) _processBundleData:(NSData *)data forDestination:(id <F53OSCServerPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) _processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
@@ -238,7 +238,7 @@
     return [[[F53OSCSocket alloc] initWithUdpSocket:socket] autorelease];
 }
 
-+ (void) processOscData:(NSData *)data forDestination:(id <F53OSCServerPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket
++ (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket
 {
     if ( data == nil )
         return;

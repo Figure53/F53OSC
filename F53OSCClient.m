@@ -94,9 +94,6 @@
     [_readData release];
     _readData = nil;
     
-    [_destination release];
-    _destination = nil;
-    
     [super dealloc];
 }
 
@@ -156,6 +153,8 @@
 {
     return [NSString stringWithFormat:@"%@ : %u", _host, _port ];
 }
+
+@synthesize destination = _destination;
 
 - (BOOL) connect
 {

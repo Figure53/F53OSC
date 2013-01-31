@@ -26,7 +26,7 @@
 
 @class F53OSCMessage;
 
-@protocol F53OSCServerPacketDestination
+@protocol F53OSCPacketDestination
 
 - (void) takeMessage:(F53OSCMessage *)message;
 
