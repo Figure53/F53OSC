@@ -255,6 +255,7 @@
 
 - (void) socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
 {
+    //NSLog( @"server socket %p didWriteDataWithTag: %li", sock, tag );
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
@@ -276,7 +277,7 @@
 
 - (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
 {
-    NSLog( @"server socket %p didCloseReadStream", sock );
+    //NSLog( @"server socket %p didCloseReadStream", sock );
 }
 
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err

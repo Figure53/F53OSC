@@ -192,7 +192,7 @@
 
 - (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
 {
-    // Client objects do not accept connections, they only send.
+    // Client objects do not accept new incoming connections.
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
@@ -269,11 +269,15 @@
 
 - (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
 {
+    //NSLog( @"client socket %p didCloseReadStream", sock );
+    
     [_readData setData:[NSData data]];
 }
 
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
 {
+    //NSLog( @"client socket %p didDisconnect", sock );
+    
     [_readData setData:[NSData data]];
 }
 

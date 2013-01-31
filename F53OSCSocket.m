@@ -309,7 +309,7 @@
 - (NSString *) description
 {
     if ( self.isTcpSocket )
-        return [NSString stringWithFormat:@"[TCP socket %@:%u]", _host, _port ];
+        return [NSString stringWithFormat:@"[TCP socket %@:%u isConnected = %i]", _host, _port, self.isConnected ];
     else
         return [NSString stringWithFormat:@"[UDP socket %@:%u]", _host, _port ];
 }
@@ -357,7 +357,7 @@
 - (void) stopListening
 {
     if ( _tcpSocket )
-        [_tcpSocket disconnectAfterReadingAndWriting];
+        [_tcpSocket disconnectAfterWriting];
     
     if ( _udpSocket )
         [_udpSocket close];
@@ -381,7 +381,7 @@
 
 - (void) disconnect
 {
-    [_tcpSocket disconnectAfterReadingAndWriting];
+    [_tcpSocket disconnect];
 }
 
 - (BOOL) isConnected
@@ -397,8 +397,10 @@
 
 - (void) sendPacket:(F53OSCPacket *)packet
 {
-    NSData *data = [packet packetData];
+    //NSLog( @"%@ sending packet: %@", _tcpSocket, self, packet );
     
+    NSData *data = [packet packetData];
+
     if ( _tcpSocket )
     {
         // Prepend the message with the length of the data.
@@ -409,6 +411,7 @@
         [newData appendData:data];
         data = [NSData dataWithData:newData];
         
+        [_tcpSocket readDataWithTimeout:-1 tag:0];
         [_tcpSocket writeData:data withTimeout:TIMEOUT tag:0];
     }
     else if ( _udpSocket )
