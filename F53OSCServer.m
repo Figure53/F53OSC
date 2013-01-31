@@ -233,7 +233,7 @@
                     newData = [NSData data];
                 [activeData setData:newData];
                 
-                [F53OSCSocket processOscData:oscData forDestination:_destination replyToSocket:activeSocket];
+                [F53OSCParser processOscData:oscData forDestination:_destination replyToSocket:activeSocket];
             }
             else
             {
@@ -332,7 +332,7 @@
     replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
     replySocket.port = _udpReplyPort;
     
-    [F53OSCSocket processOscData:data forDestination:_destination replyToSocket:replySocket];
+    [F53OSCParser processOscData:data forDestination:_destination replyToSocket:replySocket];
 }
 
 - (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *)error

@@ -25,6 +25,7 @@
 //
 
 #import "F53OSCClient.h"
+#import "F53OSCParser.h"
 
 
 @interface F53OSCClient (Private)
@@ -230,7 +231,7 @@
                 newData = [NSData data];
             [_readData setData:newData];
             
-            [F53OSCSocket processOscData:oscData forDestination:_destination replyToSocket:_socket];
+            [F53OSCParser processOscData:oscData forDestination:_destination replyToSocket:_socket];
         }
         else
         {
