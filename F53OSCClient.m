@@ -71,13 +71,13 @@
     self = [super init];
     if ( self )
     {
+        _delegate = nil;
         _host = @"localhost";
         _port = 53000;         // QLab is 53000, Stagetracker is 57115.
         _useTcp = NO;
         _userData = nil;
         _socket = nil;
         _readData = [[NSMutableData data] retain];
-        _destination = nil;
     }
     return self;
 }
@@ -111,13 +111,18 @@
     self = [super init];
     if ( self )
     {
+        _delegate = nil;
         _host = [[coder decodeObjectForKey:@"host"] retain];
         _port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
         _useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
         _userData = [[coder decodeObjectForKey:@"userData"] retain];
+        _socket = nil;
+        _readData = [[NSMutableData data] retain];
     }
     return self;
 }
+
+@synthesize delegate = _delegate;
 
 @synthesize host = _host;
 
@@ -154,8 +159,6 @@
 {
     return [NSString stringWithFormat:@"%@ : %u", _host, _port ];
 }
-
-@synthesize destination = _destination;
 
 - (BOOL) connect
 {
@@ -231,7 +234,7 @@
                 newData = [NSData data];
             [_readData setData:newData];
             
-            [F53OSCParser processOscData:oscData forDestination:_destination replyToSocket:_socket];
+            [F53OSCParser processOscData:oscData forDestination:_delegate replyToSocket:_socket];
         }
         else
         {

@@ -111,9 +111,9 @@
         GCDAsyncSocket *tcpSocket = [[[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
         GCDAsyncUdpSocket *udpSocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
         
+        _delegate = nil;
         _port = 0;
         _udpReplyPort = 0;
-        _destination = nil;
         _tcpSocket = [[F53OSCSocket socketWithTcpSocket:tcpSocket] retain];
         _udpSocket = [[F53OSCSocket socketWithUdpSocket:udpSocket] retain];
         _activeTcpSockets = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
@@ -142,6 +142,8 @@
     [super dealloc];
 }
 
+@synthesize delegate = _delegate;
+
 @synthesize port = _port;
 
 - (void) setPort:(UInt16)port
@@ -154,7 +156,7 @@
     _udpSocket.port = _port;
 }
 
-@synthesize destination = _destination;
+@synthesize udpReplyPort = _udpReplyPort;
 
 - (BOOL) startListening
 {
@@ -233,7 +235,7 @@
                     newData = [NSData data];
                 [activeData setData:newData];
                 
-                [F53OSCParser processOscData:oscData forDestination:_destination replyToSocket:activeSocket];
+                [F53OSCParser processOscData:oscData forDestination:_delegate replyToSocket:activeSocket];
             }
             else
             {
@@ -332,7 +334,7 @@
     replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
     replySocket.port = _udpReplyPort;
     
-    [F53OSCParser processOscData:data forDestination:_destination replyToSocket:replySocket];
+    [F53OSCParser processOscData:data forDestination:_delegate replyToSocket:replySocket];
 }
 
 - (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *)error
