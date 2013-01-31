@@ -225,7 +225,7 @@
 
 + (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket
 {
-    if ( data == nil )
+    if ( data == nil || destination == nil )
         return;
     
     NSUInteger length = [data length];

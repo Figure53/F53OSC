@@ -28,6 +28,7 @@
 
 #import "F53OSC.h"
 
+#define F53_OSC_SERVER_DEBUG 0
 
 @interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 {

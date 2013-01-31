@@ -182,7 +182,9 @@
 
 - (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
 {
-    //NSLog( @"server socket %p didAcceptNewSocket %p", sock, newSocket );
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didAcceptNewSocket %p", sock, newSocket );
+#endif
     
     F53OSCSocket *activeSocket = [F53OSCSocket socketWithTcpSocket:newSocket];
     activeSocket.host = newSocket.connectedHost;
@@ -202,7 +204,9 @@
 
 - (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
-    //NSLog( @"server socket %p didReadData of length %lu", sock, [data length] );
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
+#endif
     
     F53OSCSocket *activeSocket = [_activeTcpSockets objectForKey:[NSNumber numberWithInteger:tag]];
     NSMutableData *activeData = [_activeData objectForKey:[NSNumber numberWithInteger:tag]];
@@ -235,6 +239,10 @@
                     newData = [NSData data];
                 [activeData setData:newData];
                 
+#if F53_OSC_SERVER_DEBUG
+                NSLog( @"server socket %p dispatching oscData of length %lu, leaving buffer of length %lu.", sock, [oscData length], [activeData length] );
+#endif
+                
                 [F53OSCParser processOscData:oscData forDestination:_delegate replyToSocket:activeSocket];
             }
             else
@@ -249,17 +257,23 @@
 
 - (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
 {
-    //NSLog( @"server socket %p didReadPartialDataOfLength %lu tag: %li", sock, partialLength, tag );
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didReadPartialDataOfLength %lu. tag: %li", sock, partialLength, tag );
+#endif
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
 {
-    //NSLog( @"server socket %p didWriteDataWithTag: %li", sock, tag );
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didWriteDataWithTag: %li", sock, tag );
+#endif
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
 {
-    //NSLog( @"server socket %p didWritePartialDataOfLength %lu", sock, partialLength );
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didWritePartialDataOfLength %lu", sock, partialLength );
+#endif
 }
 
 - (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
@@ -276,12 +290,16 @@
 
 - (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
 {
-    //NSLog( @"server socket %p didCloseReadStream", sock );
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didCloseReadStream", sock );
+#endif
 }
 
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
 {
-    //NSLog( @"server socket %p didDisconnect", sock );
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didDisconnect", sock );
+#endif
     
     id keyOfDyingSocket;
     for ( id key in [_activeTcpSockets allKeys] )

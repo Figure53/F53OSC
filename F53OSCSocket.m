@@ -190,8 +190,7 @@
         [newData appendData:data];
         data = [NSData dataWithData:newData];
         
-        [_tcpSocket readDataWithTimeout:-1 tag:0];
-        [_tcpSocket writeData:data withTimeout:TIMEOUT tag:0];
+        [_tcpSocket writeData:data withTimeout:TIMEOUT tag:[data length]];
     }
     else if ( _udpSocket )
     {

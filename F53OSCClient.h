@@ -30,6 +30,8 @@
 #import "F53OSCSocket.h"
 #import "F53OSCPacket.h"
 
+#define F53_OSC_CLIENT_DEBUG 0
+
 @interface F53OSCClient : NSObject <NSCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 {
     id <F53OSCPacketDestination> _delegate;
