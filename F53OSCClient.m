@@ -157,7 +157,10 @@
 
 - (NSString *) title
 {
-    return [NSString stringWithFormat:@"%@ : %u", _host, _port ];
+    if ( _host && _port )
+        return [NSString stringWithFormat:@"%@ : %u", _host, _port ];
+    else
+        return [NSString stringWithFormat:@"<invalid>" ];
 }
 
 - (BOOL) connect
