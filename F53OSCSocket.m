@@ -24,10 +24,15 @@
 //  THE SOFTWARE.
 //
 
-#define TIMEOUT 3
-
 #import "F53OSCSocket.h"
 #import "F53OSCPacket.h"
+
+#define TIMEOUT         3
+
+#define END             0300    /* indicates end of packet */
+#define ESC             0333    /* indicates byte stuffing */
+#define ESC_END         0334    /* ESC ESC_END means END data byte */
+#define ESC_ESC         0335    /* ESC ESC_ESC means ESC data byte */
 
 
 @implementation F53OSCSocket
@@ -176,21 +181,33 @@
 
 - (void) sendPacket:(F53OSCPacket *)packet
 {
-    //NSLog( @"%@ sending packet: %@", _tcpSocket, self, packet );
+    //NSLog( @"%@ sending packet: %@", self, packet );
     
     NSData *data = [packet packetData];
 
     if ( _tcpSocket )
     {
-        // Prepend the message with the length of the data.
-        UInt64 length = [data length];
-        NSMutableData *newData = [NSMutableData dataWithCapacity:length];
-        length = OSSwapHostToBigInt64( length );
-        [newData appendBytes:&length length:sizeof( UInt64 )];
-        [newData appendData:data];
-        data = [NSData dataWithData:newData];
+        // Outgoing OSC messages are framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
         
-        [_tcpSocket writeData:data withTimeout:TIMEOUT tag:[data length]];
+        NSMutableData *slipData = [NSMutableData data];
+        Byte esc_end[2] = {ESC, ESC_END};
+        Byte esc_esc[2] = {ESC, ESC_ESC};
+        Byte end[1] = {END};
+        
+        NSUInteger length = [data length];
+        const Byte *buffer = [data bytes];
+        for ( NSUInteger index = 0; index < length; index++ )
+        {
+            if ( buffer[index] == END )
+                [slipData appendBytes:esc_end length:2];
+            else if ( buffer[index] == ESC )
+                [slipData appendBytes:esc_esc length:2];
+            else
+                [slipData appendBytes:&(buffer[index]) length:1];
+        }
+        [slipData appendBytes:end length:1];
+        
+        [_tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
     }
     else if ( _udpSocket )
     {

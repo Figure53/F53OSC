@@ -38,7 +38,8 @@
     F53OSCSocket *_tcpSocket;
     F53OSCSocket *_udpSocket;
     NSMutableDictionary *_activeTcpSockets;  // F53OSCSockets keyed by index of when the connection was accepted.
-    NSMutableDictionary *_activeData;        // NSMutableData keyed by index; buffers the incoming data so we can parse out individual messages.
+    NSMutableDictionary *_activeData;        // NSMutableData keyed by index; buffers the incoming data.
+    NSMutableDictionary *_activeState;       // NSMutableDictionary keyed by index; stores state of incoming data.
     NSInteger _activeIndex;
 }
 

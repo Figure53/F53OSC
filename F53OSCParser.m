@@ -29,6 +29,11 @@
 #import "F53OSCSocket.h"
 #import "F53OSCFoundationAdditions.h"
 
+#define END             0300    /* indicates end of packet */
+#define ESC             0333    /* indicates byte stuffing */
+#define ESC_END         0334    /* ESC ESC_END means END data byte */
+#define ESC_ESC         0335    /* ESC ESC_ESC means ESC data byte */
+
 
 @interface F53OSCParser (Private)
 
@@ -245,6 +250,72 @@
     else
     {
         NSLog( @"Error: Unrecognized OSC message of length %lu.", length );
+    }
+}
+
++ (void) translateSlipData:(NSData *)slipData
+                    toData:(NSMutableData *)data
+                 withState:(NSMutableDictionary *)state
+               destination:(id <F53OSCPacketDestination>)destination
+{
+    // Incoming OSC messages are framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
+    
+    F53OSCSocket *socket = [state objectForKey:@"socket"];
+    if ( socket == nil )
+    {
+        NSLog( @"Error: F53OSCParser can not translate SLIP data without a socket." );
+        return;
+    }
+    
+    BOOL dangling_ESC = [[state objectForKey:@"dangling_ESC"] boolValue];
+    
+    Byte end[1] = {END};
+    Byte esc[1] = {ESC};
+    
+    NSUInteger length = [slipData length];
+    const Byte *buffer = [slipData bytes];
+    for ( NSUInteger index = 0; index < length; index++ )
+    {
+        if ( dangling_ESC )
+        {
+            dangling_ESC = NO;
+            [state setObject:@NO forKey:@"dangling_ESC"];
+            if ( buffer[index] == ESC_END )
+                [data appendBytes:end length:1];
+            else if ( buffer[index] == ESC_ESC )
+                [data appendBytes:esc length:1];
+            else // Protocol violation. Pass the byte along and hope for the best.
+                [data appendBytes:&(buffer[index]) length:1];
+        }
+        else if ( buffer[index] == END )
+        {
+            // The data is now a complete message.
+            //NSLog( @"socket %p dispatching OSC data of length %lu", sock, [data length] );
+            [F53OSCParser processOscData:[NSData dataWithData:data] forDestination:destination replyToSocket:socket];
+            [data setData:[NSData data]];
+        }
+        else if ( buffer[index] == ESC )
+        {
+            if ( index + 1 < length )
+            {
+                index++;
+                if ( buffer[index] == ESC_END )
+                    [data appendBytes:end length:1];
+                else if ( buffer[index] == ESC_ESC )
+                    [data appendBytes:esc length:1];
+                else // Protocol violation. Pass the byte along and hope for the best.
+                    [data appendBytes:&(buffer[index]) length:1];
+            }
+            else
+            {
+                // The incoming raw data stopped in the middle of an escape sequence.
+                [state setObject:@YES forKey:@"dangling_ESC"];
+            }
+        }
+        else
+        {
+            [data appendBytes:&(buffer[index]) length:1];
+        }
     }
 }
 

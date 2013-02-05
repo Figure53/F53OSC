@@ -42,6 +42,7 @@
     
     F53OSCSocket *_socket;
     NSMutableData *_readData;
+    NSMutableDictionary *_readState;
 }
 
 @property (nonatomic, assign) id <F53OSCPacketDestination> delegate;

@@ -118,6 +118,7 @@
         _udpSocket = [[F53OSCSocket socketWithUdpSocket:udpSocket] retain];
         _activeTcpSockets = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
         _activeData = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
+        _activeState = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
         _activeIndex = 0;
     }
     return self;
@@ -138,6 +139,9 @@
     
     [_activeData release];
     _activeData = nil;
+    
+    [_activeState release];
+    _activeState = nil;
     
     [super dealloc];
 }
@@ -190,8 +194,10 @@
     activeSocket.host = newSocket.connectedHost;
     activeSocket.port = newSocket.connectedPort;
     
-    [_activeTcpSockets setObject:activeSocket forKey:[NSNumber numberWithInteger:_activeIndex]];
-    [_activeData setObject:[NSMutableData data] forKey:[NSNumber numberWithInteger:_activeIndex]];
+    NSNumber *key = [NSNumber numberWithInteger:_activeIndex];
+    [_activeTcpSockets setObject:activeSocket forKey:key];
+    [_activeData setObject:[NSMutableData data] forKey:key];
+    [_activeState setObject:[[@{ @"socket": activeSocket, @"dangling_ESC": @NO } mutableCopy] autorelease] forKey:key];
     
     [newSocket readDataWithTimeout:-1 tag:_activeIndex];
     
@@ -208,49 +214,11 @@
     NSLog( @"server socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
     
-    F53OSCSocket *activeSocket = [_activeTcpSockets objectForKey:[NSNumber numberWithInteger:tag]];
     NSMutableData *activeData = [_activeData objectForKey:[NSNumber numberWithInteger:tag]];
-    if ( activeSocket && activeData )
+    NSMutableDictionary *activeState = [_activeState objectForKey:[NSNumber numberWithInteger:tag]];
+    if ( activeData && activeState )
     {
-        [activeData appendData:data];
-        
-        // Incoming OSC messages are expected to be prepended by the length of the message when sent via TCP.
-        // Each time we get more data we look to see if we now have a complete message to process.
-        
-        NSUInteger length = [activeData length];
-        if ( length > sizeof( UInt64 ) )
-        {
-            const char *buffer = [activeData bytes];
-            UInt64 dataSize = *((UInt64 *)buffer);
-            dataSize = OSSwapBigToHostInt64( dataSize );
-            
-            if ( length - sizeof( UInt64 ) >= dataSize )
-            {
-                buffer += sizeof( UInt64 );
-                length -= sizeof( UInt64 );
-                NSData *oscData = [NSData dataWithBytes:buffer length:dataSize];
-                
-                buffer += dataSize;
-                length -= dataSize;
-                NSData *newData = nil;
-                if ( length )
-                    newData = [NSData dataWithBytes:buffer length:length];
-                else
-                    newData = [NSData data];
-                [activeData setData:newData];
-                
-#if F53_OSC_SERVER_DEBUG
-                NSLog( @"server socket %p dispatching oscData of length %lu, leaving buffer of length %lu.", sock, [oscData length], [activeData length] );
-#endif
-                
-                [F53OSCParser processOscData:oscData forDestination:_delegate replyToSocket:activeSocket];
-            }
-            else
-            {
-                // TODO: protect against them filling up the buffer with a huge amount of incoming data.
-            }
-        }
-        
+        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:_delegate];
         [sock readDataWithTimeout:-1 tag:tag];
     }
 }
@@ -316,6 +284,7 @@
     {
         [_activeTcpSockets removeObjectForKey:keyOfDyingSocket];
         [_activeData removeObjectForKey:keyOfDyingSocket];
+        [_activeState removeObjectForKey:keyOfDyingSocket];
     }
     else
     {

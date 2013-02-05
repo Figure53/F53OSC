@@ -40,6 +40,8 @@
 
 - (void) _destroySocket
 {
+    [_readState removeObjectForKey:@"socket"];
+    
     [_socket disconnect];
     [_socket autorelease];
     _socket = nil;
@@ -51,6 +53,8 @@
     {
         GCDAsyncSocket *tcpSocket = [[[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
         _socket = [[F53OSCSocket socketWithTcpSocket:tcpSocket] retain];
+        if ( _socket )
+            [_readState setObject:_socket forKey:@"socket"];
     }
     else
     {
@@ -78,6 +82,7 @@
         _userData = nil;
         _socket = nil;
         _readData = [[NSMutableData data] retain];
+        _readState = [[NSMutableDictionary dictionary] retain];
     }
     return self;
 }
@@ -94,6 +99,9 @@
     
     [_readData release];
     _readData = nil;
+    
+    [_readState release];
+    _readState = nil;
     
     [super dealloc];
 }
@@ -118,6 +126,7 @@
         _userData = [[coder decodeObjectForKey:@"userData"] retain];
         _socket = nil;
         _readData = [[NSMutableData data] retain];
+        _readState = [[NSMutableDictionary dictionary] retain];
     }
     return self;
 }
@@ -176,6 +185,7 @@
 {
     [_socket disconnect];
     [_readData setData:[NSData data]];
+    [_readState setObject:@NO forKey:@"dangling_ESC"];
 }
 
 - (void) sendPacket:(F53OSCPacket *)packet
@@ -220,45 +230,7 @@
     NSLog( @"client socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
     
-    [_readData appendData:data];
-        
-    // Incoming OSC messages are expected to be prepended by the length of the message when sent via TCP.
-    // Each time we get more data we look to see if we now have a complete message to process.
-        
-    NSUInteger length = [_readData length];
-    if ( length > sizeof( UInt64 ) )
-    {
-        const char *buffer = [_readData bytes];
-        UInt64 dataSize = *((UInt64 *)buffer);
-        dataSize = OSSwapBigToHostInt64( dataSize );
-        
-        if ( length - sizeof( UInt64 ) >= dataSize )
-        {
-            buffer += sizeof( UInt64 );
-            length -= sizeof( UInt64 );
-            NSData *oscData = [NSData dataWithBytes:buffer length:dataSize];
-            
-            buffer += dataSize;
-            length -= dataSize;
-            NSData *newData = nil;
-            if ( length )
-                newData = [NSData dataWithBytes:buffer length:length];
-            else
-                newData = [NSData data];
-            [_readData setData:newData];
-            
-#if F53_OSC_CLIENT_DEBUG
-            NSLog( @"client socket %p dispatching oscData of length %lu, leaving buffer of length %lu.", sock, [oscData length], [_readData length] );
-#endif
-            
-            [F53OSCParser processOscData:oscData forDestination:_delegate replyToSocket:_socket];
-        }
-        else
-        {
-            // TODO: protect against them filling up the buffer with a huge amount of incoming data.
-        }
-    }
-    
+    [F53OSCParser translateSlipData:data toData:_readData withState:_readState destination:_delegate];
     [sock readDataWithTimeout:-1 tag:tag];
 }
 
@@ -302,6 +274,7 @@
 #endif
     
     [_readData setData:[NSData data]];
+    [_readState setObject:@NO forKey:@"dangling_ESC"];
 }
 
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
@@ -311,6 +284,7 @@
 #endif
     
     [_readData setData:[NSData data]];
+    [_readState setObject:@NO forKey:@"dangling_ESC"];
 }
 
 - (void) socketDidSecure:(GCDAsyncSocket *)sock
