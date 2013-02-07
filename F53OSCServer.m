@@ -269,7 +269,7 @@
     NSLog( @"server socket %p didDisconnect", sock );
 #endif
     
-    id keyOfDyingSocket;
+    id keyOfDyingSocket = nil;
     for ( id key in [_activeTcpSockets allKeys] )
     {
         F53OSCSocket *socket = [_activeTcpSockets objectForKey:key];
