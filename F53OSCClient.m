@@ -222,6 +222,10 @@
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didConnectToHost %@:%u", sock, host, port );
 #endif
+  
+  if ( [self.delegate respondsToSelector:@selector(clientDidConnect:)] ) {
+      [self.delegate clientDidConnect:self];
+  }
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
@@ -285,6 +289,10 @@
     
     [_readData setData:[NSData data]];
     [_readState setObject:@NO forKey:@"dangling_ESC"];
+  
+    if ( [self.delegate respondsToSelector:@selector(clientDidDisconnect:)] ) {
+        [self.delegate clientDidDisconnect:self];
+    }
 }
 
 - (void) socketDidSecure:(GCDAsyncSocket *)sock
