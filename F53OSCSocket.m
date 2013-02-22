@@ -184,6 +184,8 @@
     //NSLog( @"%@ sending packet: %@", self, packet );
     
     NSData *data = [packet packetData];
+    
+    //NSLog( @"%@ sending message with native length: %li", self, [data length] );
 
     if ( _tcpSocket )
     {
