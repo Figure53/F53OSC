@@ -50,6 +50,7 @@
 @property (nonatomic, assign) UInt16 port;
 @property (nonatomic, assign) BOOL useTcp;
 @property (nonatomic, retain) id userData;
+@property (nonatomic, assign) NSDictionary *state;
 @property (readonly) NSString *title;
 
 - (BOOL) connect;

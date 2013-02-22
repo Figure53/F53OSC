@@ -164,6 +164,24 @@
 
 @synthesize userData = _userData;
 
+- (NSDictionary *) state
+{
+    return @{
+    @"host": _host ? _host : @"",
+    @"port": @( _port ),
+    @"useTcp": @( _useTcp ),
+    @"userData": ( _userData ? _userData : [NSNull null] )
+    };
+}
+
+- (void) setState:(NSDictionary *)state
+{
+    self.host = state[@"host"];
+    self.port = [state[@"port"] unsignedIntValue];
+    self.useTcp = [state[@"useTcp"] boolValue];
+    self.userData = state[@"userData"];
+}
+
 - (NSString *) title
 {
     if ( _host && _port )
