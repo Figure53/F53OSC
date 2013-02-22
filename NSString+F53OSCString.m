@@ -34,13 +34,13 @@
     //  A note on the 4s: For OSC, everything is null-terminated and in multiples of 4 bytes. 
     //  If the data is already a multiple of 4 bytes, it needs to have four null bytes appended.
     
-    NSUInteger length = [self lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
-    const char *bytes = [self cStringUsingEncoding:NSASCIIStringEncoding];
+    NSUInteger length = [self lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+    const char *bytes = [self cStringUsingEncoding:NSUTF8StringEncoding];
     length = 4 * ( ceil( (length + 1) / 4.0 ) );
 
     char *string = malloc( length * sizeof( char ) );
     int i;
-    for ( i = 0; i < [self lengthOfBytesUsingEncoding:NSASCIIStringEncoding]; i++ )
+    for ( i = 0; i < [self lengthOfBytesUsingEncoding:NSUTF8StringEncoding]; i++ )
         string[i] = bytes[i];
     for ( ; i < length; i++ )
         string[i] = 0;
