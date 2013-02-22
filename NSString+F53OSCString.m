@@ -35,12 +35,13 @@
     //  If the data is already a multiple of 4 bytes, it needs to have four null bytes appended.
     
     NSUInteger length = [self lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+    NSUInteger stringLength = length;
     const char *bytes = [self cStringUsingEncoding:NSUTF8StringEncoding];
     length = 4 * ( ceil( (length + 1) / 4.0 ) );
 
     char *string = malloc( length * sizeof( char ) );
     int i;
-    for ( i = 0; i < [self lengthOfBytesUsingEncoding:NSUTF8StringEncoding]; i++ )
+    for ( i = 0; i < stringLength; i++ )
         string[i] = bytes[i];
     for ( ; i < length; i++ )
         string[i] = 0;
