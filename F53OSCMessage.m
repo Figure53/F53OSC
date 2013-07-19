@@ -87,6 +87,14 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
 
 + (F53OSCMessage *) messageWithString:(NSString *)string
 {
+    if ( string == nil )
+        return nil;
+    
+    string = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    if ( [string isEqualToString:@""] )
+        return nil;
+    
     // Pull out address.
     NSString *address = [[string componentsSeparatedByString:@" "] objectAtIndex:0];
     if ( ![self legalAddress:address] )
