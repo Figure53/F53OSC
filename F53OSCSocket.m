@@ -189,13 +189,14 @@
 
     if ( _tcpSocket )
     {
-        // Outgoing OSC messages are framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
+        // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
         
         NSMutableData *slipData = [NSMutableData data];
         Byte esc_end[2] = {ESC, ESC_END};
         Byte esc_esc[2] = {ESC, ESC_ESC};
         Byte end[1] = {END};
         
+        [slipData appendBytes:end length:1];
         NSUInteger length = [data length];
         const Byte *buffer = [data bytes];
         for ( NSUInteger index = 0; index < length; index++ )
