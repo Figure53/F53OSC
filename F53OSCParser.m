@@ -74,9 +74,18 @@
         buffer += dataLength;
         lengthOfRemainingBuffer -= dataLength;
         
+        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+        {
+            NSLog( @"Incoming OSC message:" );
+            NSLog( @"  %@", addressPattern );
+        }
+        
         NSInteger numArgs = [typeTag length] - 1;
         if ( numArgs > 0 )
         {
+            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                NSLog( @"  arguments:" );
+            
             for ( int i = 1; i < numArgs + 1; i++ )
             {
                 NSString *stringArg = nil;
@@ -93,6 +102,9 @@
                             [args addObject:stringArg];
                             buffer += dataLength;
                             lengthOfRemainingBuffer -= dataLength;
+                            
+                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                                NSLog( @"    string: \"%@\"", stringArg );
                         }
                         else
                         {
@@ -107,6 +119,9 @@
                             [args addObject:dataArg];
                             buffer += dataLength + 4;
                             lengthOfRemainingBuffer -= (dataLength + 4);
+                            
+                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                                NSLog( @"    blob: %@", dataArg );
                         }
                         else
                         {
@@ -121,6 +136,9 @@
                             [args addObject:numberArg];
                             buffer += 4;
                             lengthOfRemainingBuffer -= 4;
+                            
+                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                                NSLog( @"    int: %@", numberArg );
                         }
                         else
                         {
@@ -135,6 +153,9 @@
                             [args addObject:numberArg];
                             buffer += 4;
                             lengthOfRemainingBuffer -= 4;
+                            
+                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                                NSLog( @"    float: %@", numberArg );
                         }
                         else
                         {
