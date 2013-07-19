@@ -131,12 +131,20 @@
     return self;
 }
 
+- (NSString *) description
+{
+    return [NSString stringWithFormat:@"[F53OSCClient %@:%u]", _host, _port ];
+}
+
 @synthesize delegate = _delegate;
 
 @synthesize host = _host;
 
 - (void) setHost:(NSString *)host
 {
+    if ( [host isEqualToString:@""] )
+        host = nil;
+    
     [_host autorelease];
     _host = [host copy];
     _socket.host = _host;
@@ -163,6 +171,15 @@
 }
 
 @synthesize userData = _userData;
+
+- (void) setUserData:(id)userData
+{
+    if ( userData == [NSNull null] )
+        userData = nil;
+    
+    [_userData autorelease];
+    _userData = [userData retain];
+}
 
 - (NSDictionary *) state
 {
