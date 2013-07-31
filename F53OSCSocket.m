@@ -215,6 +215,7 @@
     else if ( _udpSocket )
     {
         [_udpSocket sendData:data toHost:_host port:_port withTimeout:TIMEOUT tag:0];
+        [_udpSocket closeAfterSending];
     }
 }
 
