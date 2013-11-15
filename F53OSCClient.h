@@ -54,6 +54,7 @@
 @property (nonatomic, retain) id userData;
 @property (nonatomic, assign) NSDictionary *state;
 @property (readonly) NSString *title;
+@property (readonly) BOOL isConnected;
 
 - (BOOL) connect;
 - (void) disconnect;
@@ -66,7 +67,7 @@
 
 @optional
 
-- (void)clientDidConnect:(F53OSCClient *)client;
-- (void)clientDidDisconnect:(F53OSCClient *)client;
+- (void) clientDidConnect:(F53OSCClient *)client;
+- (void) clientDidDisconnect:(F53OSCClient *)client;
 
 @end

@@ -207,6 +207,11 @@
         return [NSString stringWithFormat:@"<invalid>" ];
 }
 
+- (BOOL) isConnected
+{
+    return [_socket isConnected];
+}
+
 - (BOOL) connect
 {
     if ( !_socket )
@@ -258,7 +263,8 @@
     NSLog( @"client socket %p didConnectToHost %@:%u", sock, host, port );
 #endif
   
-  if ( [self.delegate respondsToSelector:@selector(clientDidConnect:)] ) {
+  if ( [self.delegate respondsToSelector:@selector( clientDidConnect: )] )
+  {
       [self.delegate clientDidConnect:self];
   }
 }
@@ -325,7 +331,8 @@
     [_readData setData:[NSData data]];
     [_readState setObject:@NO forKey:@"dangling_ESC"];
   
-    if ( [self.delegate respondsToSelector:@selector(clientDidDisconnect:)] ) {
+    if ( [self.delegate respondsToSelector:@selector( clientDidDisconnect: )] )
+    {
         [self.delegate clientDidDisconnect:self];
     }
 }
