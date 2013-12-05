@@ -189,6 +189,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
         self.addressPattern = @"/";
         self.typeTagString = @",";
         self.arguments = [NSArray array];
+        self.userData = nil;
     }
     return self;
 }
@@ -198,6 +199,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     self.addressPattern = nil;
     self.typeTagString = nil;
     self.arguments = nil;
+    self.userData = nil;
     
     [super dealloc];
 }
@@ -227,6 +229,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     copy->_addressPattern = [_addressPattern copyWithZone:zone];
     copy->_typeTagString = [_typeTagString copyWithZone:zone];
     copy->_arguments = [_arguments copyWithZone:zone];
+    copy->_userData = [_userData copyWithZone:zone];
     return copy;
 }
 
@@ -322,6 +325,8 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     [_arguments autorelease];
     _arguments = [newArgs copy];
 }
+
+@synthesize userData = _userData;
 
 - (NSArray *) addressParts
 {

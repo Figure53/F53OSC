@@ -44,6 +44,7 @@
     NSString *_addressPattern;
     NSString *_typeTagString;
     NSArray *_arguments;
+    id _userData;
 }
 
 + (BOOL) legalAddressComponent:(NSString *)addressComponent;
@@ -59,6 +60,7 @@
 @property (nonatomic, copy) NSString *addressPattern;
 @property (nonatomic, retain) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.
 @property (nonatomic, retain) NSArray *arguments;        ///< May contain NSString, NSData, or NSNumber objects. This could be extended in the future, but those three cover the four mandatory OSC types.
+@property (nonatomic, retain) id userData;               
 
 - (NSArray *) addressParts;
 
