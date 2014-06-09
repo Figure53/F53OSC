@@ -50,6 +50,7 @@
 
 + (NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;
 {
+    
     if ( buf == NULL || maxLength == 0 )
         return nil;
     
@@ -60,9 +61,10 @@
     }
     return nil; // Buffer wasn't null terminated, so it's not a valid OSC blob.
     
-    UInt32 dataSize = 0;
     
-valid:
+valid:; // semicolon prevents complaining about dataSize variable declaration on next line
+    
+    UInt32 dataSize = 0;
     
     dataSize = *((UInt32 *)buf);
     dataSize = OSSwapBigToHostInt32( dataSize );
