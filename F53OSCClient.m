@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2014 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -201,10 +201,18 @@
 
 - (NSString *) title
 {
-    if ( _host && _port )
+    if ( self.isValid )
         return [NSString stringWithFormat:@"%@ : %u", _host, _port ];
     else
         return [NSString stringWithFormat:@"<invalid>" ];
+}
+
+- (BOOL) isValid
+{
+    if ( _host && _port )
+        return YES;
+    else
+        return NO;
 }
 
 - (BOOL) isConnected

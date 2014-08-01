@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2014 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,7 @@
 @property (nonatomic, retain) id userData;
 @property (nonatomic, assign) NSDictionary *state;
 @property (readonly) NSString *title;
+@property (readonly) BOOL isValid;
 @property (readonly) BOOL isConnected;
 
 - (BOOL) connect;
