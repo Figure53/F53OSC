@@ -14,6 +14,8 @@
 #import <CFNetwork/CFNetwork.h>
 #endif
 
+#import <AvailabilityMacros.h>
+
 #import <arpa/inet.h>
 #import <fcntl.h>
 #import <ifaddrs.h>
