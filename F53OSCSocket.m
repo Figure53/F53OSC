@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -69,6 +69,13 @@
         _udpSocket = [socket retain];
         _host = @"localhost";
         _port = 0;
+        
+        NSError *error = nil;
+        if ( ![_udpSocket enableBroadcast:YES error:&error] )
+        {
+            NSString *errString = error ? [error localizedDescription] : @"(unknown error)";
+            NSLog( @"Warning: F53OSCSocket unable to enable UDP broadcast - %@", errString );
+        }
     }
     return self;
 }
