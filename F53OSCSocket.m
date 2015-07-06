@@ -69,13 +69,6 @@
         _udpSocket = [socket retain];
         _host = @"localhost";
         _port = 0;
-        
-        NSError *error = nil;
-        if ( ![_udpSocket enableBroadcast:YES error:&error] )
-        {
-            NSString *errString = error ? [error localizedDescription] : @"(unknown error)";
-            NSLog( @"Warning: F53OSCSocket unable to enable UDP broadcast - %@", errString );
-        }
     }
     return self;
 }
@@ -100,9 +93,9 @@
 - (NSString *) description
 {
     if ( self.isTcpSocket )
-        return [NSString stringWithFormat:@"[TCP socket %@:%u isConnected = %i]", _host, _port, self.isConnected ];
+        return [NSString stringWithFormat:@"<F53OSCSocket TCP %@:%u isConnected = %i>", _host, _port, self.isConnected ];
     else
-        return [NSString stringWithFormat:@"[UDP socket %@:%u]", _host, _port ];
+        return [NSString stringWithFormat:@"<F53OSCSocket UDP %@:%u>", _host, _port ];
 }
 
 - (GCDAsyncSocket *) tcpSocket
@@ -188,7 +181,9 @@
 
 - (void) sendPacket:(F53OSCPacket *)packet
 {
-    //NSLog( @"%@ sending packet: %@", self, packet );
+#if F53_OSC_SOCKET_DEBUG
+    NSLog( @"%@ sending packet: %@", self, packet );
+#endif
     
     NSData *data = [packet packetData];
     
@@ -221,6 +216,13 @@
     }
     else if ( _udpSocket )
     {
+        NSError *error = nil;
+        if ( ![_udpSocket enableBroadcast:YES error:&error] )
+        {
+            NSString *errString = error ? [error localizedDescription] : @"(unknown error)";
+            NSLog( @"Warning: %@ unable to enable UDP broadcast - %@", self, errString );
+        }
+        
         [_udpSocket sendData:data toHost:_host port:_port withTimeout:TIMEOUT tag:0];
         [_udpSocket closeAfterSending];
     }

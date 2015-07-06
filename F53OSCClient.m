@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2014 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -133,7 +133,7 @@
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"[F53OSCClient %@:%u]", _host, _port ];
+    return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", _host, _port ];
 }
 
 @synthesize delegate = _delegate;
@@ -240,6 +240,10 @@
 {
     if ( !_socket )
         [self connect];
+    
+#if F53_OSC_CLIENT_DEBUG
+    NSLog( @"%@ sending packet: %@", self, packet );
+#endif
     
     if ( _socket )
     {
@@ -361,10 +365,16 @@
 
 - (void) udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
 {
+#if F53_OSC_CLIENT_DEBUG
+    NSLog( @"client socket %p didSendDataWithTag: %ld", sock, tag );
+#endif
 }
 
 - (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error
 {
+#if F53_OSC_CLIENT_DEBUG
+    NSLog( @"client socket %p didSendDataWithTag: %ld dueToError: %@", sock, tag, [error localizedDescription] );
+#endif
 }
 
 - (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)filterContext
