@@ -4479,12 +4479,7 @@ enum GCDAsyncUdpSocketConfig
 	}
 	else
 	{
-		if (flags & kReceiveContinuous)
-		{
-			// Continuous receive mode
-			[self doReceive];
-		}
-		else
+		if (flags & kReceiveOnce)
 		{
 			// One-at-a-time receive mode
 			if (notifiedDelegate)
@@ -4502,6 +4497,16 @@ enum GCDAsyncUdpSocketConfig
 				// Waiting on asynchronous receive filter...
 			}
 		}
+        else
+        {
+            // This used to be a recursive call, but we overran the stack, so use a timer
+            // instead so that in the case of high traffic, at least we don't crash.
+            [NSTimer scheduledTimerWithTimeInterval:0
+                                             target:self
+                                           selector:@selector(doReceive)
+                                           userInfo:nil
+                                            repeats:NO];
+        }
 	}
 }
 
