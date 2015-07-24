@@ -185,6 +185,9 @@
     NSLog( @"%@ sending packet: %@", self, packet );
 #endif
     
+    if ( packet == nil )
+        return;
+    
     NSData *data = [packet packetData];
     
     //NSLog( @"%@ sending message with native length: %li", self, [data length] );
