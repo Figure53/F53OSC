@@ -34,6 +34,59 @@
 #define ESC_END         0334    /* ESC ESC_END means END data byte */
 #define ESC_ESC         0335    /* ESC ESC_ESC means ESC data byte */
 
+@implementation F53OSCStats
+
+- (id) init
+{
+    self = [super init];
+    _totalBytes = 0;
+    self.messages = 0;
+    self.bytesPerSecond = 0;
+
+    self.history = [NSMutableArray array];
+
+    _currentBytes = 0;
+    _timer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                              target:self
+                                            selector:@selector(countBytes)
+                                            userInfo:nil
+                                             repeats:YES];
+
+    return self;
+}
+
+- (void) countBytes
+{
+    self.bytesPerSecond = _currentBytes;
+    if ([self.history count] == 60)
+        [self.history removeObjectAtIndex:0];
+    [self.history addObject:[NSNumber numberWithDouble:self.bytesPerSecond]];
+
+#if F53_OSC_SOCKET_DEBUG
+    NSLog( @"[F53OSCStats] UDP Bytes: %f per second, %f total", _currentBytes, _totalBytes );
+#endif
+
+    _currentBytes = 0;
+}
+
+- (double) bytes
+{
+    return _totalBytes;
+}
+
+- (void) addBytes:(double)bytes
+{
+    _totalBytes += bytes;
+    _currentBytes += bytes;
+}
+
+- (void) stop
+{
+    [_timer invalidate];
+}
+
+@end
+
 
 @implementation F53OSCSocket
 
@@ -83,7 +136,10 @@
     [_udpSocket setDelegate:nil];
     [_udpSocket release];
     _udpSocket = nil;
-    
+
+    [_stats release];
+    _stats = nil;
+
     [_host release];
     _host = nil;
 
@@ -108,6 +164,11 @@
     return _udpSocket;
 }
 
+- (F53OSCStats *) stats
+{
+    return _stats;
+}
+
 - (BOOL) isTcpSocket
 {
     return ( _tcpSocket != nil );
@@ -130,7 +191,10 @@
     if ( _udpSocket )
     {
         if ( [_udpSocket bindToPort:_port error:nil] )
+        {
+            _stats = [[[F53OSCStats alloc] init] autorelease];
             return [_udpSocket beginReceiving:nil];
+        }
         else
             return NO;
     }

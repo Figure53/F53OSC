@@ -320,7 +320,9 @@
     F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
     replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
     replySocket.port = _udpReplyPort;
-    
+
+    [_udpSocket.stats addBytes:[data length]];
+
     [F53OSCParser processOscData:data forDestination:_delegate replyToSocket:replySocket];
 }
 
