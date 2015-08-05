@@ -33,6 +33,27 @@
 
 @class F53OSCPacket;
 
+// tracking socket behavior over time
+@interface F53OSCStats : NSObject
+{
+    NSTimer *_timer;
+    double _currentBytes;
+    double _totalBytes;
+}
+
+// @property double bytes;
+@property double messages;
+@property double bytesPerSecond;
+
+@property (strong) NSMutableArray *history;
+
+- (double) bytes;
+- (void) addBytes:(double)bytes;
+
+- (void) stop;
+
+@end
+
 ///
 ///  An F53OSCSocket object represents either a TCP socket or UDP socket, but never both at the same time.
 ///
@@ -43,6 +64,8 @@
     GCDAsyncUdpSocket *_udpSocket;
     NSString *_host;
     UInt16 _port;
+
+    F53OSCStats *_stats;
 }
 
 + (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;
@@ -57,6 +80,8 @@
 @property (readonly) BOOL isUdpSocket;
 @property (nonatomic, copy) NSString *host;
 @property (nonatomic, assign) UInt16 port;
+
+@property (readonly) F53OSCStats *stats;
 
 - (BOOL) startListening;
 - (void) stopListening;

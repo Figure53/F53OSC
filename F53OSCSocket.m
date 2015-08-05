@@ -79,14 +79,14 @@
     [_tcpSocket disconnect];
     [_tcpSocket release];
     _tcpSocket = nil;
-    
+
     [_udpSocket setDelegate:nil];
     [_udpSocket release];
     _udpSocket = nil;
     
     [_host release];
     _host = nil;
-    
+
     [super dealloc];
 }
 
@@ -126,7 +126,7 @@
 {
     if ( _tcpSocket )
         return [_tcpSocket acceptOnPort:_port error:nil];
-    
+
     if ( _udpSocket )
     {
         if ( [_udpSocket bindToPort:_port error:nil] )
@@ -134,7 +134,7 @@
         else
             return NO;
     }
-    
+
     return NO;
 }
 
@@ -142,9 +142,12 @@
 {
     if ( _tcpSocket )
         [_tcpSocket disconnectAfterWriting];
-    
+
     if ( _udpSocket )
+    {
         [_udpSocket close];
+        [_stats stop];
+     }
 }
 
 - (BOOL) connect
@@ -156,10 +159,10 @@
         else
             return NO;
     }
-    
+
     if ( _udpSocket )
         return YES;
-    
+
     return NO;
 }
 
@@ -172,10 +175,10 @@
 {
     if ( _tcpSocket )
         return [_tcpSocket isConnected];
-    
+
     if ( _udpSocket )
         return YES;
-    
+
     return NO;
 }
 
@@ -184,23 +187,23 @@
 #if F53_OSC_SOCKET_DEBUG
     NSLog( @"%@ sending packet: %@", self, packet );
 #endif
-    
+
     if ( packet == nil )
         return;
-    
+
     NSData *data = [packet packetData];
-    
+
     //NSLog( @"%@ sending message with native length: %li", self, [data length] );
 
     if ( _tcpSocket )
     {
         // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
-        
+
         NSMutableData *slipData = [NSMutableData data];
         Byte esc_end[2] = {ESC, ESC_END};
         Byte esc_esc[2] = {ESC, ESC_ESC};
         Byte end[1] = {END};
-        
+
         [slipData appendBytes:end length:1];
         NSUInteger length = [data length];
         const Byte *buffer = [data bytes];
@@ -214,7 +217,7 @@
                 [slipData appendBytes:&(buffer[index]) length:1];
         }
         [slipData appendBytes:end length:1];
-        
+
         [_tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
     }
     else if ( _udpSocket )
@@ -225,7 +228,7 @@
             NSString *errString = error ? [error localizedDescription] : @"(unknown error)";
             NSLog( @"Warning: %@ unable to enable UDP broadcast - %@", self, errString );
         }
-        
+
         [_udpSocket sendData:data toHost:_host port:_port withTimeout:TIMEOUT tag:0];
         [_udpSocket closeAfterSending];
     }

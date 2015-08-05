@@ -66,25 +66,25 @@
     return @"\"$%&'()+-.0123456789:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\^_`abcdefghijklmnopqrstuvwxyz|~!";
 }
 
-+ (NSPredicate *) predicateForAttribute:(NSString *)attributeName 
++ (NSPredicate *) predicateForAttribute:(NSString *)attributeName
                      matchingOSCPattern:(NSString *)pattern
 {
     //NSLog( @"pattern   : %@", pattern );
-    
+
     // Basic validity checks.
     if ( [[pattern componentsSeparatedByString:@"["] count] != [[pattern componentsSeparatedByString:@"]"] count] )
         return nil;
     if ( [[pattern componentsSeparatedByString:@"{"] count] != [[pattern componentsSeparatedByString:@"}"] count] )
         return nil;
-    
+
     NSString *validOscChars = [F53OSCServer _stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
     NSString *wildCard = [NSString stringWithFormat:@"[%@]*", validOscChars];
     NSString *oneChar = [NSString stringWithFormat:@"[%@]{1}?", validOscChars];
-    
+
     // Escape characters that are special in regex (ICU v3) but not special in OSC.
     pattern = [F53OSCServer _stringWithSpecialRegexCharactersEscaped:pattern];
     //NSLog( @"cleaned   : %@", pattern );
-    
+
     // Replace characters that are special in OSC with their equivalents in regex (ICU v3).
     pattern = [pattern stringByReplacingOccurrencesOfString:@"*" withString:wildCard];
     pattern = [pattern stringByReplacingOccurrencesOfString:@"?" withString:oneChar];
@@ -93,13 +93,13 @@
     pattern = [pattern stringByReplacingOccurrencesOfString:@"}" withString:@")"];
     pattern = [pattern stringByReplacingOccurrencesOfString:@"," withString:@"|"];
     //NSLog( @"translated: %@", pattern );
-    
+
     // MATCHES:
-    // The left hand expression equals the right hand expression 
+    // The left hand expression equals the right hand expression
     // using a regex-style comparison according to ICU v3. See:
     // http://icu.sourceforge.net/userguide/regexp.html
     // http://userguide.icu-project.org/strings/regexp#TOC-Regular-Expression-Metacharacters
-    
+
     return [NSPredicate predicateWithFormat:@"%K MATCHES %@", attributeName, pattern];
 }
 
@@ -110,7 +110,7 @@
     {
         GCDAsyncSocket *tcpSocket = [[[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
         GCDAsyncUdpSocket *udpSocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
-        
+
         _delegate = nil;
         _port = 0;
         _udpReplyPort = 0;
@@ -127,22 +127,22 @@
 - (void) dealloc
 {
     [self stopListening];
-    
+
     [_tcpSocket release];
     _tcpSocket = nil;
-    
+
     [_udpSocket release];
     _udpSocket = nil;
-    
+
     [_activeTcpSockets release];
     _activeTcpSockets = nil;
-    
+
     [_activeData release];
     _activeData = nil;
-    
+
     [_activeState release];
     _activeState = nil;
-    
+
     [super dealloc];
 }
 
@@ -153,7 +153,7 @@
 - (void) setPort:(UInt16)port
 {
     _port = port;
-    
+
     [_tcpSocket stopListening];
     [_udpSocket stopListening];
     _tcpSocket.port = _port;
@@ -189,18 +189,18 @@
 #if F53_OSC_SERVER_DEBUG
     NSLog( @"server socket %p didAcceptNewSocket %p", sock, newSocket );
 #endif
-    
+
     F53OSCSocket *activeSocket = [F53OSCSocket socketWithTcpSocket:newSocket];
     activeSocket.host = newSocket.connectedHost;
     activeSocket.port = newSocket.connectedPort;
-    
+
     NSNumber *key = [NSNumber numberWithInteger:_activeIndex];
     [_activeTcpSockets setObject:activeSocket forKey:key];
     [_activeData setObject:[NSMutableData data] forKey:key];
     [_activeState setObject:[[@{ @"socket": activeSocket, @"dangling_ESC": @NO } mutableCopy] autorelease] forKey:key];
-    
+
     [newSocket readDataWithTimeout:-1 tag:_activeIndex];
-    
+
     _activeIndex++;
 }
 
@@ -213,7 +213,7 @@
 #if F53_OSC_SERVER_DEBUG
     NSLog( @"server socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
-    
+
     NSMutableData *activeData = [_activeData objectForKey:[NSNumber numberWithInteger:tag]];
     NSMutableDictionary *activeState = [_activeState objectForKey:[NSNumber numberWithInteger:tag]];
     if ( activeData && activeState )
@@ -268,7 +268,7 @@
 #if F53_OSC_SERVER_DEBUG
     NSLog( @"server socket %p didDisconnect", sock );
 #endif
-    
+
     id keyOfDyingSocket = nil;
     for ( id key in [_activeTcpSockets allKeys] )
     {
@@ -279,7 +279,7 @@
             break;
         }
     }
-    
+
     if ( keyOfDyingSocket )
     {
         [_activeTcpSockets removeObjectForKey:keyOfDyingSocket];
