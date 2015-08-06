@@ -77,8 +77,6 @@
     NSLog( @"[F53OSCStats] UDP Bytes: %f per second, %f total", _currentBytes, _totalBytes );
 #endif
     
-    NSLog( @"[F53OSCStats] UDP Bytes: %f per second, %f total", _currentBytes, _totalBytes );
-    
     _bytesPerSecond = _currentBytes;
     _currentBytes = 0;
 }
