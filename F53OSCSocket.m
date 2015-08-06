@@ -122,6 +122,7 @@
         _udpSocket = [socket retain];
         _host = @"localhost";
         _port = 0;
+        _stats = nil;
     }
     return self;
 }
@@ -192,7 +193,8 @@
     {
         if ( [_udpSocket bindToPort:_port error:nil] )
         {
-            _stats = [[F53OSCStats alloc] init];
+            if ( !_stats )
+                _stats = [[F53OSCStats alloc] init];
             return [_udpSocket beginReceiving:nil];
         }
         else
