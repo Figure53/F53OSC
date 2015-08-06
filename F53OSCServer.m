@@ -177,6 +177,16 @@
     [_udpSocket stopListening];
 }
 
+- (F53OSCSocket *)udpSocket
+{
+    return _udpSocket;
+}
+
+- (F53OSCSocket *)tcpSocket
+{
+    return _tcpSocket;
+}
+
 #pragma mark - GCDAsyncSocketDelegate
 
 - (dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock

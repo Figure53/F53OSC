@@ -54,4 +54,7 @@
 - (BOOL) startListening;
 - (void) stopListening;
 
+- (F53OSCSocket *)udpSocket;
+- (F53OSCSocket *)tcpSocket;
+
 @end
