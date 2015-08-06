@@ -45,7 +45,7 @@
     for ( int i = ([self length] - 1) % 4; i < 3; i++ )
         [newData appendBytes:&zero length:1];
     
-    return [[newData copy] autorelease];
+    return [newData copy];
 }
 
 + (NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;

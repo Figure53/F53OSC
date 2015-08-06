@@ -40,9 +40,8 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     if ( !_LEGAL_ADDRESS_CHARACTERS )
     {
         NSString *legalAddressChars = [NSString stringWithFormat:@"%@/*?[]{,}", [F53OSCServer validCharsForOSCMethod]];
-        _LEGAL_ADDRESS_CHARACTERS = [[NSCharacterSet characterSetWithCharactersInString:legalAddressChars] retain];
-        
-        _LEGAL_METHOD_CHARACTERS = [[NSCharacterSet characterSetWithCharactersInString:[F53OSCServer validCharsForOSCMethod]] retain];
+        _LEGAL_ADDRESS_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:legalAddressChars];
+        _LEGAL_METHOD_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:[F53OSCServer validCharsForOSCMethod]];
     }
 }
 
@@ -151,7 +150,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
         }
         else
         {
-            NSNumberFormatter *formatter = [[[NSNumberFormatter alloc] init] autorelease];
+            NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
             [formatter setLocale:[NSLocale currentLocale]];
             [formatter setAllowsFloats:YES];
             
@@ -178,7 +177,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
                                     arguments:(NSArray *)arguments
                                   replySocket:(F53OSCSocket *)replySocket
 {
-    F53OSCMessage *msg = [[F53OSCMessage new] autorelease];
+    F53OSCMessage *msg = [F53OSCMessage new];
     msg.addressPattern = addressPattern;
     msg.arguments = arguments;
     msg.replySocket = replySocket;
@@ -204,8 +203,6 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     self.typeTagString = nil;
     self.arguments = nil;
     self.userData = nil;
-    
-    [super dealloc];
 }
 
 - (void) encodeWithCoder:(NSCoder *)coder
@@ -272,7 +269,6 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
         return;
     }
     
-    [_addressPattern autorelease];
     _addressPattern = [addressPattern copy];
 }
 
@@ -325,8 +321,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
             [newArgs addObject:obj];
         }
     }
-    self.typeTagString = [[newTypes copy] autorelease];
-    [_arguments autorelease];
+    self.typeTagString = [newTypes copy];
     _arguments = [newArgs copy];
 }
 
@@ -389,7 +384,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
         }
     }
     
-    return [result autorelease];
+    return result;
 }
 
 @end

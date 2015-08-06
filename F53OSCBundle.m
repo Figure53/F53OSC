@@ -36,7 +36,7 @@
     F53OSCBundle *bundle = [F53OSCBundle new];
     bundle.timeTag = timeTag;
     bundle.elements = elements;
-    return [bundle autorelease];
+    return bundle;
 }
 
 - (id) init
@@ -54,8 +54,6 @@
 {
     self.timeTag = nil;
     self.elements = nil;
-    
-    [super dealloc];
 }
 
 - (NSString *) description
@@ -84,7 +82,7 @@
         [result appendData:[element oscBlobData]];
     }
     
-    return [result autorelease];
+    return result;
 }
 
 @end

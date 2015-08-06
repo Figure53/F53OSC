@@ -32,7 +32,6 @@
 
 @interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 {
-    id <F53OSCPacketDestination> _delegate;
     UInt16 _port;
     UInt16 _udpReplyPort;
     F53OSCSocket *_tcpSocket;

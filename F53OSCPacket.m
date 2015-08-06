@@ -31,16 +31,13 @@
 
 - (void) dealloc
 {
-    [_replySocket release];
     _replySocket = nil;
-    
-    [super dealloc];
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
     F53OSCPacket *copy = [[self class] allocWithZone:zone];
-    copy->_replySocket = [_replySocket retain];
+    copy->_replySocket = _replySocket;
     return copy;
 }
 

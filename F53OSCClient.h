@@ -36,7 +36,6 @@
 
 @interface F53OSCClient : NSObject <NSCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 {
-    id <F53OSCPacketDestination, F53OSCClientDelegate> _delegate;
     NSString *_host;
     UInt16 _port;
     BOOL _useTcp;

@@ -60,16 +60,20 @@
     if ( buf == NULL || maxLength == 0 )
         return nil;
     
+    bool isValid = false;
     for ( NSUInteger index = 0; index < maxLength; index++ )
     {
         if ( buf[index] == 0 )
-            goto valid; // Found a null character within the buffer.
+        {
+            isValid = true;
+            break;
+        }
     }
-    return nil; // Buffer wasn't null terminated, so it's not a valid OSC string.
+    
+    if ( !isValid )
+        return nil; // Buffer wasn't null terminated, so it's not a valid OSC string.
     
     NSString *result = nil;
-    
-valid:
     
     result = [NSString stringWithUTF8String:buf];
     *outLength = 4 * ceil( ([result length] + 1) / 4.0 );

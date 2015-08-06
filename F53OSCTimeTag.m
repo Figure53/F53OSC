@@ -40,7 +40,7 @@
     double secondsSince1900 = [date timeIntervalSince1970] + 2208988800;
     result.seconds = ((UInt64)secondsSince1900) & 0xffffffff;
     result.fraction = (UInt32)( fmod( secondsSince1900, 1.0 ) * fractionsPerSecond );
-    return [result autorelease];
+    return result;
 }
 
 + (F53OSCTimeTag *) immediateTimeTag
@@ -48,7 +48,7 @@
     F53OSCTimeTag *result = [F53OSCTimeTag new];
     result.seconds = 0;
     result.fraction = 1;
-    return [result autorelease];
+    return result;
 }
 
 - (NSData *) oscTimeTagData
@@ -58,7 +58,7 @@
     NSMutableData *data = [NSMutableData data];
     [data appendBytes:&seconds length:sizeof( UInt32 )];
     [data appendBytes:&fraction length:sizeof( UInt32 )];
-    return [[data copy] autorelease];
+    return [data copy];
 }
 
 + (F53OSCTimeTag *) timeTagWithOSCTimeBytes:(char *)buf
@@ -69,7 +69,7 @@
     UInt32 seconds = *((UInt32 *)buf);
     buf += sizeof( UInt32 );
     UInt32 fraction = *((UInt32 *)buf);
-    F53OSCTimeTag *result = [[[F53OSCTimeTag alloc] init] autorelease];
+    F53OSCTimeTag *result = [[F53OSCTimeTag alloc] init];
     result.seconds = OSSwapBigToHostInt32( seconds );
     result.fraction = OSSwapBigToHostInt32( fraction );
     return result;

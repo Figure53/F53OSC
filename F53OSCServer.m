@@ -108,17 +108,17 @@
     self = [super init];
     if ( self )
     {
-        GCDAsyncSocket *tcpSocket = [[[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
-        GCDAsyncUdpSocket *udpSocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+        GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
 
-        _delegate = nil;
+        self.delegate = nil;
         _port = 0;
         _udpReplyPort = 0;
-        _tcpSocket = [[F53OSCSocket socketWithTcpSocket:tcpSocket] retain];
-        _udpSocket = [[F53OSCSocket socketWithUdpSocket:udpSocket] retain];
-        _activeTcpSockets = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
-        _activeData = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
-        _activeState = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
+        _tcpSocket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+        _udpSocket = [F53OSCSocket socketWithUdpSocket:udpSocket];
+        _activeTcpSockets = [NSMutableDictionary dictionaryWithCapacity:1];
+        _activeData = [NSMutableDictionary dictionaryWithCapacity:1];
+        _activeState = [NSMutableDictionary dictionaryWithCapacity:1];
         _activeIndex = 0;
     }
     return self;
@@ -128,25 +128,12 @@
 {
     [self stopListening];
 
-    [_tcpSocket release];
     _tcpSocket = nil;
-
-    [_udpSocket release];
     _udpSocket = nil;
-
-    [_activeTcpSockets release];
     _activeTcpSockets = nil;
-
-    [_activeData release];
     _activeData = nil;
-
-    [_activeState release];
     _activeState = nil;
-
-    [super dealloc];
 }
-
-@synthesize delegate = _delegate;
 
 @synthesize port = _port;
 
@@ -207,7 +194,7 @@
     NSNumber *key = [NSNumber numberWithInteger:_activeIndex];
     [_activeTcpSockets setObject:activeSocket forKey:key];
     [_activeData setObject:[NSMutableData data] forKey:key];
-    [_activeState setObject:[[@{ @"socket": activeSocket, @"dangling_ESC": @NO } mutableCopy] autorelease] forKey:key];
+    [_activeState setObject:[@{ @"socket": activeSocket, @"dangling_ESC": @NO } mutableCopy] forKey:key];
 
     [newSocket readDataWithTimeout:-1 tag:_activeIndex];
 
@@ -228,7 +215,7 @@
     NSMutableDictionary *activeState = [_activeState objectForKey:[NSNumber numberWithInteger:tag]];
     if ( activeData && activeState )
     {
-        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:_delegate];
+        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate];
         [sock readDataWithTimeout:-1 tag:tag];
     }
 }
@@ -326,14 +313,14 @@
 
 - (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)filterContext
 {
-    GCDAsyncUdpSocket *rawReplySocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
     replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
     replySocket.port = _udpReplyPort;
 
     [_udpSocket.stats addBytes:[data length]];
 
-    [F53OSCParser processOscData:data forDestination:_delegate replyToSocket:replySocket];
+    [F53OSCParser processOscData:data forDestination:self.delegate replyToSocket:replySocket];
 }
 
 - (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *)error
