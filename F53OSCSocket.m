@@ -192,7 +192,7 @@
     {
         if ( [_udpSocket bindToPort:_port error:nil] )
         {
-            _stats = [[[F53OSCStats alloc] init] autorelease];
+            _stats = [[F53OSCStats alloc] init];
             return [_udpSocket beginReceiving:nil];
         }
         else
