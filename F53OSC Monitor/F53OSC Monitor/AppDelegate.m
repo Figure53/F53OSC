@@ -18,10 +18,9 @@
 
 @implementation AppDelegate
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
-    UInt16 _port = [[NSNumber numberWithInt:9999] intValue];
-    self.server = [[DemoServer alloc] initWithPort:_port];
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+    self.server = [[DemoServer alloc] initWithPort:9999];
     self.server.app = self;
     [self.server start];
     
@@ -31,7 +30,8 @@
     [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
 }
 
-- (void)log:(NSString *)message {
+- (void)log:(NSString *)message
+{
     dispatch_async(dispatch_get_main_queue(), ^{
         _logCount++;
         NSString *logString = [NSString stringWithFormat:@"[%@ %07ld] %@\n", [NSDate new], _logCount, message];
@@ -43,11 +43,13 @@
     });
 }
 
-- (void)updateDataRateLabel {
+- (void)updateDataRateLabel
+{
     [self.dataRateLabel setStringValue:self.server.stats];
 }
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
+- (void)applicationWillTerminate:(NSNotification *)aNotification
+{
     // Insert code here to tear down your application
     [self.timer invalidate];
 }
