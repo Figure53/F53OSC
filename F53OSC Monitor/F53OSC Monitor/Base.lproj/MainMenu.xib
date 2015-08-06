@@ -13,6 +13,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="dataRateLabel" destination="gbc-FM-R7n" id="WQl-I2-Kea"/>
                 <outlet property="logOutput" destination="tqp-Gh-9hw" id="bwP-zv-qos"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
@@ -677,20 +678,20 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GnB-br-kru">
-                        <rect key="frame" x="-1" y="-1" width="641" height="602"/>
+                        <rect key="frame" x="-1" y="31" width="641" height="570"/>
                         <clipView key="contentView" id="qet-vE-xB4">
                             <rect key="frame" x="1" y="1" width="223" height="133"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" richText="NO" findStyle="panel" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="tqp-Gh-9hw">
-                                    <rect key="frame" x="0.0" y="0.0" width="223" height="297"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="223" height="600"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="624" height="600"/>
-                                    <size key="maxSize" width="624" height="10000000"/>
+                                    <size key="minSize" width="624" height="568"/>
+                                    <size key="maxSize" width="641" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="624" height="600"/>
-                                    <size key="maxSize" width="624" height="10000000"/>
+                                    <size key="minSize" width="624" height="568"/>
+                                    <size key="maxSize" width="641" height="10000000"/>
                                 </textView>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -704,14 +705,28 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gbc-FM-R7n">
+                        <rect key="frame" x="18" y="9" width="307" height="14"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="303" id="T7z-WS-ZWg"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Data Rate" id="8uM-tR-jrL">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
                 <constraints>
                     <constraint firstItem="GnB-br-kru" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="-1" id="4r5-vC-FG5"/>
-                    <constraint firstAttribute="bottom" secondItem="GnB-br-kru" secondAttribute="bottom" constant="-1" id="H4n-Mf-dDs"/>
+                    <constraint firstAttribute="bottom" secondItem="GnB-br-kru" secondAttribute="bottom" constant="31" id="H4n-Mf-dDs"/>
                     <constraint firstAttribute="trailing" secondItem="GnB-br-kru" secondAttribute="trailing" constant="-1" id="Wy1-w5-hsk"/>
+                    <constraint firstAttribute="bottom" secondItem="gbc-FM-R7n" secondAttribute="bottom" constant="9" id="aZI-8v-kjI"/>
+                    <constraint firstItem="gbc-FM-R7n" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="20" id="rje-ux-vW6"/>
                     <constraint firstItem="GnB-br-kru" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="-1" id="xNY-wb-A91"/>
                 </constraints>
             </view>
+            <contentBorderThickness minY="32"/>
             <point key="canvasLocation" x="557.5" y="642"/>
         </window>
     </objects>

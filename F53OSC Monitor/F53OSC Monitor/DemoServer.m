@@ -11,6 +11,7 @@
 
 @interface DemoServer () {
     BOOL _isActive;
+    NSByteCountFormatter *_formatter;
 }
 
 @property (strong) F53OSCServer *server;
@@ -29,6 +30,9 @@
 {
     self = [super init];
     
+    _formatter = [[NSByteCountFormatter alloc] init];
+    _formatter.allowsNonnumericFormatting = NO;
+
     self.listeningPort = port;
     
     [self _attachServer];
@@ -64,9 +68,15 @@
     }
 }
 
-- (void) stop {
+- (void)stop {
     [self.server stopListening];
     _isActive = NO;
+}
+
+- (NSString *)stats {
+    return [NSString stringWithFormat:@"%@ / %@ per second",
+            [_formatter stringFromByteCount:self.server.udpSocket.stats.bytes],
+            [_formatter stringFromByteCount:self.server.udpSocket.stats.bytesPerSecond]];
 }
 
 #pragma mark - Message Handling

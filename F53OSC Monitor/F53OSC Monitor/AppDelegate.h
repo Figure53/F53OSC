@@ -13,6 +13,9 @@
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
 @property (strong) IBOutlet NSTextView *logOutput;
+@property (strong) IBOutlet NSTextField *dataRateLabel;
+
+@property (strong) NSTimer *timer;
 
 @property (strong) DemoServer *server;
 

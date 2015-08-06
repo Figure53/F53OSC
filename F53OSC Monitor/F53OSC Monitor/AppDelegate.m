@@ -26,6 +26,9 @@
     [self.server start];
     
     _logCount = 0;
+
+    self.timer = [NSTimer timerWithTimeInterval:0.5 target:self selector:@selector( updateDataRateLabel ) userInfo:nil repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
 }
 
 - (void)log:(NSString *)message {
@@ -40,8 +43,13 @@
     });
 }
 
+- (void)updateDataRateLabel {
+    [self.dataRateLabel setStringValue:self.server.stats];
+}
+
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
+    [self.timer invalidate];
 }
 
 @end

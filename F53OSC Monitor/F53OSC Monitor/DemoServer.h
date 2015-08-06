@@ -21,4 +21,6 @@
 - (void) start;
 - (void) stop;
 
+- (NSString *)stats;
+
 @end
