@@ -13,6 +13,7 @@
 }
 
 @property (weak) IBOutlet NSWindow *window;
+@property (strong) NSTimer *timer;
 
 @end
 

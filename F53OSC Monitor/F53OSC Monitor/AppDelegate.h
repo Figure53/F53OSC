@@ -15,8 +15,6 @@
 @property (strong) IBOutlet NSTextView *logOutput;
 @property (strong) IBOutlet NSTextField *dataRateLabel;
 
-@property (strong) NSTimer *timer;
-
 @property (strong) DemoServer *server;
 
 - (void)log:(NSString *)message;
