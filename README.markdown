@@ -11,3 +11,7 @@ For convenience, we've included a few public domain source files from [CocoaAsyn
 - GCDAsyncSocket.m and GCDAsyncUDPSocket.m both require ARC
 - All other files are not ARC-compatible
 - You need to link against Security.framework and CFNetwork.framework
+
+## Demo
+
+Inluded is a small demo app "F53OSC Monitor", which logs OSC messages sent to it via port 9999 and displays some basic stats about incoming traffic.
