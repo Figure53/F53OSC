@@ -29,15 +29,15 @@
 - (id)initWithPort:(UInt16)port
 {
     self = [super init];
-    
+
     _formatter = [[NSByteCountFormatter alloc] init];
     _formatter.allowsNonnumericFormatting = NO;
 
     self.listeningPort = port;
-    
+
     [self _attachServer];
     self.server.port = self.listeningPort;
-    
+
     return self;
 }
 
@@ -45,18 +45,18 @@
     NSLog( @"starting OSC server" );
     NSString *errorString = nil;
     _isActive = NO;
-    
+
     if ( ![self.server startListening] )
     {
         NSLog( @"Error: DemoServer was unable to start listening on port %u.", self.server.port );
-        errorString = [NSString stringWithFormat:@"QLab was unable to start listening for OSC messages on port %u.", self.server.port ];
+        errorString = [NSString stringWithFormat:@"DemoServer was unable to start listening for OSC messages on port %u.", self.server.port ];
     }
     else
     {
         [self.app log:[NSString stringWithFormat:@"OSC server is listening on port %u", self.server.port]];
         _isActive = YES;
     }
-    
+
     if ( errorString )
     {
         NSAlert *alert = [[NSAlert alloc] init];
@@ -95,7 +95,7 @@
     if ([message.arguments count] > 0)
         argsString = [NSString stringWithFormat:@"(%@)",[message.arguments componentsJoinedByString:@", "]];
     NSString *logString = [NSString stringWithFormat:@"/%@ %@", [message.addressParts componentsJoinedByString:@"/"], argsString] ;
-    
+
     [self.app log:logString];
 }
 
