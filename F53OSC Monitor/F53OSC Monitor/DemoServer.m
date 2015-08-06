@@ -29,15 +29,16 @@
 - (id)initWithPort:(UInt16)port
 {
     self = [super init];
+    if ( self )
+    {
+        _formatter = [[NSByteCountFormatter alloc] init];
+        _formatter.allowsNonnumericFormatting = NO;
 
-    _formatter = [[NSByteCountFormatter alloc] init];
-    _formatter.allowsNonnumericFormatting = NO;
+        self.listeningPort = port;
 
-    self.listeningPort = port;
-
-    [self _attachServer];
-    self.server.port = self.listeningPort;
-
+        [self _attachServer];
+        self.server.port = self.listeningPort;
+    }
     return self;
 }
 
