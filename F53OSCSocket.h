@@ -33,26 +33,25 @@
 
 @class F53OSCPacket;
 
-// tracking socket behavior over time
+///
+///  F53OSCStats tracks socket behavior over time.
+///
+
 @interface F53OSCStats : NSObject
 {
-    NSTimer *_timer;
-    double _currentBytes;
     double _totalBytes;
+    double _currentBytes;
+    double _bytesPerSecond;
+    NSTimer *_timer;
 }
 
-// @property double bytes;
-@property double messages;
-@property double bytesPerSecond;
+@property (readonly) double totalBytes;
+@property (assign) double bytesPerSecond; // as calculated over the last second
 
-@property (retain) NSMutableArray *history;
-
-- (double) bytes;
 - (void) addBytes:(double)bytes;
 
-- (void) stop;
-
 @end
+
 
 ///
 ///  An F53OSCSocket object represents either a TCP socket or UDP socket, but never both at the same time.

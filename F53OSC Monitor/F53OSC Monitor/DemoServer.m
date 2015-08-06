@@ -42,7 +42,8 @@
     return self;
 }
 
-- (void)start {
+- (void)start
+{
     NSLog( @"starting OSC server" );
     NSString *errorString = nil;
     _isActive = NO;
@@ -54,7 +55,7 @@
     }
     else
     {
-        [self.app log:[NSString stringWithFormat:@"OSC server is listening on port %u", self.server.port]];
+        [self.app log:[NSString stringWithFormat:@"DemoServer is listening for OSC messages on port %u", self.server.port]];
         _isActive = YES;
     }
 
@@ -69,14 +70,16 @@
     }
 }
 
-- (void)stop {
+- (void)stop
+{
     [self.server stopListening];
     _isActive = NO;
 }
 
-- (NSString *)stats {
+- (NSString *)stats
+{
     return [NSString stringWithFormat:@"%@ / %@ per second",
-            [_formatter stringFromByteCount:self.server.udpSocket.stats.bytes],
+            [_formatter stringFromByteCount:self.server.udpSocket.stats.totalBytes],
             [_formatter stringFromByteCount:self.server.udpSocket.stats.bytesPerSecond]];
 }
 
@@ -85,12 +88,14 @@
 ///
 ///  Note: F53OSC reserves the right to send messages off the main thread.
 ///
-- (void)takeMessage:(F53OSCMessage *)message {
+- (void)takeMessage:(F53OSCMessage *)message
+{
     // log received message
     [self performSelectorOnMainThread:@selector( _processMessage: ) withObject:message waitUntilDone:NO];
 }
 
-- (void)_processMessage:(F53OSCMessage *)message {
+- (void)_processMessage:(F53OSCMessage *)message
+{
     // build log string
     NSString *argsString = @"";
     if ([message.arguments count] > 0)
