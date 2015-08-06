@@ -45,7 +45,7 @@
 @property double messages;
 @property double bytesPerSecond;
 
-@property (strong) NSMutableArray *history;
+@property (retain) NSMutableArray *history;
 
 - (double) bytes;
 - (void) addBytes:(double)bytes;
