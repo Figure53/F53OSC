@@ -34,7 +34,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         _logCount++;
-        NSString *logString = [NSString stringWithFormat:@"[%@ %07ld] %@\n", [NSDate new], _logCount, message];
+        NSString *logString = [NSString stringWithFormat:@"[%@ %07ld] %@\n", [NSDate date], _logCount, message];
         NSDictionary *attrs = @{NSFontAttributeName:[NSFont fontWithName:@"Menlo" size:11]};
         NSAttributedString* outString = [[NSAttributedString alloc] initWithString:logString attributes:attrs];
         
