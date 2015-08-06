@@ -88,7 +88,6 @@
 
 - (void) addBytes:(double)bytes
 {
-    NSLog( @"addBytes: %f", bytes );
     _totalBytes += bytes;
     _currentBytes += bytes;
 }
