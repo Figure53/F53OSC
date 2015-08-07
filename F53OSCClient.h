@@ -36,6 +36,7 @@
 
 @interface F53OSCClient : NSObject <NSCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 {
+    id <F53OSCPacketDestination, F53OSCClientDelegate> __weak _delegate;
     NSString *_host;
     UInt16 _port;
     BOOL _useTcp;
@@ -46,7 +47,7 @@
     NSMutableDictionary *_readState;
 }
 
-@property (nonatomic, assign) id <F53OSCPacketDestination, F53OSCClientDelegate> delegate;
+@property (nonatomic, weak) id <F53OSCPacketDestination, F53OSCClientDelegate> delegate;
 @property (nonatomic, copy) NSString *host;
 @property (nonatomic, assign) UInt16 port;
 @property (nonatomic, assign) BOOL useTcp;

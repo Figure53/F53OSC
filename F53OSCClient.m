@@ -74,7 +74,7 @@
     self = [super init];
     if ( self )
     {
-        self.delegate = nil;
+        _delegate = nil;
         _host = @"localhost";
         _port = 53000;         // QLab is 53000, Stagetracker is 57115.
         _useTcp = NO;
@@ -110,7 +110,7 @@
     self = [super init];
     if ( self )
     {
-        self.delegate = nil;
+        _delegate = nil;
         _host = [coder decodeObjectForKey:@"host"];
         _port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
         _useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
@@ -127,6 +127,7 @@
     return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", _host, _port ];
 }
 
+@synthesize delegate = _delegate;
 @synthesize host = _host;
 
 - (void) setHost:(NSString *)host

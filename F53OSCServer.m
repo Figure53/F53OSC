@@ -111,7 +111,7 @@
         GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
         GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
 
-        self.delegate = nil;
+        _delegate = nil;
         _port = 0;
         _udpReplyPort = 0;
         _tcpSocket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
@@ -135,6 +135,7 @@
     _activeState = nil;
 }
 
+@synthesize delegate = _delegate;
 @synthesize port = _port;
 
 - (void) setPort:(UInt16)port

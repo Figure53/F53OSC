@@ -32,6 +32,7 @@
 
 @interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 {
+    id <F53OSCPacketDestination> __weak _delegate;
     UInt16 _port;
     UInt16 _udpReplyPort;
     F53OSCSocket *_tcpSocket;
@@ -46,7 +47,7 @@
 + (NSPredicate *) predicateForAttribute:(NSString *)attributeName 
                      matchingOSCPattern:(NSString *)pattern;
 
-@property (nonatomic, assign) id <F53OSCPacketDestination> delegate;
+@property (nonatomic, weak) id <F53OSCPacketDestination> delegate;
 @property (nonatomic, assign) UInt16 port;
 @property (nonatomic, assign) UInt16 udpReplyPort;
 
