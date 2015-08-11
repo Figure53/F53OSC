@@ -26,6 +26,10 @@
 //  Reference information: http://opensoundcontrol.org/spec-1_0-examples
 //
 
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #import "F53OSCMessage.h"
 #import "F53OSCServer.h"
 #import "F53OSCFoundationAdditions.h"
