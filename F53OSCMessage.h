@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -58,9 +58,9 @@
                                   replySocket:(F53OSCSocket *)replySocket;
 
 @property (nonatomic, copy) NSString *addressPattern;
-@property (nonatomic, retain) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.
-@property (nonatomic, retain) NSArray *arguments;        ///< May contain NSString, NSData, or NSNumber objects. This could be extended in the future, but those three cover the four mandatory OSC types.
-@property (nonatomic, retain) id userData;               
+@property (nonatomic, strong) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.
+@property (nonatomic, strong) NSArray *arguments;        ///< May contain NSString, NSData, or NSNumber objects. This could be extended in the future, but those three cover the four mandatory OSC types.
+@property (nonatomic, strong) id userData;
 
 - (NSArray *) addressParts;
 

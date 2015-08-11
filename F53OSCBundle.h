@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,8 @@
     NSArray *_elements;
 }
 
-@property (retain) F53OSCTimeTag *timeTag;
-@property (retain) NSArray *elements;
+@property (strong) F53OSCTimeTag *timeTag;
+@property (strong) NSArray *elements;
 
 + (F53OSCBundle *) bundleWithTimeTag:(F53OSCTimeTag *)timeTag
                             elements:(NSArray *)elements;     ///< Elements must be an array of NSData objects; convert F53OSCMessages using their packetData method.
