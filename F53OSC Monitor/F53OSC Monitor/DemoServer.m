@@ -42,6 +42,11 @@
     return self;
 }
 
+- (bool)isActive
+{
+    return _isActive;
+}
+
 - (void)start
 {
     NSLog( @"starting OSC server" );
@@ -61,12 +66,7 @@
 
     if ( errorString )
     {
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSWarningAlertStyle];
-        [alert setMessageText:@"Unable to initialize OSC"];
-        [alert setInformativeText:errorString];
-        [alert addButtonWithTitle:@"OK"];
-        [alert runModal];
+        [self.app log:errorString];
     }
 }
 
@@ -83,6 +83,11 @@
             [_formatter stringFromByteCount:self.server.udpSocket.stats.bytesPerSecond]];
 }
 
+- (NSNumber *)bytesPerSecond
+{
+    return @(self.server.udpSocket.stats.bytesPerSecond);
+}
+
 #pragma mark - Message Handling
 
 ///
@@ -90,12 +95,13 @@
 ///
 - (void)takeMessage:(F53OSCMessage *)message
 {
-    // log received message
-    [self performSelectorOnMainThread:@selector( _processMessage: ) withObject:message waitUntilDone:NO];
+    // handle all messages synchronously
+    // [self performSelectorOnMainThread:@selector( _processMessage: ) withObject:message waitUntilDone:NO];
 }
 
 - (void)_processMessage:(F53OSCMessage *)message
 {
+    // log all received messages
     // build log string
     NSString *argsString = @"";
     if ([message.arguments count] > 0)

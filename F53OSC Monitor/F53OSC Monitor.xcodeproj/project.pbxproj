@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66AFE4391B79483200985C54 /* ActivityChart.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66AFE4381B79483200985C54 /* ActivityChart.xib */; };
+		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
+		66CAE3D91B754B1B001306FD /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66CAE3D81B754B1B001306FD /* WebKit.framework */; };
 		66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17581B729EA0008B6743 /* AppDelegate.m */; };
 		66EE175B1B729EA0008B6743 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE175A1B729EA0008B6743 /* main.m */; };
 		66EE175D1B729EA0008B6743 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66EE175C1B729EA0008B6743 /* Images.xcassets */; };
@@ -40,6 +43,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		66AFE4381B79483200985C54 /* ActivityChart.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ActivityChart.xib; sourceTree = "<group>"; };
+		66AFE43A1B79485100985C54 /* ActivityChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityChartView.h; sourceTree = "<group>"; };
+		66AFE43B1B79485100985C54 /* ActivityChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityChartView.m; sourceTree = "<group>"; };
+		66CAE3D81B754B1B001306FD /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		66EE17521B729EA0008B6743 /* F53OSC Monitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "F53OSC Monitor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		66EE17561B729EA0008B6743 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		66EE17571B729EA0008B6743 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -90,6 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66CAE3D91B754B1B001306FD /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,12 +111,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		66CAE3D71B754AA3001306FD /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				66EE175C1B729EA0008B6743 /* Images.xcassets */,
+				66AFE4381B79483200985C54 /* ActivityChart.xib */,
+				66EE175E1B729EA0008B6743 /* MainMenu.xib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		66EE17491B729EA0008B6743 = {
 			isa = PBXGroup;
 			children = (
 				66EE17541B729EA0008B6743 /* F53OSC Monitor */,
 				66EE17681B729EA0008B6743 /* F53OSC MonitorTests */,
 				66EE17531B729EA0008B6743 /* Products */,
+				66CAE3D81B754B1B001306FD /* WebKit.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -124,13 +143,14 @@
 		66EE17541B729EA0008B6743 /* F53OSC Monitor */ = {
 			isa = PBXGroup;
 			children = (
-				66EE17751B729EAA008B6743 /* F53OSC */,
 				66EE17571B729EA0008B6743 /* AppDelegate.h */,
 				66EE17581B729EA0008B6743 /* AppDelegate.m */,
 				66EE17A31B72AC59008B6743 /* DemoServer.h */,
 				66EE17A41B72AC59008B6743 /* DemoServer.m */,
-				66EE175C1B729EA0008B6743 /* Images.xcassets */,
-				66EE175E1B729EA0008B6743 /* MainMenu.xib */,
+				66AFE43A1B79485100985C54 /* ActivityChartView.h */,
+				66AFE43B1B79485100985C54 /* ActivityChartView.m */,
+				66EE17751B729EAA008B6743 /* F53OSC */,
+				66CAE3D71B754AA3001306FD /* Resources */,
 				66EE17551B729EA0008B6743 /* Supporting Files */,
 			);
 			path = "F53OSC Monitor";
@@ -280,6 +300,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66AFE4391B79483200985C54 /* ActivityChart.xib in Resources */,
 				66EE175D1B729EA0008B6743 /* Images.xcassets in Resources */,
 				66EE17601B729EA0008B6743 /* MainMenu.xib in Resources */,
 			);
@@ -309,6 +330,7 @@
 				66EE17A01B729EFB008B6743 /* NSDate+F53OSCTimeTag.m in Sources */,
 				66EE17981B729EFB008B6743 /* F53OSCPacket.m in Sources */,
 				66EE17A11B729EFB008B6743 /* NSNumber+F53OSCNumber.m in Sources */,
+				66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */,
 				66EE17961B729EFB008B6743 /* F53OSCClient.m in Sources */,
 				66EE179B1B729EFB008B6743 /* F53OSCSocket.m in Sources */,
 				66EE179C1B729EFB008B6743 /* F53OSCTimeTag.m in Sources */,

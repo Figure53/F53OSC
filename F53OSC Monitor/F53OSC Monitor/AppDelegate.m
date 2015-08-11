@@ -27,7 +27,8 @@
     
     _logCount = 0;
 
-    self.timer = [NSTimer timerWithTimeInterval:0.5 target:self selector:@selector( updateDataRateLabel ) userInfo:nil repeats:YES];
+    // update data rate
+    self.timer = [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector( updateDataRateLabel ) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
 }
 
@@ -38,7 +39,6 @@
         NSString *logString = [NSString stringWithFormat:@"[%@ %07ld] %@\n", [NSDate date], _logCount, message];
         NSDictionary *attrs = @{NSFontAttributeName:[NSFont fontWithName:@"Menlo" size:11]};
         NSAttributedString* outString = [[NSAttributedString alloc] initWithString:logString attributes:attrs];
-        
         [[self.logOutput textStorage] appendAttributedString:outString];
         [self.logOutput  scrollRangeToVisible:NSMakeRange([[self.logOutput string] length], 0)];
     });
@@ -47,6 +47,30 @@
 - (void)updateDataRateLabel
 {
     [self.dataRateLabel setStringValue:self.server.stats];
+    [self.chart addDataPoint:self.server.bytesPerSecond];
+}
+
+- (IBAction)toggleServerActive:(id)sender
+{
+    if ( self.server.isActive )
+    {
+        [self.server stop];
+        if ( !self.server.isActive )
+        {
+            [self log:@"server has been stopped"];
+        }
+
+        [self.connectionToggle setTitle:@"Connect"];
+    }
+    else
+    {
+        [self.server start];
+        if ( self.server.isActive )
+        {
+            [self log:@"server has been started"];
+        }
+        [self.connectionToggle setTitle:@"Disconnect"];
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
