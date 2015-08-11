@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -32,15 +32,9 @@
 
 @interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 {
-    id <F53OSCPacketDestination> __weak _delegate;
-    UInt16 _port;
-    UInt16 _udpReplyPort;
-    F53OSCSocket *_tcpSocket;
-    F53OSCSocket *_udpSocket;
-    NSMutableDictionary *_activeTcpSockets;  // F53OSCSockets keyed by index of when the connection was accepted.
-    NSMutableDictionary *_activeData;        // NSMutableData keyed by index; buffers the incoming data.
-    NSMutableDictionary *_activeState;       // NSMutableDictionary keyed by index; stores state of incoming data.
-    NSInteger _activeIndex;
+    id <F53OSCPacketDestination> __weak delegate;
+    UInt16 port;
+    UInt16 udpReplyPort;
 }
 
 + (NSString *) validCharsForOSCMethod;

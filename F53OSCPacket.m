@@ -35,17 +35,17 @@
 
 - (void) dealloc
 {
-    _replySocket = nil;
+    self.replySocket = nil;
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
     F53OSCPacket *copy = [[self class] allocWithZone:zone];
-    copy->_replySocket = _replySocket;
+    copy.replySocket = self.replySocket;
     return copy;
 }
 
-@synthesize replySocket = _replySocket;
+@synthesize replySocket;
 
 - (NSData *) packetData
 {

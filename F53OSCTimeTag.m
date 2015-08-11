@@ -33,9 +33,9 @@
 
 @implementation F53OSCTimeTag
 
-@synthesize seconds = _seconds;
+@synthesize seconds;
 
-@synthesize fraction = _fraction;
+@synthesize fraction;
 
 + (F53OSCTimeTag *) timeTagWithDate:(NSDate *)date
 {
@@ -57,11 +57,11 @@
 
 - (NSData *) oscTimeTagData
 {
-    UInt32 seconds = OSSwapHostToBigInt32( _seconds );
-    UInt32 fraction = OSSwapHostToBigInt32( _fraction );
+    UInt32 swappedSeconds = OSSwapHostToBigInt32( self.seconds );
+    UInt32 swappedFraction = OSSwapHostToBigInt32( self.fraction );
     NSMutableData *data = [NSMutableData data];
-    [data appendBytes:&seconds length:sizeof( UInt32 )];
-    [data appendBytes:&fraction length:sizeof( UInt32 )];
+    [data appendBytes:&swappedSeconds length:sizeof( UInt32 )];
+    [data appendBytes:&swappedFraction length:sizeof( UInt32 )];
     return [data copy];
 }
 
@@ -73,6 +73,7 @@
     UInt32 seconds = *((UInt32 *)buf);
     buf += sizeof( UInt32 );
     UInt32 fraction = *((UInt32 *)buf);
+    
     F53OSCTimeTag *result = [[F53OSCTimeTag alloc] init];
     result.seconds = OSSwapBigToHostInt32( seconds );
     result.fraction = OSSwapBigToHostInt32( fraction );

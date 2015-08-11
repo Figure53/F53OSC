@@ -31,8 +31,8 @@
 
 @interface F53OSCBundle : F53OSCPacket
 {
-    F53OSCTimeTag *_timeTag;
-    NSArray *_elements;
+    F53OSCTimeTag *timeTag;
+    NSArray *elements;
 }
 
 @property (strong) F53OSCTimeTag *timeTag;

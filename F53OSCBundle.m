@@ -65,15 +65,15 @@
     return [NSString stringWithFormat:@"%@", self.elements];
 }
 
-@synthesize timeTag = _timeTag;
+@synthesize timeTag;
 
-@synthesize elements = _elements;
+@synthesize elements;
 
 - (NSData *) packetData
 {
     NSMutableData *result = [[@"#bundle" oscStringData] mutableCopy];
     
-    [result appendData:[_timeTag oscTimeTagData]];
+    [result appendData:[self.timeTag oscTimeTagData]];
     
     for ( NSData *element in self.elements )
     {

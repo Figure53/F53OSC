@@ -41,15 +41,16 @@
 
 @interface F53OSCMessage : F53OSCPacket <NSCoding, NSCopying>
 {
-    NSString *_addressPattern;
-    NSString *_typeTagString;
-    NSArray *_arguments;
-    id _userData;
+    NSString *addressPattern;
+    NSString *typeTagString;
+    NSArray *arguments;
+    id userData;
 }
 
 + (BOOL) legalAddressComponent:(NSString *)addressComponent;
 + (BOOL) legalAddress:(NSString *)address;
 + (BOOL) legalMethod:(NSString *)method;
+
 + (F53OSCMessage *) messageWithString:(NSString *)string;
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
                                     arguments:(NSArray *)arguments;
@@ -59,7 +60,7 @@
 
 @property (nonatomic, copy) NSString *addressPattern;
 @property (nonatomic, strong) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.
-@property (nonatomic, strong) NSArray *arguments;        ///< May contain NSString, NSData, or NSNumber objects. This could be extended in the future, but those three cover the four mandatory OSC types.
+@property (nonatomic, strong) NSArray *arguments;        ///< May contain NSString, NSData, or NSNumber objects. This could be extended in the future, but those three cover the four mandatory OSC 1.0 types.
 @property (nonatomic, strong) id userData;
 
 - (NSArray *) addressParts;

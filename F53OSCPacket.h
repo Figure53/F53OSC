@@ -30,7 +30,7 @@
 
 @interface F53OSCPacket : NSObject <NSCopying>
 {
-    F53OSCSocket *_replySocket;      ///< If this message was received from a client, this is the socket to use to reply.
+    F53OSCSocket *replySocket; ///< If this message was received from a client, this is the socket to use to reply.
 }
 
 @property (strong) F53OSCSocket *replySocket;
