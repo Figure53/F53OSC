@@ -73,6 +73,14 @@
     }
 }
 
+- (IBAction)clearConsole:(id)sender
+{
+    [self.logOutput setSelectedRange:NSMakeRange(0, self.logOutput.textStorage.length)];
+    [self.logOutput setEditable:YES];
+    [self.logOutput delete:nil];
+    [self.logOutput setEditable:NO];
+}
+
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
     [self.timer invalidate];

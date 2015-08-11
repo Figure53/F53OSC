@@ -22,6 +22,7 @@
 - (void)log:(NSString *)message;
 
 - (IBAction)toggleServerActive:(id)sender;
+- (IBAction)clearConsole:(id)sender;
 
 @end
 

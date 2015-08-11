@@ -85,7 +85,7 @@
 - (void)takeMessage:(F53OSCMessage *)message
 {
     // handle all messages synchronously
-    // [self performSelectorOnMainThread:@selector( _processMessage: ) withObject:message waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector( _processMessage: ) withObject:message waitUntilDone:NO];
 }
 
 - (void)_processMessage:(F53OSCMessage *)message

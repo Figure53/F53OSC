@@ -720,6 +720,9 @@
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qmL-3R-kIP">
                         <rect key="frame" x="520" y="-1" width="105" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="93" id="Gax-17-n4i"/>
+                        </constraints>
                         <buttonCell key="cell" type="push" title="Disconnect" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gtK-9u-G45">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
@@ -728,15 +731,27 @@
                             <action selector="toggleServerActive:" target="Voe-Tx-rLC" id="GC4-aB-rIA"/>
                         </connections>
                     </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0de-lS-QHi">
+                        <rect key="frame" x="447" y="-1" width="73" height="32"/>
+                        <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1t8-hd-VKB">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearConsole:" target="Voe-Tx-rLC" id="Rs4-nb-NHR"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="qmL-3R-kIP" secondAttribute="trailing" constant="20" id="13Q-dJ-yj4"/>
                     <constraint firstItem="GnB-br-kru" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="-1" id="4r5-vC-FG5"/>
                     <constraint firstAttribute="bottom" secondItem="GnB-br-kru" secondAttribute="bottom" constant="31" id="H4n-Mf-dDs"/>
+                    <constraint firstAttribute="bottom" secondItem="0de-lS-QHi" secondAttribute="bottom" constant="6" id="HTz-bi-h3T"/>
                     <constraint firstAttribute="trailing" secondItem="GnB-br-kru" secondAttribute="trailing" constant="-1" id="Wy1-w5-hsk"/>
                     <constraint firstAttribute="bottom" secondItem="gbc-FM-R7n" secondAttribute="bottom" constant="9" id="aZI-8v-kjI"/>
                     <constraint firstAttribute="bottom" secondItem="qmL-3R-kIP" secondAttribute="bottom" constant="6" id="hnH-m1-UlP"/>
                     <constraint firstItem="gbc-FM-R7n" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="20" id="rje-ux-vW6"/>
+                    <constraint firstItem="qmL-3R-kIP" firstAttribute="leading" secondItem="0de-lS-QHi" secondAttribute="trailing" constant="12" id="rkT-3c-gVk"/>
                     <constraint firstItem="GnB-br-kru" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="-1" id="xNY-wb-A91"/>
                 </constraints>
             </view>
