@@ -24,49 +24,24 @@
 //  THE SOFTWARE.
 //
 
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #import "F53OSCClient.h"
 #import "F53OSCParser.h"
 
 
-@interface F53OSCClient (Private)
+@interface F53OSCClient ()
 
-- (void) _destroySocket;
-- (void) _createSocket;
+@property (strong) F53OSCSocket *socket;
+@property (strong) NSMutableData *readData;
+@property (strong) NSMutableDictionary *readState;
 
-@end
-
-
-@implementation F53OSCClient (Private)
-
-- (void) _destroySocket
-{
-    [_readState removeObjectForKey:@"socket"];
-    
-    [_socket disconnect];
-    [_socket autorelease];
-    _socket = nil;
-}
-
-- (void) _createSocket
-{
-    if ( _useTcp )
-    {
-        GCDAsyncSocket *tcpSocket = [[[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
-        _socket = [[F53OSCSocket socketWithTcpSocket:tcpSocket] retain];
-        if ( _socket )
-            [_readState setObject:_socket forKey:@"socket"];
-    }
-    else
-    {
-        GCDAsyncUdpSocket *udpSocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
-        _socket = [[F53OSCSocket socketWithUdpSocket:udpSocket] retain];
-    }
-    _socket.host = self.host;
-    _socket.port = self.port;
-}
+- (void) destroySocket;
+- (void) createSocket;
 
 @end
-
 
 @implementation F53OSCClient
 
@@ -75,43 +50,35 @@
     self = [super init];
     if ( self )
     {
-        _delegate = nil;
-        _host = @"localhost";
-        _port = 53000;         // QLab is 53000, Stagetracker is 57115.
-        _useTcp = NO;
-        _userData = nil;
-        _socket = nil;
-        _readData = [[NSMutableData data] retain];
-        _readState = [[NSMutableDictionary dictionary] retain];
+        self.delegate = nil;
+        self.host = @"localhost";
+        self.port = 53000;         // QLab is 53000, Stagetracker is 57115.
+        self.useTcp = NO;
+        self.userData = nil;
+        self.socket = nil;
+        self.readData = [NSMutableData data];
+        self.readState = [NSMutableDictionary dictionary];
     }
     return self;
 }
 
 - (void) dealloc
 {
-    [_host release];
-    _host = nil;
+    self.delegate = nil;
+    self.host = nil;
+    self.userData = nil;
     
-    [_userData release];
-    _userData = nil;
-    
-    [self _destroySocket];
-    
-    [_readData release];
-    _readData = nil;
-    
-    [_readState release];
-    _readState = nil;
-    
-    [super dealloc];
+    [self destroySocket];
+    self.readData = nil;
+    self.readState = nil;
 }
 
 - (void) encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:_host forKey:@"host"];
-    [coder encodeObject:[NSNumber numberWithUnsignedShort:_port] forKey:@"port"];
-    [coder encodeObject:[NSNumber numberWithBool:_useTcp] forKey:@"useTcp"];
-    [coder encodeObject:_userData forKey:@"userData"];
+    [coder encodeObject:self.host forKey:@"host"];
+    [coder encodeObject:[NSNumber numberWithUnsignedShort:self.port] forKey:@"port"];
+    [coder encodeObject:[NSNumber numberWithBool:self.useTcp] forKey:@"useTcp"];
+    [coder encodeObject:self.userData forKey:@"userData"];
 }
 
 - (id) initWithCoder:(NSCoder *)coder
@@ -119,76 +86,100 @@
     self = [super init];
     if ( self )
     {
-        _delegate = nil;
-        _host = [[coder decodeObjectForKey:@"host"] retain];
-        _port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
-        _useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
-        _userData = [[coder decodeObjectForKey:@"userData"] retain];
-        _socket = nil;
-        _readData = [[NSMutableData data] retain];
-        _readState = [[NSMutableDictionary dictionary] retain];
+        self.delegate = nil;
+        self.host = [coder decodeObjectForKey:@"host"];
+        self.port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
+        self.useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
+        self.userData = [coder decodeObjectForKey:@"userData"];
+        self.socket = nil;
+        self.readData = [NSMutableData data];
+        self.readState = [NSMutableDictionary dictionary];
     }
     return self;
 }
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", _host, _port ];
+    return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", self.host, self.port ];
 }
 
-@synthesize delegate = _delegate;
-
-@synthesize host = _host;
-
-- (void) setHost:(NSString *)host
+- (void) destroySocket
 {
-    if ( [host isEqualToString:@""] )
-        host = nil;
+    [self.readState removeObjectForKey:@"socket"];
     
-    [_host autorelease];
-    _host = [host copy];
-    _socket.host = _host;
+    [self.socket disconnect];
+    self.socket = nil;
 }
 
-@synthesize port = _port;
-
-- (void) setPort:(UInt16)port
+- (void) createSocket
 {
-    _port = port;
-    _socket.port = _port;
+    if ( self.useTcp )
+    {
+        GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+        if ( self.socket )
+            [self.readState setObject:self.socket forKey:@"socket"];
+    }
+    else // use UDP
+    {
+        GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        self.socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
+    }
+    self.socket.host = self.host;
+    self.socket.port = self.port;
 }
 
-@synthesize useTcp = _useTcp;
+@synthesize delegate;
 
-- (void) setUseTcp:(BOOL)useTcp
+@synthesize host;
+
+- (void) setHost:(NSString *)newHost
 {
-    if ( _useTcp == useTcp )
+    if ( [newHost isEqualToString:@""] )
+        newHost = nil;
+    
+    host = [newHost copy];
+    self.socket.host = self.host;
+}
+
+@synthesize port;
+
+- (void) setPort:(UInt16)newPort
+{
+    port = newPort;
+    self.socket.port = self.port;
+}
+
+@synthesize useTcp;
+
+- (void) setUseTcp:(BOOL)flag
+{
+    if ( useTcp == flag )
         return;
     
-    _useTcp = useTcp;
+    useTcp = flag;
     
-    [self _destroySocket];
+    [self destroySocket];
 }
 
-@synthesize userData = _userData;
+@synthesize userData;
 
-- (void) setUserData:(id)userData
+- (void) setUserData:(id)newUserData
 {
-    if ( userData == [NSNull null] )
-        userData = nil;
+    if ( newUserData == [NSNull null] )
+        newUserData = nil;
     
-    [_userData autorelease];
-    _userData = [userData retain];
+    userData = newUserData;
 }
 
 - (NSDictionary *) state
 {
     return @{
-    @"host": _host ? _host : @"",
-    @"port": @( _port ),
-    @"useTcp": @( _useTcp ),
-    @"userData": ( _userData ? _userData : [NSNull null] )
-    };
+             @"host": self.host ? self.host : @"",
+             @"port": @( self.port ),
+             @"useTcp": @( self.useTcp ),
+             @"userData": ( self.userData ? self.userData : [NSNull null] )
+            };
 }
 
 - (void) setState:(NSDictionary *)state
@@ -202,14 +193,14 @@
 - (NSString *) title
 {
     if ( self.isValid )
-        return [NSString stringWithFormat:@"%@ : %u", _host, _port ];
+        return [NSString stringWithFormat:@"%@ : %u", self.host, self.port ];
     else
         return [NSString stringWithFormat:@"<invalid>" ];
 }
 
 - (BOOL) isValid
 {
-    if ( _host && _port )
+    if ( self.host && self.port )
         return YES;
     else
         return NO;
@@ -217,39 +208,39 @@
 
 - (BOOL) isConnected
 {
-    return [_socket isConnected];
+    return [self.socket isConnected];
 }
 
 - (BOOL) connect
 {
-    if ( !_socket )
-        [self _createSocket];
-    if ( _socket )
-        return [_socket connect];
+    if ( !self.socket )
+        [self createSocket];
+    if ( self.socket )
+        return [self.socket connect];
     return NO;
 }
 
 - (void) disconnect
 {
-    [_socket disconnect];
-    [_readData setData:[NSData data]];
-    [_readState setObject:@NO forKey:@"dangling_ESC"];
+    [self.socket disconnect];
+    [self.readData setData:[NSData data]];
+    [self.readState setObject:@NO forKey:@"dangling_ESC"];
 }
 
 - (void) sendPacket:(F53OSCPacket *)packet
 {
-    if ( !_socket )
+    if ( !self.socket )
         [self connect];
     
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"%@ sending packet: %@", self, packet );
 #endif
     
-    if ( _socket )
+    if ( self.socket )
     {
-        if ( _socket.isTcpSocket )
-            [_socket.tcpSocket readDataWithTimeout:-1 tag:0]; // Listen for a potential response.
-        [_socket sendPacket:packet];
+        if ( self.socket.isTcpSocket )
+            [self.socket.tcpSocket readDataWithTimeout:-1 tag:0]; // Listen for a potential response.
+        [self.socket sendPacket:packet];
     }
     else
     {
@@ -287,7 +278,7 @@
     NSLog( @"client socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
     
-    [F53OSCParser translateSlipData:data toData:_readData withState:_readState destination:_delegate];
+    [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate];
     [sock readDataWithTimeout:-1 tag:tag];
 }
 
@@ -330,8 +321,8 @@
     NSLog( @"client socket %p didCloseReadStream", sock );
 #endif
     
-    [_readData setData:[NSData data]];
-    [_readState setObject:@NO forKey:@"dangling_ESC"];
+    [self.readData setData:[NSData data]];
+    [self.readState setObject:@NO forKey:@"dangling_ESC"];
 }
 
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
@@ -340,8 +331,8 @@
     NSLog( @"client socket %p didDisconnect", sock );
 #endif
     
-    [_readData setData:[NSData data]];
-    [_readState setObject:@NO forKey:@"dangling_ESC"];
+    [self.readData setData:[NSData data]];
+    [self.readState setObject:@NO forKey:@"dangling_ESC"];
   
     if ( [self.delegate respondsToSelector:@selector( clientDidDisconnect: )] )
     {

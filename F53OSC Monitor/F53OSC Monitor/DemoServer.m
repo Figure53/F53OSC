@@ -9,34 +9,28 @@
 #import "AppDelegate.h"
 #import "DemoServer.h"
 
-@interface DemoServer () {
-    BOOL _isActive;
-    NSByteCountFormatter *_formatter;
-}
+@interface DemoServer ()
 
+@property (strong) NSByteCountFormatter *formatter;
 @property (strong) F53OSCServer *server;
+@property (assign) UInt16 listeningPort;
 
 @end
 
 @implementation DemoServer
-
-- (void) _attachServer
-{
-    self.server = [F53OSCServer new];
-    self.server.delegate = self;
-}
 
 - (id)initWithPort:(UInt16)port
 {
     self = [super init];
     if ( self )
     {
-        _formatter = [[NSByteCountFormatter alloc] init];
-        _formatter.allowsNonnumericFormatting = NO;
+        self.formatter = [[NSByteCountFormatter alloc] init];
+        self.formatter.allowsNonnumericFormatting = NO;
 
+        self.server = [F53OSCServer new];
+        self.server.delegate = self;
+        
         self.listeningPort = port;
-
-        [self _attachServer];
         self.server.port = self.listeningPort;
     }
     return self;
@@ -44,19 +38,17 @@
 
 - (void)start
 {
-    NSLog( @"starting OSC server" );
+    NSLog( @"starting F53OSC Monitor" );
     NSString *errorString = nil;
-    _isActive = NO;
 
     if ( ![self.server startListening] )
     {
-        NSLog( @"Error: DemoServer was unable to start listening on port %u.", self.server.port );
-        errorString = [NSString stringWithFormat:@"DemoServer was unable to start listening for OSC messages on port %u.", self.server.port ];
+        NSLog( @"Error: F53OSC Monitor was unable to start listening on port %u.", self.server.port );
+        errorString = [NSString stringWithFormat:@"F53OSC Monitor was unable to start listening for OSC messages on port %u.", self.server.port ];
     }
     else
     {
-        [self.app log:[NSString stringWithFormat:@"DemoServer is listening for OSC messages on port %u", self.server.port]];
-        _isActive = YES;
+        [self.app log:[NSString stringWithFormat:@"F53OSC Monitor is listening for OSC messages on port %u", self.server.port]];
     }
 
     if ( errorString )
@@ -73,14 +65,13 @@
 - (void)stop
 {
     [self.server stopListening];
-    _isActive = NO;
 }
 
 - (NSString *)stats
 {
     return [NSString stringWithFormat:@"%@ / %@ per second",
-            [_formatter stringFromByteCount:self.server.udpSocket.stats.totalBytes],
-            [_formatter stringFromByteCount:self.server.udpSocket.stats.bytesPerSecond]];
+            [self.formatter stringFromByteCount:self.server.udpSocket.stats.totalBytes],
+            [self.formatter stringFromByteCount:self.server.udpSocket.stats.bytesPerSecond]];
 }
 
 #pragma mark - Message Handling

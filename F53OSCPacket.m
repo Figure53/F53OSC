@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,10 @@
 //  THE SOFTWARE.
 //
 
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #import "F53OSCPacket.h"
 
 
@@ -31,20 +35,17 @@
 
 - (void) dealloc
 {
-    [_replySocket release];
-    _replySocket = nil;
-    
-    [super dealloc];
+    self.replySocket = nil;
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
     F53OSCPacket *copy = [[self class] allocWithZone:zone];
-    copy->_replySocket = [_replySocket retain];
+    copy.replySocket = self.replySocket;
     return copy;
 }
 
-@synthesize replySocket = _replySocket;
+@synthesize replySocket;
 
 - (NSData *) packetData
 {

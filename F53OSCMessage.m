@@ -26,23 +26,26 @@
 //  Reference information: http://opensoundcontrol.org/spec-1_0-examples
 //
 
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #import "F53OSCMessage.h"
 #import "F53OSCServer.h"
 #import "F53OSCFoundationAdditions.h"
 
 @implementation F53OSCMessage
 
-static NSCharacterSet *_LEGAL_ADDRESS_CHARACTERS = nil;
-static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
+static NSCharacterSet *LEGAL_ADDRESS_CHARACTERS = nil;
+static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 
 + (void) initialize
 {
-    if ( !_LEGAL_ADDRESS_CHARACTERS )
+    if ( !LEGAL_ADDRESS_CHARACTERS )
     {
         NSString *legalAddressChars = [NSString stringWithFormat:@"%@/*?[]{,}", [F53OSCServer validCharsForOSCMethod]];
-        _LEGAL_ADDRESS_CHARACTERS = [[NSCharacterSet characterSetWithCharactersInString:legalAddressChars] retain];
-        
-        _LEGAL_METHOD_CHARACTERS = [[NSCharacterSet characterSetWithCharactersInString:[F53OSCServer validCharsForOSCMethod]] retain];
+        LEGAL_ADDRESS_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:legalAddressChars];
+        LEGAL_METHOD_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:[F53OSCServer validCharsForOSCMethod]];
     }
 }
 
@@ -51,7 +54,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     if ( addressComponent == nil )
         return NO;
     
-    if ( [_LEGAL_ADDRESS_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:addressComponent]] )
+    if ( [LEGAL_ADDRESS_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:addressComponent]] )
     {
         if ( [addressComponent length] >= 1 )
             return YES;
@@ -65,7 +68,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     if ( address == nil )
         return NO;
     
-    if ( [_LEGAL_ADDRESS_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:address]] )
+    if ( [LEGAL_ADDRESS_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:address]] )
     {
         if ( [address length] >= 1 && [address characterAtIndex:0] == '/' )
             return YES;
@@ -79,7 +82,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     if ( method == nil )
         return NO;
     
-    if ( [_LEGAL_METHOD_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:method]] )
+    if ( [LEGAL_METHOD_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:method]] )
         return YES;
     else
         return NO;
@@ -151,7 +154,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
         }
         else
         {
-            NSNumberFormatter *formatter = [[[NSNumberFormatter alloc] init] autorelease];
+            NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
             [formatter setLocale:[NSLocale currentLocale]];
             [formatter setAllowsFloats:YES];
             
@@ -178,7 +181,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
                                     arguments:(NSArray *)arguments
                                   replySocket:(F53OSCSocket *)replySocket
 {
-    F53OSCMessage *msg = [[F53OSCMessage new] autorelease];
+    F53OSCMessage *msg = [F53OSCMessage new];
     msg.addressPattern = addressPattern;
     msg.arguments = arguments;
     msg.replySocket = replySocket;
@@ -204,15 +207,13 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     self.typeTagString = nil;
     self.arguments = nil;
     self.userData = nil;
-    
-    [super dealloc];
 }
 
 - (void) encodeWithCoder:(NSCoder *)coder
 {
-    [coder encodeObject:_addressPattern forKey:@"addressPattern"];
-    [coder encodeObject:_typeTagString forKey:@"typeTagString"];
-    [coder encodeObject:_arguments forKey:@"arguments"];
+    [coder encodeObject:self.addressPattern forKey:@"addressPattern"];
+    [coder encodeObject:self.typeTagString forKey:@"typeTagString"];
+    [coder encodeObject:self.arguments forKey:@"arguments"];
 }
 
 - (id) initWithCoder:(NSCoder *)coder
@@ -230,10 +231,10 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
 - (id) copyWithZone:(NSZone *)zone
 {
     F53OSCMessage *copy = [super copyWithZone:zone];
-    copy->_addressPattern = [_addressPattern copyWithZone:zone];
-    copy->_typeTagString = [_typeTagString copyWithZone:zone];
-    copy->_arguments = [_arguments copyWithZone:zone];
-    copy->_userData = [_userData copyWithZone:zone];
+    copy.addressPattern = [self.addressPattern copyWithZone:zone];
+    copy.typeTagString = [self.typeTagString copyWithZone:zone];
+    copy.arguments = [self.arguments copyWithZone:zone];
+    copy.userData = [self.userData copyWithZone:zone];
     return copy;
 }
 
@@ -252,8 +253,8 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     if ( [object isMemberOfClass:[self class]] )
     {
         F53OSCMessage *otherObject = object;
-        if (   [[otherObject addressPattern] isEqualToString:_addressPattern]
-            && [[otherObject arguments] isEqualToArray:_arguments] )
+        if (   [otherObject.addressPattern isEqualToString:self.addressPattern]
+            && [otherObject.arguments isEqualToArray:self.arguments] )
         {
             return YES;
         }
@@ -261,24 +262,23 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
     return NO;
 }
 
-@synthesize addressPattern = _addressPattern;
+@synthesize addressPattern;
 
-- (void) setAddressPattern:(NSString *)addressPattern
+- (void) setAddressPattern:(NSString *)newAddressPattern
 {
-    if ( addressPattern == nil ||
-        [addressPattern length] == 0 ||
-        [addressPattern characterAtIndex:0] != '/' )
+    if ( newAddressPattern == nil ||
+        [newAddressPattern length] == 0 ||
+        [newAddressPattern characterAtIndex:0] != '/' )
     {
         return;
     }
     
-    [_addressPattern autorelease];
-    _addressPattern = [addressPattern copy];
+    addressPattern = [newAddressPattern copy];
 }
 
-@synthesize typeTagString = _typeTagString;
+@synthesize typeTagString;
 
-@synthesize arguments = _arguments;
+@synthesize arguments;
 
 - (void) setArguments:(NSArray *)argArray
 {
@@ -325,12 +325,11 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
             [newArgs addObject:obj];
         }
     }
-    self.typeTagString = [[newTypes copy] autorelease];
-    [_arguments autorelease];
-    _arguments = [newArgs copy];
+    self.typeTagString = [newTypes copy];
+    arguments = [newArgs copy];
 }
 
-@synthesize userData = _userData;
+@synthesize userData;
 
 - (NSArray *) addressParts
 {
@@ -389,7 +388,7 @@ static NSCharacterSet *_LEGAL_METHOD_CHARACTERS = nil;
         }
     }
     
-    return [result autorelease];
+    return result;
 }
 
 @end

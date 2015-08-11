@@ -38,16 +38,9 @@
 ///
 
 @interface F53OSCStats : NSObject
-{
-    double _totalBytes;
-    double _currentBytes;
-    double _bytesPerSecond;
-    NSTimer *_timer;
-}
 
-@property (readonly) double totalBytes;
-@property (assign) double bytesPerSecond; // as calculated over the last second
-
+- (double) totalBytes;
+- (double) bytesPerSecond;       // as calculated over the last second
 - (void) addBytes:(double)bytes;
 
 @end
@@ -59,12 +52,8 @@
 
 @interface F53OSCSocket : NSObject
 {
-    GCDAsyncSocket *_tcpSocket;
-    GCDAsyncUdpSocket *_udpSocket;
-    NSString *_host;
-    UInt16 _port;
-
-    F53OSCStats *_stats;
+    NSString *host;
+    UInt16 port;  
 }
 
 + (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;

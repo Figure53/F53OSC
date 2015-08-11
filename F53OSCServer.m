@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,25 +24,36 @@
 //  THE SOFTWARE.
 //
 
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #import "F53OSCServer.h"
 #import "F53OSCFoundationAdditions.h"
 
 
-@interface F53OSCServer (Private)
+@interface F53OSCServer ()
 
-+ (NSString *) _stringWithSpecialRegexCharactersEscaped:(NSString *)string;
+@property (strong) F53OSCSocket *tcpSocket;
+@property (strong) F53OSCSocket *udpSocket;
+@property (strong) NSMutableDictionary *activeTcpSockets;  // F53OSCSockets keyed by index of when the connection was accepted.
+@property (strong) NSMutableDictionary *activeData;        // NSMutableData keyed by index; buffers the incoming data.
+@property (strong) NSMutableDictionary *activeState;       // NSMutableDictionary keyed by index; stores state of incoming data.
+@property (assign) NSInteger activeIndex;
+
++ (NSString *) stringWithSpecialRegexCharactersEscaped:(NSString *)string;
 
 @end
 
 
-@implementation F53OSCServer (Private)
+@implementation F53OSCServer
 
 ///
 ///  Escape characters that are special in regex (ICU v3) but not special in OSC.
 ///  Regex docs: http://userguide.icu-project.org/strings/regexp#TOC-Regular-Expression-Metacharacters
 ///  OSC docs: http://opensoundcontrol.org/spec-1_0
 ///
-+ (NSString *) _stringWithSpecialRegexCharactersEscaped:(NSString *)string
++ (NSString *) stringWithSpecialRegexCharactersEscaped:(NSString *)string
 {
     string = [string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"]; // Do this first!
     string = [string stringByReplacingOccurrencesOfString:@"+" withString:@"\\+"];
@@ -55,11 +66,6 @@
     string = [string stringByReplacingOccurrencesOfString:@"." withString:@"\\."];
     return string;
 }
-
-@end
-
-
-@implementation F53OSCServer
 
 + (NSString *) validCharsForOSCMethod
 {
@@ -77,12 +83,12 @@
     if ( [[pattern componentsSeparatedByString:@"{"] count] != [[pattern componentsSeparatedByString:@"}"] count] )
         return nil;
 
-    NSString *validOscChars = [F53OSCServer _stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
+    NSString *validOscChars = [F53OSCServer stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
     NSString *wildCard = [NSString stringWithFormat:@"[%@]*", validOscChars];
     NSString *oneChar = [NSString stringWithFormat:@"[%@]{1}?", validOscChars];
 
     // Escape characters that are special in regex (ICU v3) but not special in OSC.
-    pattern = [F53OSCServer _stringWithSpecialRegexCharactersEscaped:pattern];
+    pattern = [F53OSCServer stringWithSpecialRegexCharactersEscaped:pattern];
     //NSLog( @"cleaned   : %@", pattern );
 
     // Replace characters that are special in OSC with their equivalents in regex (ICU v3).
@@ -108,18 +114,18 @@
     self = [super init];
     if ( self )
     {
-        GCDAsyncSocket *tcpSocket = [[[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
-        GCDAsyncUdpSocket *udpSocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+        GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        GCDAsyncUdpSocket *rawUdpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
 
-        _delegate = nil;
-        _port = 0;
-        _udpReplyPort = 0;
-        _tcpSocket = [[F53OSCSocket socketWithTcpSocket:tcpSocket] retain];
-        _udpSocket = [[F53OSCSocket socketWithUdpSocket:udpSocket] retain];
-        _activeTcpSockets = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
-        _activeData = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
-        _activeState = [[NSMutableDictionary dictionaryWithCapacity:1] retain];
-        _activeIndex = 0;
+        self.delegate = nil;
+        self.port = 0;
+        self.udpReplyPort = 0;
+        self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket];
+        self.udpSocket = [F53OSCSocket socketWithUdpSocket:rawUdpSocket];
+        self.activeTcpSockets = [NSMutableDictionary dictionaryWithCapacity:1];
+        self.activeData = [NSMutableDictionary dictionaryWithCapacity:1];
+        self.activeState = [NSMutableDictionary dictionaryWithCapacity:1];
+        self.activeIndex = 0;
     }
     return self;
 }
@@ -128,63 +134,43 @@
 {
     [self stopListening];
 
-    [_tcpSocket release];
-    _tcpSocket = nil;
-
-    [_udpSocket release];
-    _udpSocket = nil;
-
-    [_activeTcpSockets release];
-    _activeTcpSockets = nil;
-
-    [_activeData release];
-    _activeData = nil;
-
-    [_activeState release];
-    _activeState = nil;
-
-    [super dealloc];
+    self.delegate = nil;
+    self.tcpSocket = nil;
+    self.udpSocket = nil;
+    self.activeTcpSockets = nil;
+    self.activeData = nil;
+    self.activeState = nil;
 }
 
-@synthesize delegate = _delegate;
+@synthesize delegate;
 
-@synthesize port = _port;
+@synthesize port;
 
-- (void) setPort:(UInt16)port
+- (void) setPort:(UInt16)newPort
 {
-    _port = port;
+    port = newPort;
 
-    [_tcpSocket stopListening];
-    [_udpSocket stopListening];
-    _tcpSocket.port = _port;
-    _udpSocket.port = _port;
+    [self.tcpSocket stopListening];
+    [self.udpSocket stopListening];
+    self.tcpSocket.port = self.port;
+    self.udpSocket.port = self.port;
 }
 
-@synthesize udpReplyPort = _udpReplyPort;
+@synthesize udpReplyPort;
 
 - (BOOL) startListening
 {
     BOOL success;
-    success = [_tcpSocket startListening];
+    success = [self.tcpSocket startListening];
     if ( success )
-        success = [_udpSocket startListening];
+        success = [self.udpSocket startListening];
     return success;
 }
 
 - (void) stopListening
 {
-    [_tcpSocket stopListening];
-    [_udpSocket stopListening];
-}
-
-- (F53OSCSocket *)udpSocket
-{
-    return _udpSocket;
-}
-
-- (F53OSCSocket *)tcpSocket
-{
-    return _tcpSocket;
+    [self.tcpSocket stopListening];
+    [self.udpSocket stopListening];
 }
 
 #pragma mark - GCDAsyncSocketDelegate
@@ -204,14 +190,14 @@
     activeSocket.host = newSocket.connectedHost;
     activeSocket.port = newSocket.connectedPort;
 
-    NSNumber *key = [NSNumber numberWithInteger:_activeIndex];
-    [_activeTcpSockets setObject:activeSocket forKey:key];
-    [_activeData setObject:[NSMutableData data] forKey:key];
-    [_activeState setObject:[[@{ @"socket": activeSocket, @"dangling_ESC": @NO } mutableCopy] autorelease] forKey:key];
+    NSNumber *key = [NSNumber numberWithInteger:self.activeIndex];
+    [self.activeTcpSockets setObject:activeSocket forKey:key];
+    [self.activeData setObject:[NSMutableData data] forKey:key];
+    [self.activeState setObject:[@{ @"socket": activeSocket, @"dangling_ESC": @NO } mutableCopy] forKey:key];
 
-    [newSocket readDataWithTimeout:-1 tag:_activeIndex];
+    [newSocket readDataWithTimeout:-1 tag:self.activeIndex];
 
-    _activeIndex++;
+    self.activeIndex++;
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
@@ -224,11 +210,11 @@
     NSLog( @"server socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
 
-    NSMutableData *activeData = [_activeData objectForKey:[NSNumber numberWithInteger:tag]];
-    NSMutableDictionary *activeState = [_activeState objectForKey:[NSNumber numberWithInteger:tag]];
+    NSMutableData *activeData = [self.activeData objectForKey:[NSNumber numberWithInteger:tag]];
+    NSMutableDictionary *activeState = [self.activeState objectForKey:[NSNumber numberWithInteger:tag]];
     if ( activeData && activeState )
     {
-        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:_delegate];
+        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate];
         [sock readDataWithTimeout:-1 tag:tag];
     }
 }
@@ -280,9 +266,9 @@
 #endif
 
     id keyOfDyingSocket = nil;
-    for ( id key in [_activeTcpSockets allKeys] )
+    for ( id key in [self.activeTcpSockets allKeys] )
     {
-        F53OSCSocket *socket = [_activeTcpSockets objectForKey:key];
+        F53OSCSocket *socket = [self.activeTcpSockets objectForKey:key];
         if ( socket.tcpSocket == sock )
         {
             keyOfDyingSocket = key;
@@ -292,9 +278,9 @@
 
     if ( keyOfDyingSocket )
     {
-        [_activeTcpSockets removeObjectForKey:keyOfDyingSocket];
-        [_activeData removeObjectForKey:keyOfDyingSocket];
-        [_activeState removeObjectForKey:keyOfDyingSocket];
+        [self.activeTcpSockets removeObjectForKey:keyOfDyingSocket];
+        [self.activeData removeObjectForKey:keyOfDyingSocket];
+        [self.activeState removeObjectForKey:keyOfDyingSocket];
     }
     else
     {
@@ -326,14 +312,14 @@
 
 - (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)filterContext
 {
-    GCDAsyncUdpSocket *rawReplySocket = [[[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()] autorelease];
+    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
     replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
-    replySocket.port = _udpReplyPort;
+    replySocket.port = self.udpReplyPort;
 
-    [_udpSocket.stats addBytes:[data length]];
+    [self.udpSocket.stats addBytes:[data length]];
 
-    [F53OSCParser processOscData:data forDestination:_delegate replyToSocket:replySocket];
+    [F53OSCParser processOscData:data forDestination:self.delegate replyToSocket:replySocket];
 }
 
 - (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *)error

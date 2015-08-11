@@ -12,20 +12,20 @@
 		66EE175D1B729EA0008B6743 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66EE175C1B729EA0008B6743 /* Images.xcassets */; };
 		66EE17601B729EA0008B6743 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66EE175E1B729EA0008B6743 /* MainMenu.xib */; };
 		66EE176C1B729EA0008B6743 /* F53OSC_MonitorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE176B1B729EA0008B6743 /* F53OSC_MonitorTests.m */; };
-		66EE17951B729EFB008B6743 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17781B729EFB008B6743 /* F53OSCBundle.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE17961B729EFB008B6743 /* F53OSCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE177A1B729EFB008B6743 /* F53OSCClient.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE17971B729EFB008B6743 /* F53OSCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE177D1B729EFB008B6743 /* F53OSCMessage.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE17981B729EFB008B6743 /* F53OSCPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE177F1B729EFB008B6743 /* F53OSCPacket.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE17991B729EFB008B6743 /* F53OSCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17811B729EFB008B6743 /* F53OSCParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE179A1B729EFB008B6743 /* F53OSCServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17841B729EFB008B6743 /* F53OSCServer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE179B1B729EFB008B6743 /* F53OSCSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17861B729EFB008B6743 /* F53OSCSocket.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE179C1B729EFB008B6743 /* F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17881B729EFB008B6743 /* F53OSCTimeTag.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		66EE17951B729EFB008B6743 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17781B729EFB008B6743 /* F53OSCBundle.m */; };
+		66EE17961B729EFB008B6743 /* F53OSCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE177A1B729EFB008B6743 /* F53OSCClient.m */; };
+		66EE17971B729EFB008B6743 /* F53OSCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE177D1B729EFB008B6743 /* F53OSCMessage.m */; };
+		66EE17981B729EFB008B6743 /* F53OSCPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE177F1B729EFB008B6743 /* F53OSCPacket.m */; };
+		66EE17991B729EFB008B6743 /* F53OSCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17811B729EFB008B6743 /* F53OSCParser.m */; };
+		66EE179A1B729EFB008B6743 /* F53OSCServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17841B729EFB008B6743 /* F53OSCServer.m */; };
+		66EE179B1B729EFB008B6743 /* F53OSCSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17861B729EFB008B6743 /* F53OSCSocket.m */; };
+		66EE179C1B729EFB008B6743 /* F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17881B729EFB008B6743 /* F53OSCTimeTag.m */; };
 		66EE179D1B729EFB008B6743 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE178A1B729EFB008B6743 /* GCDAsyncSocket.m */; };
 		66EE179E1B729EFB008B6743 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE178C1B729EFB008B6743 /* GCDAsyncUdpSocket.m */; };
-		66EE179F1B729EFB008B6743 /* NSData+F53OSCBlob.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE178E1B729EFB008B6743 /* NSData+F53OSCBlob.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE17A01B729EFB008B6743 /* NSDate+F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17901B729EFB008B6743 /* NSDate+F53OSCTimeTag.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE17A11B729EFB008B6743 /* NSNumber+F53OSCNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17921B729EFB008B6743 /* NSNumber+F53OSCNumber.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		66EE17A21B729EFB008B6743 /* NSString+F53OSCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17941B729EFB008B6743 /* NSString+F53OSCString.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		66EE179F1B729EFB008B6743 /* NSData+F53OSCBlob.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE178E1B729EFB008B6743 /* NSData+F53OSCBlob.m */; };
+		66EE17A01B729EFB008B6743 /* NSDate+F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17901B729EFB008B6743 /* NSDate+F53OSCTimeTag.m */; };
+		66EE17A11B729EFB008B6743 /* NSNumber+F53OSCNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17921B729EFB008B6743 /* NSNumber+F53OSCNumber.m */; };
+		66EE17A21B729EFB008B6743 /* NSString+F53OSCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17941B729EFB008B6743 /* NSString+F53OSCString.m */; };
 		66EE17A51B72AC59008B6743 /* DemoServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17A41B72AC59008B6743 /* DemoServer.m */; };
 /* End PBXBuildFile section */
 
@@ -505,6 +505,7 @@
 				66EE17711B729EA0008B6743 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		66EE17721B729EA0008B6743 /* Build configuration list for PBXNativeTarget "F53OSC MonitorTests" */ = {
 			isa = XCConfigurationList;
@@ -513,6 +514,7 @@
 				66EE17741B729EA0008B6743 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,10 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
+
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
 
 #import "NSString+F53OSCString.h"
 
@@ -63,13 +67,13 @@
     for ( NSUInteger index = 0; index < maxLength; index++ )
     {
         if ( buf[index] == 0 )
-            goto valid; // Found a null character within the buffer.
+            goto valid; // found a NULL character within the buffer
     }
     return nil; // Buffer wasn't null terminated, so it's not a valid OSC string.
     
-    NSString *result = nil;
+valid:;
     
-valid:
+    NSString *result = nil;
     
     result = [NSString stringWithUTF8String:buf];
     *outLength = 4 * ceil( ([result length] + 1) / 4.0 );
