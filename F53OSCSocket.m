@@ -36,7 +36,11 @@
 
 #pragma mark - F53OSCStats
 
-@interface F53OSCStats ()
+@interface F53OSCStats () {
+    NSDate *_currentTime;
+    dispatch_queue_t _timerQueue;
+    bool _stopCounting;
+}
 
 - (void) stop;
 
@@ -52,11 +56,14 @@
         _totalBytes = 0;
         _currentBytes = 0;
         _bytesPerSecond = 0;
-        _timer = [NSTimer scheduledTimerWithTimeInterval:1.0
-                                                  target:self
-                                                selector:@selector(countBytes)
-                                                userInfo:nil
-                                                 repeats:YES];
+        _currentTime = [NSDate date];
+
+        _stopCounting = NO;
+        _timerQueue = dispatch_queue_create("com.figure53.F53OSCStats", NULL);
+        // keep timer on background thread
+        dispatch_async(_timerQueue, ^{
+            [self countBytes];
+        });
     }
     return self;
 }
@@ -65,18 +72,36 @@
 {
     // you need to call "stop" to ever get to dealloc in the first place,
     // but to honor the form until we ARC-ify this code...
-    [_timer invalidate];
-    _timer = nil;
+    @synchronized ( self ) {
+        // make sure timer shuts itself off
+        _stopCounting = YES;
+    }
 }
 
 - (void) countBytes
 {
+    @synchronized ( self )
+    {
+        NSDate *checkTime = [NSDate date];
+        if ( [checkTime timeIntervalSince1970] - [_currentTime timeIntervalSince1970] >= 1.0 )
+        {
 #if F53_OSC_SOCKET_DEBUG
-    NSLog( @"[F53OSCStats] UDP Bytes: %f per second, %f total", _currentBytes, _totalBytes );
+            NSLog( @"[F53OSCStats] UDP Bytes: %f per second, %f total", _currentBytes, _totalBytes );
 #endif
+            _currentTime = checkTime;
+            _bytesPerSecond = _currentBytes;
+            _currentBytes = 0;
+        }
     
-    _bytesPerSecond = _currentBytes;
-    _currentBytes = 0;
+        if ( !_stopCounting )
+        {
+            // trigger again after delay
+            int64_t delay = 0.2 * NSEC_PER_SEC;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay), _timerQueue, ^{
+                [self countBytes];
+            });
+        }
+    }
 }
 
 - (double) totalBytes
@@ -86,14 +111,16 @@
 
 - (void) addBytes:(double)bytes
 {
-    _totalBytes += bytes;
-    _currentBytes += bytes;
+    @synchronized ( self )
+    {
+        _totalBytes += bytes;
+        _currentBytes += bytes;
+    }
 }
 
 - (void) stop
 {
-    [_timer invalidate];
-    _timer = nil;
+    _stopCounting = YES;
 }
 
 @end

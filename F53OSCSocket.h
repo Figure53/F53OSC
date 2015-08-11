@@ -42,7 +42,6 @@
     double _totalBytes;
     double _currentBytes;
     double _bytesPerSecond;
-    NSTimer *_timer;
 }
 
 @property (readonly) double totalBytes;
