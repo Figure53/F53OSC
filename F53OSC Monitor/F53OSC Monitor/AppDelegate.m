@@ -8,12 +8,12 @@
 
 #import "AppDelegate.h"
 
-@interface AppDelegate () {
-    long _logCount;
-}
+@interface AppDelegate ()
 
 @property (weak) IBOutlet NSWindow *window;
 @property (strong) NSTimer *timer;
+@property (strong) DemoServer *server;
+@property (assign) long logCount;
 
 @end
 
@@ -25,7 +25,7 @@
     self.server.app = self;
     [self.server start];
     
-    _logCount = 0;
+    self.logCount = 0;
 
     // update data rate
     self.timer = [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector( updateDataRateLabel ) userInfo:nil repeats:YES];
@@ -35,12 +35,12 @@
 - (void)log:(NSString *)message
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        _logCount++;
-        NSString *logString = [NSString stringWithFormat:@"[%@ %07ld] %@\n", [NSDate date], _logCount, message];
+        self.logCount++;
+        NSString *logString = [NSString stringWithFormat:@"[%@ %07ld] %@\n", [NSDate date], self.logCount, message];
         NSDictionary *attrs = @{NSFontAttributeName:[NSFont fontWithName:@"Menlo" size:11]};
         NSAttributedString* outString = [[NSAttributedString alloc] initWithString:logString attributes:attrs];
         [[self.logOutput textStorage] appendAttributedString:outString];
-        [self.logOutput  scrollRangeToVisible:NSMakeRange([[self.logOutput string] length], 0)];
+        [self.logOutput scrollRangeToVisible:NSMakeRange([[self.logOutput string] length], 0)];
     });
 }
 

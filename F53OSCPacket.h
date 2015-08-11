@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,10 @@
 
 @interface F53OSCPacket : NSObject <NSCopying>
 {
-    F53OSCSocket *_replySocket;      ///< If this message was received from a client, this is the socket to use to reply.
+    F53OSCSocket *replySocket; ///< If this message was received from a client, this is the socket to use to reply.
 }
 
-@property (retain) F53OSCSocket *replySocket;
+@property (strong) F53OSCSocket *replySocket;
 
 - (NSData *) packetData;
 

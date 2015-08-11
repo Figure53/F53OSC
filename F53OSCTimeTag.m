@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,18 @@
 //  THE SOFTWARE.
 //
 
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #import "F53OSCTimeTag.h"
 #import "NSDate+F53OSCTimeTag.h"
 
 @implementation F53OSCTimeTag
 
-@synthesize seconds = _seconds;
+@synthesize seconds;
 
-@synthesize fraction = _fraction;
+@synthesize fraction;
 
 + (F53OSCTimeTag *) timeTagWithDate:(NSDate *)date
 {
@@ -53,11 +57,11 @@
 
 - (NSData *) oscTimeTagData
 {
-    UInt32 seconds = OSSwapHostToBigInt32( _seconds );
-    UInt32 fraction = OSSwapHostToBigInt32( _fraction );
+    UInt32 swappedSeconds = OSSwapHostToBigInt32( self.seconds );
+    UInt32 swappedFraction = OSSwapHostToBigInt32( self.fraction );
     NSMutableData *data = [NSMutableData data];
-    [data appendBytes:&seconds length:sizeof( UInt32 )];
-    [data appendBytes:&fraction length:sizeof( UInt32 )];
+    [data appendBytes:&swappedSeconds length:sizeof( UInt32 )];
+    [data appendBytes:&swappedFraction length:sizeof( UInt32 )];
     return [data copy];
 }
 
@@ -69,6 +73,7 @@
     UInt32 seconds = *((UInt32 *)buf);
     buf += sizeof( UInt32 );
     UInt32 fraction = *((UInt32 *)buf);
+    
     F53OSCTimeTag *result = [[F53OSCTimeTag alloc] init];
     result.seconds = OSSwapBigToHostInt32( seconds );
     result.fraction = OSSwapBigToHostInt32( fraction );

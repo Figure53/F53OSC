@@ -8,7 +8,7 @@ For convenience, we've included a few public domain source files from [CocoaAsyn
 
 ## Usage Notes
 
-- This project is ARC-compliant.
+- F53OSC must be compiled with ARC.
 - You need to link against Security.framework and CFNetwork.framework
 
 ## Demo

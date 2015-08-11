@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,10 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
+
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
 
 #import "F53OSCBundle.h"
 #import "F53OSCTimeTag.h"
@@ -61,15 +65,15 @@
     return [NSString stringWithFormat:@"%@", self.elements];
 }
 
-@synthesize timeTag = _timeTag;
+@synthesize timeTag;
 
-@synthesize elements = _elements;
+@synthesize elements;
 
 - (NSData *) packetData
 {
     NSMutableData *result = [[@"#bundle" oscStringData] mutableCopy];
     
-    [result appendData:[_timeTag oscTimeTagData]];
+    [result appendData:[self.timeTag oscTimeTagData]];
     
     for ( NSData *element in self.elements )
     {

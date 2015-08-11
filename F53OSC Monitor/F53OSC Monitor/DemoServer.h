@@ -13,8 +13,7 @@
 
 @interface DemoServer : NSObject <F53OSCPacketDestination>
 
-@property (assign) AppDelegate *app;
-@property (assign, nonatomic) UInt16 listeningPort;
+@property (weak) AppDelegate *app;
 
 - (id) initWithPort:(UInt16)port;
 

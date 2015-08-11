@@ -19,8 +19,6 @@
 
 @property (strong) IBOutlet ActivityChartView *chart;
 
-@property (strong) DemoServer *server;
-
 - (void)log:(NSString *)message;
 
 - (IBAction)toggleServerActive:(id)sender;

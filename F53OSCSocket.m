@@ -24,6 +24,10 @@
 //  THE SOFTWARE.
 //
 
+#if !__has_feature(objc_arc)
+#warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
 #import "F53OSCSocket.h"
 #import "F53OSCPacket.h"
 
@@ -37,12 +41,15 @@
 #pragma mark - F53OSCStats
 
 @interface F53OSCStats () {
-    NSDate *_currentTime;
-    dispatch_queue_t _timerQueue;
-    bool _stopCounting;
 }
 
-- (void) stop;
+@property (strong) NSDate *currentTime;
+@property (strong) dispatch_queue_t timerQueue;
+@property (assign) bool stopCounting;
+
+@property (assign) double totalBytes;
+@property (assign) double bytesPerSecond;
+@property (assign) double currentBytes;
 
 @end
 
@@ -53,15 +60,15 @@
     self = [super init];
     if (self)
     {
-        _totalBytes = 0;
-        _currentBytes = 0;
-        _bytesPerSecond = 0;
-        _currentTime = [NSDate date];
+        self.totalBytes = 0;
+        self.bytesPerSecond = 0;
+        self.currentBytes = 0;
+        self.currentTime = [NSDate date];
 
-        _stopCounting = NO;
-        _timerQueue = dispatch_queue_create("com.figure53.F53OSCStats", NULL);
+        self.stopCounting = NO;
+        self.timerQueue = dispatch_queue_create("com.figure53.F53OSCStats", NULL);
         // keep timer on background thread
-        dispatch_async(_timerQueue, ^{
+        dispatch_async(self.timerQueue, ^{
             [self countBytes];
         });
     }
@@ -74,7 +81,7 @@
     // but to honor the form until we ARC-ify this code...
     @synchronized ( self ) {
         // make sure timer shuts itself off
-        _stopCounting = YES;
+        self.stopCounting = YES;
     }
 }
 
@@ -83,49 +90,52 @@
     @synchronized ( self )
     {
         NSDate *checkTime = [NSDate date];
-        if ( [checkTime timeIntervalSince1970] - [_currentTime timeIntervalSince1970] >= 1.0 )
+        if ( [checkTime timeIntervalSince1970] - [self.currentTime timeIntervalSince1970] >= 1.0 )
         {
 #if F53_OSC_SOCKET_DEBUG
-            NSLog( @"[F53OSCStats] UDP Bytes: %f per second, %f total", _currentBytes, _totalBytes );
+            NSLog( @"[F53OSCStats] UDP Bytes: %f per second, %f total", self.currentBytes, self.totalBytes );
 #endif
-            _currentTime = checkTime;
-            _bytesPerSecond = _currentBytes;
-            _currentBytes = 0;
+            self.currentTime = checkTime;
+            self.bytesPerSecond = self.currentBytes;
+            self.currentBytes = 0;
         }
-    
-        if ( !_stopCounting )
+
+        if ( !self.stopCounting )
         {
             // trigger again after delay
             int64_t delay = 0.2 * NSEC_PER_SEC;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay), _timerQueue, ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay), self.timerQueue, ^{
                 [self countBytes];
             });
         }
     }
 }
 
-- (double) totalBytes
-{
-    return _totalBytes;
-}
-
 - (void) addBytes:(double)bytes
 {
     @synchronized ( self )
     {
-        _totalBytes += bytes;
-        _currentBytes += bytes;
+        self.totalBytes += bytes;
+        self.currentBytes += bytes;
     }
 }
 
 - (void) stop
 {
-    _stopCounting = YES;
+    self.stopCounting = YES;
 }
 
 @end
 
 #pragma mark - F53OSCSocket
+
+@interface F53OSCSocket ()
+
+@property (strong) GCDAsyncSocket *tcpSocket;
+@property (strong) GCDAsyncUdpSocket *udpSocket;
+@property (strong) F53OSCStats *stats;
+
+@end
 
 @implementation F53OSCSocket
 
@@ -144,10 +154,10 @@
     self = [super init];
     if ( self )
     {
-        _tcpSocket = socket;
-        _udpSocket = nil;
-        _host = @"localhost";
-        _port = 0;
+        self.tcpSocket = socket;
+        self.udpSocket = nil;
+        self.host = @"localhost";
+        self.port = 0;
     }
     return self;
 }
@@ -157,82 +167,71 @@
     self = [super init];
     if ( self )
     {
-        _tcpSocket = nil;
-        _udpSocket = socket;
-        _host = @"localhost";
-        _port = 0;
-        _stats = nil;
+        self.tcpSocket = nil;
+        self.udpSocket = socket;
+        self.host = @"localhost";
+        self.port = 0;
+        self.stats = nil;
     }
     return self;
 }
 
 - (void) dealloc
 {
-    [_tcpSocket setDelegate:nil];
-    [_tcpSocket disconnect];
-    _tcpSocket = nil;
+    [self.tcpSocket setDelegate:nil];
+    [self.tcpSocket disconnect];
+    self.tcpSocket = nil;
 
-    [_udpSocket setDelegate:nil];
-    _udpSocket = nil;
+    [self.udpSocket setDelegate:nil];
+    self.udpSocket = nil;
 
-    [_stats stop];
-    _stats = nil;
+    self.host = nil;
 
-    _host = nil;
+    [self.stats stop];
+    self.stats = nil;
 }
 
 - (NSString *) description
 {
     if ( self.isTcpSocket )
-        return [NSString stringWithFormat:@"<F53OSCSocket TCP %@:%u isConnected = %i>", _host, _port, self.isConnected ];
+        return [NSString stringWithFormat:@"<F53OSCSocket TCP %@:%u isConnected = %i>", self.host, self.port, self.isConnected ];
     else
-        return [NSString stringWithFormat:@"<F53OSCSocket UDP %@:%u>", _host, _port ];
-}
-
-- (GCDAsyncSocket *) tcpSocket
-{
-    return _tcpSocket;
-}
-
-- (GCDAsyncUdpSocket *) udpSocket
-{
-    return _udpSocket;
-}
-
-- (F53OSCStats *) stats
-{
-    return _stats;
+        return [NSString stringWithFormat:@"<F53OSCSocket UDP %@:%u>", self.host, self.port ];
 }
 
 - (BOOL) isTcpSocket
 {
-    return ( _tcpSocket != nil );
+    return ( self.tcpSocket != nil );
 }
 
 - (BOOL) isUdpSocket
 {
-    return ( _udpSocket != nil );
+    return ( self.udpSocket != nil );
 }
 
-@synthesize host = _host;
+@synthesize host;
 
-@synthesize port = _port;
+@synthesize port;
 
 - (BOOL) startListening
 {
-    if ( _tcpSocket )
-        return [_tcpSocket acceptOnPort:_port error:nil];
-
-    if ( _udpSocket )
+    if ( self.tcpSocket )
     {
-        if ( [_udpSocket bindToPort:_port error:nil] )
+        return [self.tcpSocket acceptOnPort:self.port error:nil];
+    }
+
+    if ( self.udpSocket )
+    {
+        if ( [self.udpSocket bindToPort:self.port error:nil] )
         {
-            if ( !_stats )
-                _stats = [[F53OSCStats alloc] init];
-            return [_udpSocket beginReceiving:nil];
+            if ( !self.stats )
+                self.stats = [[F53OSCStats alloc] init];
+            return [self.udpSocket beginReceiving:nil];
         }
         else
+        {
             return NO;
+        }
     }
 
     return NO;
@@ -240,28 +239,28 @@
 
 - (void) stopListening
 {
-    if ( _tcpSocket )
-        [_tcpSocket disconnectAfterWriting];
+    if ( self.tcpSocket )
+        [self.tcpSocket disconnectAfterWriting];
 
-    if ( _udpSocket )
+    if ( self.udpSocket )
     {
-        [_udpSocket close];
-        [_stats stop];
-        _stats = nil;
+        [self.udpSocket close];
+        [self.stats stop];
+        self.stats = nil;
     }
 }
 
 - (BOOL) connect
 {
-    if ( _tcpSocket )
+    if ( self.tcpSocket )
     {
-        if ( _host && _port )
-            return [_tcpSocket connectToHost:_host onPort:_port error:nil];
+        if ( self.host && self.port )
+            return [self.tcpSocket connectToHost:self.host onPort:self.port error:nil];
         else
             return NO;
     }
 
-    if ( _udpSocket )
+    if ( self.udpSocket )
         return YES;
 
     return NO;
@@ -269,15 +268,15 @@
 
 - (void) disconnect
 {
-    [_tcpSocket disconnect];
+    [self.tcpSocket disconnect];
 }
 
 - (BOOL) isConnected
 {
-    if ( _tcpSocket )
-        return [_tcpSocket isConnected];
+    if ( self.tcpSocket )
+        return [self.tcpSocket isConnected];
 
-    if ( _udpSocket )
+    if ( self.udpSocket )
         return YES;
 
     return NO;
@@ -296,7 +295,7 @@
 
     //NSLog( @"%@ sending message with native length: %li", self, [data length] );
 
-    if ( _tcpSocket )
+    if ( self.tcpSocket )
     {
         // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
 
@@ -319,19 +318,19 @@
         }
         [slipData appendBytes:end length:1];
 
-        [_tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
+        [self.tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
     }
-    else if ( _udpSocket )
+    else if ( self.udpSocket )
     {
         NSError *error = nil;
-        if ( ![_udpSocket enableBroadcast:YES error:&error] )
+        if ( ![self.udpSocket enableBroadcast:YES error:&error] )
         {
             NSString *errString = error ? [error localizedDescription] : @"(unknown error)";
             NSLog( @"Warning: %@ unable to enable UDP broadcast - %@", self, errString );
         }
 
-        [_udpSocket sendData:data toHost:_host port:_port withTimeout:TIMEOUT tag:0];
-        [_udpSocket closeAfterSending];
+        [self.udpSocket sendData:data toHost:self.host port:self.port withTimeout:TIMEOUT tag:0];
+        [self.udpSocket closeAfterSending];
     }
 }
 
