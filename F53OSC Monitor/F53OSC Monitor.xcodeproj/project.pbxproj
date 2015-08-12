@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
-		66CAE3D91B754B1B001306FD /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66CAE3D81B754B1B001306FD /* WebKit.framework */; };
 		66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17581B729EA0008B6743 /* AppDelegate.m */; };
 		66EE175B1B729EA0008B6743 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE175A1B729EA0008B6743 /* main.m */; };
 		66EE175D1B729EA0008B6743 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66EE175C1B729EA0008B6743 /* Images.xcassets */; };
@@ -95,7 +94,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66CAE3D91B754B1B001306FD /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
