@@ -53,7 +53,7 @@
 @interface F53OSCSocket : NSObject
 {
     NSString *host;
-    UInt16 port;  
+    UInt16 port;
 }
 
 + (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;

@@ -13,6 +13,8 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
+                <outlet property="chart" destination="FLf-wU-bYp" id="ztj-XP-CjM"/>
+                <outlet property="connectionToggle" destination="qmL-3R-kIP" id="H5y-Uf-3FK"/>
                 <outlet property="dataRateLabel" destination="gbc-FM-R7n" id="WQl-I2-Kea"/>
                 <outlet property="logOutput" destination="tqp-Gh-9hw" id="bwP-zv-qos"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
@@ -716,18 +718,69 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qmL-3R-kIP">
+                        <rect key="frame" x="520" y="-1" width="105" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="93" id="Gax-17-n4i"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="Disconnect" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gtK-9u-G45">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="cellTitle"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="toggleServerActive:" target="Voe-Tx-rLC" id="GC4-aB-rIA"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0de-lS-QHi">
+                        <rect key="frame" x="447" y="-1" width="73" height="32"/>
+                        <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1t8-hd-VKB">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearConsole:" target="Voe-Tx-rLC" id="Rs4-nb-NHR"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="trailing" secondItem="qmL-3R-kIP" secondAttribute="trailing" constant="20" id="13Q-dJ-yj4"/>
                     <constraint firstItem="GnB-br-kru" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="-1" id="4r5-vC-FG5"/>
                     <constraint firstAttribute="bottom" secondItem="GnB-br-kru" secondAttribute="bottom" constant="31" id="H4n-Mf-dDs"/>
+                    <constraint firstAttribute="bottom" secondItem="0de-lS-QHi" secondAttribute="bottom" constant="6" id="HTz-bi-h3T"/>
                     <constraint firstAttribute="trailing" secondItem="GnB-br-kru" secondAttribute="trailing" constant="-1" id="Wy1-w5-hsk"/>
                     <constraint firstAttribute="bottom" secondItem="gbc-FM-R7n" secondAttribute="bottom" constant="9" id="aZI-8v-kjI"/>
+                    <constraint firstAttribute="bottom" secondItem="qmL-3R-kIP" secondAttribute="bottom" constant="6" id="hnH-m1-UlP"/>
                     <constraint firstItem="gbc-FM-R7n" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="20" id="rje-ux-vW6"/>
+                    <constraint firstItem="qmL-3R-kIP" firstAttribute="leading" secondItem="0de-lS-QHi" secondAttribute="trailing" constant="12" id="rkT-3c-gVk"/>
                     <constraint firstItem="GnB-br-kru" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="-1" id="xNY-wb-A91"/>
                 </constraints>
             </view>
             <contentBorderThickness minY="32"/>
             <point key="canvasLocation" x="557.5" y="642"/>
+        </window>
+        <window title="Activity" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="w36-HG-bcR">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="283" y="305" width="360" height="200"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <value key="minSize" type="size" width="360" height="200"/>
+            <value key="maxSize" type="size" width="360" height="200"/>
+            <view key="contentView" id="KiA-fY-jJL">
+                <rect key="frame" x="0.0" y="0.0" width="360" height="200"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="FLf-wU-bYp" customClass="ActivityChartView">
+                        <rect key="frame" x="0.0" y="0.0" width="360" height="200"/>
+                    </customView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="FLf-wU-bYp" firstAttribute="top" secondItem="KiA-fY-jJL" secondAttribute="top" id="AAR-Fp-qnA"/>
+                    <constraint firstAttribute="bottom" secondItem="FLf-wU-bYp" secondAttribute="bottom" id="E7c-9d-xuo"/>
+                    <constraint firstAttribute="trailing" secondItem="FLf-wU-bYp" secondAttribute="trailing" id="Fax-Qf-KjR"/>
+                    <constraint firstItem="FLf-wU-bYp" firstAttribute="leading" secondItem="KiA-fY-jJL" secondAttribute="leading" id="usb-HJ-QaB"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="1119" y="485.5"/>
         </window>
     </objects>
 </document>

@@ -19,7 +19,9 @@
 
 - (void) start;
 - (void) stop;
+- (bool) isActive;
 
 - (NSString *)stats;
+- (NSNumber *)bytesPerSecond;
 
 @end

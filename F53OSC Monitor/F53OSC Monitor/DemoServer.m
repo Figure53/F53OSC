@@ -14,6 +14,7 @@
 @property (strong) NSByteCountFormatter *formatter;
 @property (strong) F53OSCServer *server;
 @property (assign) UInt16 listeningPort;
+@property (assign) bool isActive;
 
 @end
 
@@ -49,22 +50,19 @@
     else
     {
         [self.app log:[NSString stringWithFormat:@"F53OSC Monitor is listening for OSC messages on port %u", self.server.port]];
+        self.isActive = YES;
     }
 
     if ( errorString )
     {
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setAlertStyle:NSWarningAlertStyle];
-        [alert setMessageText:@"Unable to initialize OSC"];
-        [alert setInformativeText:errorString];
-        [alert addButtonWithTitle:@"OK"];
-        [alert runModal];
+        [self.app log:errorString];
     }
 }
 
 - (void)stop
 {
     [self.server stopListening];
+    self.isActive = NO;
 }
 
 - (NSString *)stats
@@ -74,6 +72,11 @@
             [self.formatter stringFromByteCount:self.server.udpSocket.stats.bytesPerSecond]];
 }
 
+- (NSNumber *)bytesPerSecond
+{
+    return @(self.server.udpSocket.stats.bytesPerSecond);
+}
+
 #pragma mark - Message Handling
 
 ///
@@ -81,12 +84,13 @@
 ///
 - (void)takeMessage:(F53OSCMessage *)message
 {
-    // log received message
+    // handle all messages synchronously
     [self performSelectorOnMainThread:@selector( _processMessage: ) withObject:message waitUntilDone:NO];
 }
 
 - (void)_processMessage:(F53OSCMessage *)message
 {
+    // log all received messages
     // build log string
     NSString *argsString = @"";
     if ([message.arguments count] > 0)
