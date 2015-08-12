@@ -40,8 +40,7 @@
 
 #pragma mark - F53OSCStats
 
-@interface F53OSCStats () {
-}
+@interface F53OSCStats ()
 
 @property (strong) NSDate *currentTime;
 @property (strong) dispatch_queue_t timerQueue;
@@ -77,12 +76,6 @@
 
 - (void) dealloc
 {
-    // you need to call "stop" to ever get to dealloc in the first place,
-    // but to honor the form until we ARC-ify this code...
-    @synchronized ( self ) {
-        // make sure timer shuts itself off
-        self.stopCounting = YES;
-    }
 }
 
 - (void) countBytes
