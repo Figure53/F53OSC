@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		66AFE4391B79483200985C54 /* ActivityChart.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66AFE4381B79483200985C54 /* ActivityChart.xib */; };
 		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
 		66CAE3D91B754B1B001306FD /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66CAE3D81B754B1B001306FD /* WebKit.framework */; };
 		66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17581B729EA0008B6743 /* AppDelegate.m */; };
@@ -43,7 +42,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		66AFE4381B79483200985C54 /* ActivityChart.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ActivityChart.xib; sourceTree = "<group>"; };
 		66AFE43A1B79485100985C54 /* ActivityChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityChartView.h; sourceTree = "<group>"; };
 		66AFE43B1B79485100985C54 /* ActivityChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityChartView.m; sourceTree = "<group>"; };
 		66CAE3D81B754B1B001306FD /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -115,7 +113,6 @@
 			isa = PBXGroup;
 			children = (
 				66EE175C1B729EA0008B6743 /* Images.xcassets */,
-				66AFE4381B79483200985C54 /* ActivityChart.xib */,
 				66EE175E1B729EA0008B6743 /* MainMenu.xib */,
 			);
 			name = Resources;
@@ -300,7 +297,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66AFE4391B79483200985C54 /* ActivityChart.xib in Resources */,
 				66EE175D1B729EA0008B6743 /* Images.xcassets in Resources */,
 				66EE17601B729EA0008B6743 /* MainMenu.xib in Resources */,
 			);
