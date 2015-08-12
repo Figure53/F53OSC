@@ -94,7 +94,6 @@
     CGContextDrawPath(ctx, kCGPathFillStroke);
 }
 
-// TODO: addDataPoint
 - (void)addDataPoint:(NSNumber *)point
 {
     [self.dataPoints removeObjectAtIndex:0];
