@@ -32,14 +32,14 @@
     }
 }
 
-- (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
-    // get drawing context
-    [self drawChart];
+- (void)addDataPoint:(NSNumber *)point
+{
+    [self.dataPoints removeObjectAtIndex:0];
+    [self.dataPoints addObject:point];
+    [self setNeedsDisplay:YES];
 }
 
-- (void)drawChart
+- (void)drawRect:(NSRect)dirtyRect
 {
     CGContextRef ctx = [[NSGraphicsContext currentContext] graphicsPort];
     
@@ -92,13 +92,6 @@
     CGPathCloseSubpath(path);
     CGContextAddPath(ctx, path);
     CGContextDrawPath(ctx, kCGPathFillStroke);
-}
-
-- (void)addDataPoint:(NSNumber *)point
-{
-    [self.dataPoints removeObjectAtIndex:0];
-    [self.dataPoints addObject:point];
-    [self setNeedsDisplay:YES];
 }
 
 @end
