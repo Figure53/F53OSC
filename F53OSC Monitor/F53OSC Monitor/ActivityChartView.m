@@ -14,13 +14,12 @@
 #define CHART_HEIGHT_FLOAT 200.0
 #define DATA_POINTS 120
 
-@interface ActivityChartView () {
-    double _barWidth;
-}
+@interface ActivityChartView ()
 
 @property (strong) NSMutableArray *dataPoints;
 
 @end
+
 
 @implementation ActivityChartView
 
