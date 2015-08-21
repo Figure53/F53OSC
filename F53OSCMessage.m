@@ -105,6 +105,8 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     
     // Pull out arguments...
     
+    // TODO: support \T for true, \F for false, \N for null, and \I for impulse
+    
     // Create a working copy and place a token for each escaped " character.
     NSString *QUOTE_CHAR_TOKEN = @"•";
     NSString *workingArguments = [string substringFromIndex:[address length]];
@@ -389,6 +391,24 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     }
     
     return result;
+}
+
+- (NSString *) asQSC
+{
+    NSMutableString *description = [NSMutableString stringWithString:self.addressPattern];
+    for ( id arg in self.arguments )
+    {
+        if ( [arg isKindOfClass:[NSString class]] )
+        {
+            [description appendFormat:@" \"%@\"", arg];
+        }
+        if ( [arg isKindOfClass:[NSNumber class]] )
+        {
+            // TODO: forcibly preserve number type?
+            [description appendFormat:@" %@", arg];
+        }
+    }
+    return [NSString stringWithString:description];
 }
 
 @end

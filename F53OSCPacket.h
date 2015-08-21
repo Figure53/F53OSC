@@ -36,5 +36,6 @@
 @property (strong) F53OSCSocket *replySocket;
 
 - (NSData *) packetData;
+- (NSString *) asQSC;
 
 @end

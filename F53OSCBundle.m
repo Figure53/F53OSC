@@ -89,4 +89,10 @@
     return result;
 }
 
+- (NSString *) asQSC
+{
+    NSLog( @"Error: F53OSCBundle does not yet support conversion to QSC." );
+    return nil;
+}
+
 @end

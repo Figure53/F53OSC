@@ -53,4 +53,10 @@
     return nil;
 }
 
+- (NSString *) asQSC
+{
+    // Defined by subclasses.
+    return nil;
+}
+
 @end
