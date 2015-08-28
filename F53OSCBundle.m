@@ -34,6 +34,12 @@
 
 @implementation F53OSCBundle
 
++ (F53OSCBundle *) bundleWithString:(NSString *)qscString
+{
+    NSLog( @"Error: F53OSCBundle does not yet support conversion of OSC bundles to/from a QSC form." );
+    return nil;
+}
+
 + (F53OSCBundle *) bundleWithTimeTag:(F53OSCTimeTag *)timeTag
                             elements:(NSArray *)elements
 {
@@ -91,7 +97,14 @@
 
 - (NSString *) asQSC
 {
-    NSLog( @"Error: F53OSCBundle does not yet support conversion to QSC." );
+    NSLog( @"Error: F53OSCBundle does not yet support conversion of OSC bundles to/from a QSC form." );
+    
+    // Candidate idea, if we ever decide we want to do this:
+    //
+    // #bundleJSON_STRING
+    //
+    // e.g. #bundle{ "some_arbitrary_name": ["/a/message", "/another/message with arguments 1 2 \"3\"", "another_arbitrary_name": ["/internal/bundle/message"]] }
+    
     return nil;
 }
 

@@ -88,20 +88,24 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         return NO;
 }
 
-+ (F53OSCMessage *) messageWithString:(NSString *)string
++ (F53OSCMessage *) messageWithString:(NSString *)qscString
 {
-    if ( string == nil )
+    if ( qscString == nil )
         return nil;
     
-    string = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    qscString = [qscString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
-    if ( [string isEqualToString:@""] )
+    if ( [qscString isEqualToString:@""] )
         return nil;
     
     // Pull out address.
-    NSString *address = [[string componentsSeparatedByString:@" "] objectAtIndex:0];
+    NSString *address = [[qscString componentsSeparatedByString:@" "] objectAtIndex:0];
     if ( ![self legalAddress:address] )
+    {
+        // Note: We'll return here if caller tried to parse a QSC bundle string as a message string;
+        //       The # character used in the #bundle string is not a legal address character.
         return nil;
+    }
     
     // Pull out arguments...
     
@@ -109,7 +113,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     
     // Create a working copy and place a token for each escaped " character.
     NSString *QUOTE_CHAR_TOKEN = @"•";
-    NSString *workingArguments = [string substringFromIndex:[address length]];
+    NSString *workingArguments = [qscString substringFromIndex:[address length]];
     workingArguments = [workingArguments stringByReplacingOccurrencesOfString:@"\\\"" withString:QUOTE_CHAR_TOKEN];
     
     // The remaining " characters signify quoted string arguments; they should be paired up.
@@ -147,12 +151,28 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         {
             NSString *detokenized = [[allQuotedStrings objectAtIndex:token_index]
                                      stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""];
-            [finalArgs addObject:detokenized];
+            [finalArgs addObject:detokenized]; // quoted OSC string
             token_index++;
         }
         else if ( [arg isEqual:QUOTE_CHAR_TOKEN] )
         {
-            [finalArgs addObject:@"\""];
+            [finalArgs addObject:@"\""];       // single character OSC string
+        }
+        else if ( [arg hasPrefix:@"#blob"] )
+        {
+            NSString *encodedBlob = [arg substringFromIndex:5]; // strip #blob
+            if ( [encodedBlob isEqual:@""] )
+                continue;
+            
+            NSData *blob = [[NSData alloc] initWithBase64EncodedString:encodedBlob options:0];
+            if ( blob )
+            {
+                [finalArgs addObject:blob];    // OSC blob
+            }
+            else
+            {
+                NSLog( @"Error: F53OSCMessage: Unable to decode base64 encoded string: %@", encodedBlob );
+            }
         }
         else
         {
@@ -162,9 +182,9 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             
             NSNumber *number = [formatter numberFromString:arg];
             if ( number == nil )
-                [finalArgs addObject:arg];
+                [finalArgs addObject:arg];     // unquoted OSC string
             else
-                [finalArgs addObject:number];
+                [finalArgs addObject:number];  // OSC int or float
         }
     }
     
@@ -290,12 +310,12 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( [obj isKindOfClass:[NSString class]] )
         {
-            [newTypes appendString:@"s"];
+            [newTypes appendString:@"s"]; // OSC string
             [newArgs addObject:obj];
         }
         else if ( [obj isKindOfClass:[NSData class]] )
         {
-            [newTypes appendString:@"b"];
+            [newTypes appendString:@"b"]; // OSC blob
             [newArgs addObject:obj];
         }
         else if ( [obj isKindOfClass:[NSNumber class]] )
@@ -313,13 +333,13 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberLongType:
                 case kCFNumberLongLongType:
                 case kCFNumberNSIntegerType:
-                    [newTypes appendString:@"i"]; break;
+                    [newTypes appendString:@"i"]; break; // OSC integer
                 case kCFNumberFloat32Type:
                 case kCFNumberFloat64Type:
                 case kCFNumberFloatType:
                 case kCFNumberDoubleType:
                 case kCFNumberCGFloatType:
-                    [newTypes appendString:@"f"]; break;
+                    [newTypes appendString:@"f"]; break; // OSC float
                 default:
                     NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, obj );
                     continue;
@@ -395,20 +415,23 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 
 - (NSString *) asQSC
 {
-    NSMutableString *description = [NSMutableString stringWithString:self.addressPattern];
+    NSMutableString *qscString = [NSMutableString stringWithString:self.addressPattern];
     for ( id arg in self.arguments )
     {
         if ( [arg isKindOfClass:[NSString class]] )
         {
-            [description appendFormat:@" \"%@\"", arg];
+            [qscString appendFormat:@" \"%@\"", arg];
         }
         if ( [arg isKindOfClass:[NSNumber class]] )
         {
-            // TODO: forcibly preserve number type?
-            [description appendFormat:@" %@", arg];
+            [qscString appendFormat:@" %@", arg]; // TODO: forcibly preserve number type (int/float)?
+        }
+        if ( [arg isKindOfClass:[NSData class]] )
+        {
+            [qscString appendFormat:@" #blob%@", [arg base64EncodedStringWithOptions:0]];
         }
     }
-    return [NSString stringWithString:description];
+    return [NSString stringWithString:qscString];
 }
 
 @end

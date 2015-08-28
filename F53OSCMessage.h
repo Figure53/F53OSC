@@ -51,7 +51,7 @@
 + (BOOL) legalAddress:(NSString *)address;
 + (BOOL) legalMethod:(NSString *)method;
 
-+ (F53OSCMessage *) messageWithString:(NSString *)string;
++ (F53OSCMessage *) messageWithString:(NSString *)qscString;
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
                                     arguments:(NSArray *)arguments;
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern 
@@ -64,5 +64,6 @@
 @property (nonatomic, strong) id userData;
 
 - (NSArray *) addressParts;
+- (NSString *) asQSC;
 
 @end
