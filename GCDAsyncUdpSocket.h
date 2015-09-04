@@ -8,10 +8,10 @@
 //  https://github.com/robbiehanson/CocoaAsyncSocket
 //
 
-#import <Foundation/Foundation.h>
-#import <dispatch/dispatch.h>
-#import <TargetConditionals.h>
-#import <Availability.h>
+@import Foundation;
+@import Dispatch;
+@import Darwin.TargetConditionals;
+@import Darwin.Availability;
 
 extern NSString *const GCDAsyncUdpSocketException;
 extern NSString *const GCDAsyncUdpSocketErrorDomain;

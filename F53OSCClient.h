@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 #import "F53OSCProtocols.h"
 #import "F53OSCSocket.h"

@@ -8,13 +8,13 @@
 //  https://github.com/robbiehanson/CocoaAsyncSocket
 //
 
-#import <Foundation/Foundation.h>
-#import <Security/Security.h>
-#import <Security/SecureTransport.h>
-#import <dispatch/dispatch.h>
-#import <Availability.h>
+@import Foundation;
+@import Security;
+@import Security.SecureTransport;
+@import Dispatch;
+@import Darwin.Availability;
 
-#include <sys/socket.h> // AF_INET, AF_INET6
+@import Darwin.POSIX.sys.socket; // AF_INET, AF_INET6
 
 @class GCDAsyncReadPacket;
 @class GCDAsyncWritePacket;

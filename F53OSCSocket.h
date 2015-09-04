@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 #import "GCDAsyncSocket.h"
 #import "GCDAsyncUdpSocket.h"

@@ -11,22 +11,22 @@
 #import "GCDAsyncSocket.h"
 
 #if TARGET_OS_IPHONE
-#import <CFNetwork/CFNetwork.h>
+@import CFNetwork;
 #endif
 
-#import <TargetConditionals.h>
-#import <arpa/inet.h>
-#import <fcntl.h>
+@import Darwin.TargetConditionals;
+@import Darwin.POSIX.arpa.inet;
+@import Darwin.POSIX.fcntl;
 #import <ifaddrs.h>
-#import <netdb.h>
-#import <netinet/in.h>
-#import <net/if.h>
-#import <sys/socket.h>
-#import <sys/types.h>
-#import <sys/ioctl.h>
-#import <sys/poll.h>
-#import <sys/uio.h>
-#import <unistd.h>
+@import Darwin.POSIX.netdb;
+@import Darwin.POSIX.netinet.in;
+#import <net/if.h>  // can't use module, name is illegal: see http://www.openradar.appspot.com/18440532
+@import Darwin.POSIX.sys.socket;
+@import Darwin.POSIX.sys.types;
+@import Darwin.POSIX.ioctl;
+@import Darwin.POSIX.poll;
+@import Darwin.POSIX.sys.uio;
+@import Darwin.POSIX.unistd;
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
