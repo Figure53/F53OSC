@@ -123,7 +123,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 
     NSString *QUOTE_STRING_TOKEN = @"∞";
     NSMutableArray *allQuotedStrings = [NSMutableArray array];
-    for ( int i = 1; i < [splitOnQuotes count]; i += 2 )
+    for ( NSUInteger i = 1; i < [splitOnQuotes count]; i += 2 )
     {
         // Pull out each quoted string, which will be at each odd index.
         NSString *quotedString = [splitOnQuotes objectAtIndex:i];

@@ -52,7 +52,7 @@
     return [newData copy];
 }
 
-+ (NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;
++ (NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
 {
     
     if ( buf == NULL || maxLength == 0 )

@@ -44,7 +44,7 @@
     length = 4 * ( ceil( (length + 1) / 4.0 ) );
 
     char *string = malloc( length * sizeof( char ) );
-    int i;
+    NSUInteger i;
     for ( i = 0; i < stringLength; i++ )
         string[i] = bytes[i];
     for ( ; i < length; i++ )

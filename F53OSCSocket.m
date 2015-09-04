@@ -142,7 +142,7 @@
     return [[F53OSCSocket alloc] initWithUdpSocket:socket];
 }
 
-- (id) initWithTcpSocket:(GCDAsyncSocket *)socket;
+- (id) initWithTcpSocket:(GCDAsyncSocket *)socket
 {
     self = [super init];
     if ( self )

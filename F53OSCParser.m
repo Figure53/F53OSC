@@ -48,7 +48,7 @@
 
 @implementation F53OSCParser (private)
 
-+ (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
@@ -178,7 +178,7 @@
     [destination takeMessage:[F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:socket]];
 }
 
-+ (void) processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
@@ -230,7 +230,7 @@
                 }
                 else
                 {
-                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", elementLength );
+                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", (unsigned int)elementLength );
                     return;
                 }
                 
@@ -253,7 +253,7 @@
 
 @implementation F53OSCParser
 
-+ (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket
++ (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
 {
     if ( data == nil || destination == nil )
         return;
@@ -274,7 +274,7 @@
     }
     else
     {
-        NSLog( @"Error: Unrecognized OSC message of length %lu.", length );
+        NSLog( @"Error: Unrecognized OSC message of length %lu.", (unsigned long)length );
     }
 }
 
