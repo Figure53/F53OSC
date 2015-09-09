@@ -350,14 +350,14 @@ enum GCDAsyncUdpSocketConfig
 	return [self initWithDelegate:nil delegateQueue:NULL socketQueue:sq];
 }
 
-- (id)initWithDelegate:(id)aDelegate delegateQueue:(dispatch_queue_t)dq
+- (id)initWithDelegate:(id <GCDAsyncUdpSocketDelegate>)aDelegate delegateQueue:(dispatch_queue_t)dq
 {
 	LogTrace();
 	
 	return [self initWithDelegate:aDelegate delegateQueue:dq socketQueue:NULL];
 }
 
-- (id)initWithDelegate:(id)aDelegate delegateQueue:(dispatch_queue_t)dq socketQueue:(dispatch_queue_t)sq
+- (id)initWithDelegate:(id <GCDAsyncUdpSocketDelegate>)aDelegate delegateQueue:(dispatch_queue_t)dq socketQueue:(dispatch_queue_t)sq
 {
 	LogTrace();
 	
@@ -488,7 +488,7 @@ enum GCDAsyncUdpSocketConfig
 	}
 }
 
-- (void)setDelegate:(id)newDelegate synchronously:(BOOL)synchronously
+- (void)setDelegate:(id <GCDAsyncUdpSocketDelegate>)newDelegate synchronously:(BOOL)synchronously
 {
 	dispatch_block_t block = ^{
 		delegate = newDelegate;
@@ -505,12 +505,12 @@ enum GCDAsyncUdpSocketConfig
 	}
 }
 
-- (void)setDelegate:(id)newDelegate
+- (void)setDelegate:(id <GCDAsyncUdpSocketDelegate>)newDelegate
 {
 	[self setDelegate:newDelegate synchronously:NO];
 }
 
-- (void)synchronouslySetDelegate:(id)newDelegate
+- (void)synchronouslySetDelegate:(id <GCDAsyncUdpSocketDelegate>)newDelegate
 {
 	[self setDelegate:newDelegate synchronously:YES];
 }
@@ -566,7 +566,7 @@ enum GCDAsyncUdpSocketConfig
 	[self setDelegateQueue:newDelegateQueue synchronously:YES];
 }
 
-- (void)getDelegate:(id *)delegatePtr delegateQueue:(dispatch_queue_t *)delegateQueuePtr
+- (void)getDelegate:(id <GCDAsyncUdpSocketDelegate> *)delegatePtr delegateQueue:(dispatch_queue_t *)delegateQueuePtr
 {
 	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
 	{
@@ -588,7 +588,7 @@ enum GCDAsyncUdpSocketConfig
 	}
 }
 
-- (void)setDelegate:(id)newDelegate delegateQueue:(dispatch_queue_t)newDelegateQueue synchronously:(BOOL)synchronously
+- (void)setDelegate:(id <GCDAsyncUdpSocketDelegate>)newDelegate delegateQueue:(dispatch_queue_t)newDelegateQueue synchronously:(BOOL)synchronously
 {
 	dispatch_block_t block = ^{
 		
@@ -613,12 +613,12 @@ enum GCDAsyncUdpSocketConfig
 	}
 }
 
-- (void)setDelegate:(id)newDelegate delegateQueue:(dispatch_queue_t)newDelegateQueue
+- (void)setDelegate:(id <GCDAsyncUdpSocketDelegate>)newDelegate delegateQueue:(dispatch_queue_t)newDelegateQueue
 {
 	[self setDelegate:newDelegate delegateQueue:newDelegateQueue synchronously:NO];
 }
 
-- (void)synchronouslySetDelegate:(id)newDelegate delegateQueue:(dispatch_queue_t)newDelegateQueue
+- (void)synchronouslySetDelegate:(id <GCDAsyncUdpSocketDelegate>)newDelegate delegateQueue:(dispatch_queue_t)newDelegateQueue
 {
 	[self setDelegate:newDelegate delegateQueue:newDelegateQueue synchronously:YES];
 }
@@ -3454,6 +3454,70 @@ enum GCDAsyncUdpSocketConfig
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark Reuse port
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)enableReusePort:(BOOL)flag error:(NSError **)errPtr
+{
+	__block BOOL result = NO;
+	__block NSError *err = nil;
+	
+	dispatch_block_t block = ^{ @autoreleasepool {
+		
+		if (![self preOp:&err])
+		{
+			return_from_block;
+		}
+		
+		if ((flags & kDidCreateSockets) == 0)
+		{
+			if (![self createSockets:&err])
+			{
+				return_from_block;
+			}
+		}
+		
+		int value = flag ? 1 : 0;
+		if (socket4FD != SOCKET_NULL)
+		{
+			int error = setsockopt(socket4FD, SOL_SOCKET, SO_REUSEPORT, (const void *)&value, sizeof(value));
+			
+			if (error)
+			{
+				err = [self errnoErrorWithReason:@"Error in setsockopt() function"];
+				
+				return_from_block;
+			}
+			result = YES;
+		}
+		
+		if (socket6FD != SOCKET_NULL)
+		{
+			int error = setsockopt(socket6FD, SOL_SOCKET, SO_REUSEPORT, (const void *)&value, sizeof(value));
+			
+			if (error)
+			{
+				err = [self errnoErrorWithReason:@"Error in setsockopt() function"];
+				
+				return_from_block;
+			}
+			result = YES;
+		}
+		
+	}};
+	
+	if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
+		block();
+	else
+		dispatch_sync(socketQueue, block);
+	
+	if (errPtr)
+		*errPtr = err;
+	
+	return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Broadcast
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -4293,7 +4357,9 @@ enum GCDAsyncUdpSocketConfig
 		struct sockaddr_in sockaddr4;
 		socklen_t sockaddr4len = sizeof(sockaddr4);
 		
-		size_t bufSize = MIN(max4ReceiveSize, socket4FDBytesAvailable);
+		// #222: GCD does not necessarily return the size of an entire UDP packet 
+		// from dispatch_source_get_data(), so we must use the maximum packet size.
+		size_t bufSize = max4ReceiveSize;
 		void *buf = malloc(bufSize);
 		
 		result = recvfrom(socket4FD, buf, bufSize, 0, (struct sockaddr *)&sockaddr4, &sockaddr4len);
@@ -4328,7 +4394,9 @@ enum GCDAsyncUdpSocketConfig
 		struct sockaddr_in6 sockaddr6;
 		socklen_t sockaddr6len = sizeof(sockaddr6);
 		
-		size_t bufSize = MIN(max6ReceiveSize, socket6FDBytesAvailable);
+		// #222: GCD does not necessarily return the size of an entire UDP packet 
+		// from dispatch_source_get_data(), so we must use the maximum packet size.
+		size_t bufSize = max6ReceiveSize;
 		void *buf = malloc(bufSize);
 		
 		result = recvfrom(socket6FD, buf, bufSize, 0, (struct sockaddr *)&sockaddr6, &sockaddr6len);
