@@ -1,5 +1,5 @@
 #import "DDContextFilterLogFormatter.h"
-#import <libkern/OSAtomic.h>
+@import Darwin.libkern.OSAtomic;
 
 /**
  * Welcome to Cocoa Lumberjack!

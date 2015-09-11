@@ -1,5 +1,5 @@
-#import <Foundation/Foundation.h>
-#import <libkern/OSAtomic.h>
+@import Foundation;
+@import Darwin.libkern.OSAtomic;
 #import "DDLog.h"
 
 

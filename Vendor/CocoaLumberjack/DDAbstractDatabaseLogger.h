@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+@import Foundation;
 
 #import "DDLog.h"
 
@@ -56,8 +56,8 @@
  * The default saveThreshold is 500.
  * The default saveInterval is 60 seconds.
 **/
-@property (assign, readwrite) NSUInteger saveThreshold;
-@property (assign, readwrite) NSTimeInterval saveInterval;
+@property (atomic, assign, readwrite) NSUInteger saveThreshold;
+@property (atomic, assign, readwrite) NSTimeInterval saveInterval;
 
 /**
  * It is likely you don't want the log entries to persist forever.
@@ -85,9 +85,9 @@
  * The default deleteInterval is 5 minutes.
  * The default deleteOnEverySave is NO.
 **/
-@property (assign, readwrite) NSTimeInterval maxAge;
-@property (assign, readwrite) NSTimeInterval deleteInterval;
-@property (assign, readwrite) BOOL deleteOnEverySave;
+@property (atomic, assign, readwrite) NSTimeInterval maxAge;
+@property (atomic, assign, readwrite) NSTimeInterval deleteInterval;
+@property (atomic, assign, readwrite) BOOL deleteOnEverySave;
 
 /**
  * Forces a save of any pending log entries (flushes log entries to disk).

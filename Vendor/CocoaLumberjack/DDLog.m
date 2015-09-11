@@ -1,13 +1,13 @@
 #import "DDLog.h"
 
-#import <pthread.h>
-#import <objc/runtime.h>
-#import <mach/mach_host.h>
-#import <mach/host_info.h>
-#import <libkern/OSAtomic.h>
-#import <Availability.h>
+@import Darwin.POSIX.pthread;
+@import ObjectiveC.runtime;
+@import Darwin.Mach.mach_host;
+@import Darwin.Mach.host_info;
+@import Darwin.libkern.OSAtomic;
+@import Darwin.Availability;
 #if TARGET_OS_IPHONE
-    #import <UIKit/UIDevice.h>
+    @import UIKit.UIDevice;
 #endif
 
 /**
@@ -1119,8 +1119,8 @@ static char *dd_str_copy(const char *str)
     __block id <DDLogFormatter> result;
     
     dispatch_sync(globalLoggingQueue, ^{
-        dispatch_sync(loggerQueue, ^{
-            result = formatter;
+        dispatch_sync(self->loggerQueue, ^{
+            result = self->formatter;
         });
     });
     
@@ -1136,16 +1136,16 @@ static char *dd_str_copy(const char *str)
     
     dispatch_block_t block = ^{ @autoreleasepool {
         
-        if (formatter != logFormatter)
+        if (self->formatter != logFormatter)
         {
-            if ([formatter respondsToSelector:@selector(willRemoveFromLogger:)]) {
-                [formatter willRemoveFromLogger:self];
+            if ([self->formatter respondsToSelector:@selector(willRemoveFromLogger:)]) {
+                [self->formatter willRemoveFromLogger:self];
             }
             
-            formatter = logFormatter;
+            self->formatter = logFormatter;
             
-            if ([formatter respondsToSelector:@selector(didAddToLogger:)]) {
-                [formatter didAddToLogger:self];
+            if ([self->formatter respondsToSelector:@selector(didAddToLogger:)]) {
+                [self->formatter didAddToLogger:self];
             }
         }
     }};
@@ -1153,7 +1153,7 @@ static char *dd_str_copy(const char *str)
     dispatch_queue_t globalLoggingQueue = [DDLog loggingQueue];
     
     dispatch_async(globalLoggingQueue, ^{
-        dispatch_async(loggerQueue, block);
+        dispatch_async(self->loggerQueue, block);
     });
 }
 

@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+@import Foundation;
 #import "DDLog.h"
 
 @class DDLogFileInfo;
@@ -216,8 +216,8 @@
  * If you disable both maximumFileSize and rollingFrequency, then the log file won't ever be rolled.
  * This is strongly discouraged.
 **/
-@property (readwrite, assign) unsigned long long maximumFileSize;
-@property (readwrite, assign) NSTimeInterval rollingFrequency;
+@property (atomic, readwrite, assign) unsigned long long maximumFileSize;
+@property (atomic, readwrite, assign) NSTimeInterval rollingFrequency;
 
 /**
  * The DDLogFileManager instance can be used to retrieve the list of log files,

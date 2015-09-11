@@ -1,5 +1,5 @@
 #import "DDDispatchQueueLogFormatter.h"
-#import <libkern/OSAtomic.h>
+@import Darwin.libkern.OSAtomic;
 
 /**
  * Welcome to Cocoa Lumberjack!
@@ -100,7 +100,7 @@
             [threadUnsafeDateFormatter setDateFormat:dateFormatString];
         }
         
-        [threadUnsafeDateFormatter setCalendar:[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar]];
+        [threadUnsafeDateFormatter setCalendar:[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian]];
         return [threadUnsafeDateFormatter stringFromDate:date];
     }
     else
@@ -122,7 +122,7 @@
             threadDictionary[key] = dateFormatter;
         }
         
-        [dateFormatter setCalendar:[[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar]];
+        [dateFormatter setCalendar:[[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian]];
         return [dateFormatter stringFromDate:date];
     }
 }
@@ -222,7 +222,7 @@
         memset(spaces, ' ', numSpaces);
         spaces[numSpaces] = '\0';
         
-        return [NSString stringWithFormat:@"%@%s", queueThreadLabel, spaces];
+        return [NSString stringWithFormat:@"%@%@", queueThreadLabel, [NSString stringWithUTF8String:spaces]];
     }
     else
     {

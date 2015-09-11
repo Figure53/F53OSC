@@ -1,6 +1,6 @@
-#import <Foundation/Foundation.h>
+@import Foundation;
 #if TARGET_OS_IPHONE
-#import <UIKit/UIColor.h>
+@import UIKit.UIColor;
 #else
 #import <AppKit/NSColor.h>
 #endif
@@ -83,7 +83,7 @@
  * 
  * The default value if NO.
 **/
-@property (readwrite, assign) BOOL colorsEnabled;
+@property (atomic, readwrite, assign) BOOL colorsEnabled;
 
 /**
  * The default color set (foregroundColor, backgroundColor) is:

@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+@import Foundation;
 #import "DDLog.h"
 
 /**
@@ -20,7 +20,7 @@
 /**
  *  Array of chained formatters
  */
-@property (readonly) NSArray *formatters;
+@property (atomic, readonly) NSArray *formatters;
 
 - (void)addFormatter:(id<DDLogFormatter>)formatter;
 - (void)removeFormatter:(id<DDLogFormatter>)formatter;
