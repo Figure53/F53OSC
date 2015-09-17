@@ -35,16 +35,13 @@
 
 - (NSData *) oscBlobData
 {
-    //  A note on the 4s: For OSC, everything is null-terminated and in multiples of 4 bytes. 
-    //  If the data is already a multiple of 4 bytes, it needs to have four null bytes appended.
-    
     UInt32 dataSize = (UInt32)[self length];
-    dataSize = 4 * ( ceil( dataSize / 4.0 ) );
     dataSize = OSSwapHostToBigInt32( dataSize );
     NSMutableData *newData = [NSMutableData dataWithBytes:&dataSize length:sizeof(UInt32)];
     
     [newData appendData:self];
-    
+ 
+    // In OSC everything is in multiples of 4 bytes. We must add null bytes to pad out to 4.
     char zero = 0;
     for ( int i = ([self length] - 1) % 4; i < 3; i++ )
         [newData appendBytes:&zero length:1];
@@ -54,24 +51,17 @@
 
 + (NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;
 {
-    
     if ( buf == NULL || maxLength == 0 )
         return nil;
-    
-    for ( NSUInteger index = 0; index < maxLength; index++ )
-    {
-        if ( buf[index] == 0 )
-            goto valid; // Found a null character within the buffer.
-    }
-    return nil; // Buffer wasn't null terminated, so it's not a valid OSC blob.
-    
-    
-valid:; // semicolon prevents complaining about dataSize variable declaration on next line
     
     UInt32 dataSize = 0;
     
     dataSize = *((UInt32 *)buf);
     dataSize = OSSwapBigToHostInt32( dataSize );
+    
+    if ( dataSize + 4 > maxLength )
+        return nil;
+    
     *outLength = dataSize;
     buf += 4;
     return [NSData dataWithBytes:buf length:dataSize];
