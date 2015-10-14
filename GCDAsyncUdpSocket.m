@@ -4482,7 +4482,9 @@ enum GCDAsyncUdpSocketConfig
 		if (flags & kReceiveContinuous)
 		{
 			// Continuous receive mode
-			[self doReceive];
+			dispatch_async(socketQueue, ^{ @autoreleasepool {
+				[self doReceive];
+			}});
 		}
 		else
 		{
@@ -4495,7 +4497,9 @@ enum GCDAsyncUdpSocketConfig
 			}
 			else if (ignored)
 			{
-				[self doReceive];
+				dispatch_async(socketQueue, ^{ @autoreleasepool {
+					[self doReceive];
+				}});
 			}
 			else
 			{
