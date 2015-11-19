@@ -35,7 +35,7 @@
 
 - (NSData *) oscStringData
 {
-    //  A note on the 4s: For OSC, everything is null-terminated and in multiples of 4 bytes. 
+    //  A note on the 4s: For OSC, strings are all null-terminated and in multiples of 4 bytes.
     //  If the data is already a multiple of 4 bytes, it needs to have four null bytes appended.
     
     NSUInteger length = [self lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
