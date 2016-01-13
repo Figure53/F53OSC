@@ -32,6 +32,8 @@
 
 @interface F53OSCParser : NSObject
 
++ (F53OSCMessage *) parseOscData:(NSData *)data;
+
 + (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 
 + (void) translateSlipData:(NSData *)slipData toData:(NSMutableData *)data withState:(NSMutableDictionary *)state destination:(id <F53OSCPacketDestination>)destination;
