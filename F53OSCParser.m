@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2016 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,7 @@
 
 + (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 {
-    F53OSCMessage *inbound = [self parseOscData:data];
+    F53OSCMessage *inbound = [self parseOscMessageData:data];
     
     if (inbound == nil)
     {
@@ -138,7 +138,7 @@
 
 @implementation F53OSCParser
 
-+ (F53OSCMessage *) parseOscData:(NSData *)data
++ (F53OSCMessage *) parseOscMessageData:(NSData *)data
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
