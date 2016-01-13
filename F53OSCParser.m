@@ -50,7 +50,7 @@
 
 + (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 {
-    F53OSCMessage *inbound = [self parseOscMessageFrom:data];
+    F53OSCMessage *inbound = [self parseOscData:data];
     
     if (inbound == nil)
     {
@@ -138,7 +138,7 @@
 
 @implementation F53OSCParser
 
-+ (F53OSCMessage *) parseOscMessageFrom:(NSData *)data
++ (F53OSCMessage *) parseOscData:(NSData *)data
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];

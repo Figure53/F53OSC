@@ -32,7 +32,7 @@
 
 @interface F53OSCParser : NSObject
 
-+ (F53OSCMessage *) parseOscMessageFrom:(NSData *)data;
++ (F53OSCMessage *) parseOscData:(NSData *)data;
 
 + (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 
