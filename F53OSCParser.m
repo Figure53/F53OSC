@@ -115,7 +115,7 @@
                 }
                 else
                 {
-                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", elementLength );
+                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", (unsigned int)elementLength );
                     return;
                 }
                 
