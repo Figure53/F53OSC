@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2016 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -50,135 +50,20 @@
 
 + (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
 {
-    NSUInteger length = [data length];
-    const char *buffer = [data bytes];
+    F53OSCMessage *inbound = [self parseOscMessageData:data];
     
-    NSUInteger lengthOfRemainingBuffer = length;
-    NSUInteger dataLength = 0;
-    NSString *addressPattern = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
-    if ( addressPattern == nil || dataLength == 0 || dataLength > length )
+    if (inbound == nil)
     {
-        NSLog( @"Error: Unable to parse OSC method address." );
         return;
     }
-    
-    buffer += dataLength;
-    lengthOfRemainingBuffer -= dataLength;
-    
-    NSMutableArray *args = [NSMutableArray array];
-    BOOL hasArguments = (lengthOfRemainingBuffer > 0);
-    if ( hasArguments && buffer[0] == ',' )
+    else
     {
-        NSString *typeTag = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
-        if ( typeTag == nil )
-        {
-            NSLog( @"Error: Unable to parse type tag for OSC method %@", addressPattern );
-            return;
-        }
-        buffer += dataLength;
-        lengthOfRemainingBuffer -= dataLength;
-        
-        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
-        {
-            NSLog( @"Incoming OSC message:" );
-            NSLog( @"  %@", addressPattern );
-        }
-        
-        NSInteger numArgs = [typeTag length] - 1;
-        if ( numArgs > 0 )
-        {
-            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
-                NSLog( @"  arguments:" );
-            
-            for ( int i = 1; i < numArgs + 1; i++ )
-            {
-                NSString *stringArg = nil;
-                NSData *dataArg = nil;
-                NSNumber *numberArg = nil;
-                
-                char type = [typeTag characterAtIndex:i]; // (index starts at 1 because first char is ",")
-                switch ( type )
-                {
-                    case 's':
-                        stringArg = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
-                        if ( stringArg )
-                        {
-                            [args addObject:stringArg];
-                            buffer += dataLength;
-                            lengthOfRemainingBuffer -= dataLength;
-                            
-                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
-                                NSLog( @"    string: \"%@\"", stringArg );
-                        }
-                        else
-                        {
-                            NSLog( @"Error: Unable to parse string argument for OSC method %@", addressPattern );
-                            return;
-                        }
-                        break;
-                    case 'b':
-                        dataArg = [NSData dataWithOSCBlobBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
-                        if ( dataArg )
-                        {
-                            [args addObject:dataArg];
-                            buffer += dataLength + 4;
-                            lengthOfRemainingBuffer -= (dataLength + 4);
-                            
-                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
-                                NSLog( @"    blob: %@", dataArg );
-                        }
-                        else
-                        {
-                            NSLog( @"Error: Unable to parse blob argument for OSC method %@", addressPattern );
-                            return;
-                        }
-                        break;
-                    case 'i':
-                        numberArg = [NSNumber numberWithOSCIntBytes:buffer maxLength:lengthOfRemainingBuffer];
-                        if ( numberArg )
-                        {
-                            [args addObject:numberArg];
-                            buffer += 4;
-                            lengthOfRemainingBuffer -= 4;
-                            
-                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
-                                NSLog( @"    int: %@", numberArg );
-                        }
-                        else
-                        {
-                            NSLog( @"Error: Unable to parse int argument for OSC method %@", addressPattern );
-                            return;
-                        }
-                        break;
-                    case 'f':
-                        numberArg = [NSNumber numberWithOSCFloatBytes:buffer maxLength:lengthOfRemainingBuffer];
-                        if ( numberArg )
-                        {
-                            [args addObject:numberArg];
-                            buffer += 4;
-                            lengthOfRemainingBuffer -= 4;
-                            
-                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
-                                NSLog( @"    float: %@", numberArg );
-                        }
-                        else
-                        {
-                            NSLog( @"Error: Unable to parse float argument for OSC method %@", addressPattern );
-                            return;
-                        }
-                        break;
-                    default:
-                        NSLog( @"Error: Unrecognized type '%c' found in type tag for OSC method %@", type, addressPattern );
-                        return;
-                }
-            }
-        }
+        inbound.replySocket = socket;
+        [destination takeMessage:inbound];
     }
-    
-    [destination takeMessage:[F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:socket]];
 }
 
-+ (void) processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
++ (void) processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
@@ -230,7 +115,7 @@
                 }
                 else
                 {
-                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", (unsigned int)elementLength );
+                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", elementLength );
                     return;
                 }
                 
@@ -253,7 +138,137 @@
 
 @implementation F53OSCParser
 
-+ (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
++ (F53OSCMessage *) parseOscMessageData:(NSData *)data
+{
+    NSUInteger length = [data length];
+    const char *buffer = [data bytes];
+    
+    NSUInteger lengthOfRemainingBuffer = length;
+    NSUInteger dataLength = 0;
+    NSString *addressPattern = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+    if ( addressPattern == nil || dataLength == 0 || dataLength > length )
+    {
+        NSLog( @"Error: Unable to parse OSC method address." );
+        return nil;
+    }
+    
+    buffer += dataLength;
+    lengthOfRemainingBuffer -= dataLength;
+    
+    NSMutableArray *args = [NSMutableArray array];
+    BOOL hasArguments = (lengthOfRemainingBuffer > 0);
+    if ( hasArguments && buffer[0] == ',' )
+    {
+        NSString *typeTag = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+        if ( typeTag == nil )
+        {
+            NSLog( @"Error: Unable to parse type tag for OSC method %@", addressPattern );
+            return nil;
+        }
+        buffer += dataLength;
+        lengthOfRemainingBuffer -= dataLength;
+        
+        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+        {
+            NSLog( @"Incoming OSC message:" );
+            NSLog( @"  %@", addressPattern );
+        }
+        
+        NSInteger numArgs = [typeTag length] - 1;
+        if ( numArgs > 0 )
+        {
+            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                NSLog( @"  arguments:" );
+            
+            for ( int i = 1; i < numArgs + 1; i++ )
+            {
+                NSString *stringArg = nil;
+                NSData *dataArg = nil;
+                NSNumber *numberArg = nil;
+                
+                char type = [typeTag characterAtIndex:i]; // (index starts at 1 because first char is ",")
+                switch ( type )
+                {
+                    case 's':
+                        stringArg = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+                        if ( stringArg )
+                        {
+                            [args addObject:stringArg];
+                            buffer += dataLength;
+                            lengthOfRemainingBuffer -= dataLength;
+                            
+                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                                NSLog( @"    string: \"%@\"", stringArg );
+                        }
+                        else
+                        {
+                            NSLog( @"Error: Unable to parse string argument for OSC method %@", addressPattern );
+                            return nil;
+                        }
+                        break;
+                    case 'b':
+                        dataArg = [NSData dataWithOSCBlobBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+                        if ( dataArg )
+                        {
+                            [args addObject:dataArg];
+                            buffer += dataLength + 4;
+                            lengthOfRemainingBuffer -= (dataLength + 4);
+                            
+                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                                NSLog( @"    blob: %@", dataArg );
+                        }
+                        else
+                        {
+                            NSLog( @"Error: Unable to parse blob argument for OSC method %@", addressPattern );
+                            return nil;
+                        }
+                        break;
+                    case 'i':
+                        numberArg = [NSNumber numberWithOSCIntBytes:buffer maxLength:lengthOfRemainingBuffer];
+                        if ( numberArg )
+                        {
+                            [args addObject:numberArg];
+                            buffer += 4;
+                            lengthOfRemainingBuffer -= 4;
+                            
+                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                                NSLog( @"    int: %@", numberArg );
+                        }
+                        else
+                        {
+                            NSLog( @"Error: Unable to parse int argument for OSC method %@", addressPattern );
+                            return nil;
+                        }
+                        break;
+                    case 'f':
+                        numberArg = [NSNumber numberWithOSCFloatBytes:buffer maxLength:lengthOfRemainingBuffer];
+                        if ( numberArg )
+                        {
+                            [args addObject:numberArg];
+                            buffer += 4;
+                            lengthOfRemainingBuffer -= 4;
+                            
+                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                                NSLog( @"    float: %@", numberArg );
+                        }
+                        else
+                        {
+                            NSLog( @"Error: Unable to parse float argument for OSC method %@", addressPattern );
+                            return nil;
+                        }
+                        break;
+                    default:
+                        NSLog( @"Error: Unrecognized type '%c' found in type tag for OSC method %@", type, addressPattern );
+                        return nil;
+                }
+            }
+        }
+    }
+    
+    return [F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:nil];
+}
+
++ (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket
 {
     if ( data == nil || destination == nil )
         return;
