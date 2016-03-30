@@ -223,14 +223,6 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return self;
 }
 
-- (void) dealloc
-{
-    self.addressPattern = nil;
-    self.typeTagString = nil;
-    self.arguments = nil;
-    self.userData = nil;
-}
-
 - (void) encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:self.addressPattern forKey:@"addressPattern"];
@@ -284,8 +276,6 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return NO;
 }
 
-@synthesize addressPattern;
-
 - (void) setAddressPattern:(NSString *)newAddressPattern
 {
     if ( newAddressPattern == nil ||
@@ -295,12 +285,8 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         return;
     }
     
-    addressPattern = [newAddressPattern copy];
+    _addressPattern = [newAddressPattern copy];
 }
-
-@synthesize typeTagString;
-
-@synthesize arguments;
 
 - (void) setArguments:(NSArray *)argArray
 {
@@ -348,10 +334,8 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         }
     }
     self.typeTagString = [newTypes copy];
-    arguments = [newArgs copy];
+    _arguments = [newArgs copy];
 }
-
-@synthesize userData;
 
 - (NSArray *) addressParts
 {
