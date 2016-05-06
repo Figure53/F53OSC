@@ -149,6 +149,7 @@
     {
         self.tcpSocket = socket;
         self.udpSocket = nil;
+        self.interface = nil;
         self.host = @"localhost";
         self.port = 0;
     }
@@ -162,6 +163,7 @@
     {
         self.tcpSocket = nil;
         self.udpSocket = socket;
+        self.interface = nil;
         self.host = @"localhost";
         self.port = 0;
         self.stats = nil;
@@ -206,16 +208,18 @@
 
 @synthesize port;
 
+@synthesize interface;
+
 - (BOOL) startListening
 {
     if ( self.tcpSocket )
     {
-        return [self.tcpSocket acceptOnPort:self.port error:nil];
+        return [self.tcpSocket acceptOnInterface:self.interface port:self.port error:nil];
     }
 
     if ( self.udpSocket )
     {
-        if ( [self.udpSocket bindToPort:self.port error:nil] )
+        if ( [self.udpSocket bindToPort:self.port interface:self.interface error:nil] )
         {
             if ( !self.stats )
                 self.stats = [[F53OSCStats alloc] init];
@@ -248,7 +252,7 @@
     if ( self.tcpSocket )
     {
         if ( self.host && self.port )
-            return [self.tcpSocket connectToHost:self.host onPort:self.port error:nil];
+            return [self.tcpSocket connectToHost:self.host onPort:self.port viaInterface:self.interface withTimeout:-1 error:nil];
         else
             return NO;
     }
@@ -316,6 +320,9 @@
     else if ( self.udpSocket )
     {
         NSError *error = nil;
+        if ( self.interface )
+            [self.udpSocket bindToPort:0 interface:self.interface error:nil];
+
         if ( ![self.udpSocket enableBroadcast:YES error:&error] )
         {
             NSString *errString = error ? [error localizedDescription] : @"(unknown error)";
