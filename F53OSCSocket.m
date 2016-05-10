@@ -206,6 +206,19 @@
 
 @synthesize port;
 
+- (BOOL) isEqual:(id)object
+{
+    if ( ![object isKindOfClass:[F53OSCSocket class]] )
+        return NO;
+    
+    F53OSCSocket *otherSocket = (F53OSCSocket *)object;
+    
+    if ( self.isTcpSocket != otherSocket.isTcpSocket )
+        return NO;
+    
+    return ( [self.host isEqualToString:otherSocket.host] && self.port == otherSocket.port );
+}
+
 - (BOOL) startListening
 {
     if ( self.tcpSocket )
