@@ -208,6 +208,9 @@
 
 - (BOOL) isEqual:(id)object
 {
+    if ( object == nil )
+        return NO;
+    
     if ( ![object isKindOfClass:[F53OSCSocket class]] )
         return NO;
     
@@ -217,6 +220,11 @@
         return NO;
     
     return ( [self.host isEqualToString:otherSocket.host] && self.port == otherSocket.port );
+}
+
+- (NSUInteger) hash
+{
+    return [self.host hash] ^ [@( self.port ) hash];
 }
 
 - (BOOL) startListening
