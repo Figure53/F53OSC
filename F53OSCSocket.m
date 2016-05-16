@@ -206,6 +206,27 @@
 
 @synthesize port;
 
+- (BOOL) isEqual:(id)object
+{
+    if ( object == nil )
+        return NO;
+    
+    if ( ![object isKindOfClass:[F53OSCSocket class]] )
+        return NO;
+    
+    F53OSCSocket *otherSocket = (F53OSCSocket *)object;
+    
+    if ( self.isTcpSocket != otherSocket.isTcpSocket )
+        return NO;
+    
+    return ( [self.host isEqualToString:otherSocket.host] && self.port == otherSocket.port );
+}
+
+- (NSUInteger) hash
+{
+    return [self.host hash] ^ [@( self.port ) hash];
+}
+
 - (BOOL) startListening
 {
     if ( self.tcpSocket )
