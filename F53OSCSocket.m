@@ -321,7 +321,16 @@
     {
         NSError *error = nil;
         if ( self.interface )
-            [self.udpSocket bindToPort:0 interface:self.interface error:nil];
+        {
+            // Port 0 means that the OS should choose a random ephemeral port for this socket.
+            [self.udpSocket bindToPort:0 interface:self.interface error:&error];
+
+            if ( error )
+            {
+                NSLog( @"Warning: %@ unable to bind interface %@ - %@", self, self.interface, [error localizedDescription] );
+                return;
+            }
+        }
 
         if ( ![self.udpSocket enableBroadcast:YES error:&error] )
         {
