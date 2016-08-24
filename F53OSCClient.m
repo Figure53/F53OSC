@@ -136,7 +136,14 @@
 
 @synthesize delegate;
 
-@synthesize interface;
+- (void) setInterface:(NSString *)newInterface
+{
+    if ( [newInterface isEqualToString:@""] )
+        newInterface = nil;
+
+    interface = [newInterface copy];
+    self.socket.interface = self.interface;
+}
 
 - (NSString *) interface
 {
