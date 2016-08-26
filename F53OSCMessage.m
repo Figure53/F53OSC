@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2016 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -112,7 +112,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     // TODO: support \T for true, \F for false, \N for null, and \I for impulse
     
     // Create a working copy and place a token for each escaped " character.
-    NSString *QUOTE_CHAR_TOKEN = @"•";
+    NSString *QUOTE_CHAR_TOKEN = @"⍁"; // not trying to be perfect here; we just use an unlikely character
     NSString *workingArguments = [qscString substringFromIndex:[address length]];
     workingArguments = [workingArguments stringByReplacingOccurrencesOfString:@"\\\"" withString:QUOTE_CHAR_TOKEN];
     
@@ -121,7 +121,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     if ( [splitOnQuotes count] % 2 != 1 )
         return nil; // not matching quotes
 
-    NSString *QUOTE_STRING_TOKEN = @"∞";
+    NSString *QUOTE_STRING_TOKEN = @"⍂"; // not trying to be perfect here; we just use an unlikely character
     NSMutableArray *allQuotedStrings = [NSMutableArray array];
     for ( NSUInteger i = 1; i < [splitOnQuotes count]; i += 2 )
     {
@@ -147,6 +147,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( [arg isEqual:@""] ) // artifact of componentsSeparatedByString
             continue;
+        
         if ( [arg isEqual:QUOTE_STRING_TOKEN] )
         {
             NSString *detokenized = [[allQuotedStrings objectAtIndex:token_index]
@@ -257,7 +258,10 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     NSMutableString *description = [NSMutableString stringWithString:self.addressPattern];
     for ( id arg in self.arguments )
     {
-        [description appendFormat:@" %@", [arg description]];
+        if ( [[arg class] isSubclassOfClass:[NSString class]] )
+            [description appendFormat:@" \"%@\"", [arg description]]; // make strings clear in debug logs
+        else
+            [description appendFormat:@" %@", [arg description]];
     }
     return [NSString stringWithString:description];
 }

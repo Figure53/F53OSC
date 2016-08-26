@@ -52,6 +52,7 @@
 
 @interface F53OSCSocket : NSObject
 {
+    NSString *interface;
     NSString *host;
     UInt16 port;
 }
@@ -66,6 +67,8 @@
 @property (readonly) GCDAsyncUdpSocket *udpSocket;
 @property (atomic, readonly) BOOL isTcpSocket;
 @property (atomic, readonly) BOOL isUdpSocket;
+
+@property (nonatomic, copy) NSString *interface;
 @property (nonatomic, copy) NSString *host;
 @property (nonatomic, assign) UInt16 port;
 

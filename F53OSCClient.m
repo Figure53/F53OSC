@@ -51,6 +51,7 @@
     if ( self )
     {
         self.delegate = nil;
+        self.interface = nil;
         self.host = @"localhost";
         self.port = 53000;         // QLab is 53000, Stagetracker is 57115.
         self.useTcp = NO;
@@ -65,6 +66,7 @@
 - (void) dealloc
 {
     self.delegate = nil;
+    self.interface = nil;
     self.host = nil;
     self.userData = nil;
     
@@ -75,6 +77,7 @@
 
 - (void) encodeWithCoder:(NSCoder *)coder
 {
+    [coder encodeObject:self.interface forKey:@"interface"];
     [coder encodeObject:self.host forKey:@"host"];
     [coder encodeObject:[NSNumber numberWithUnsignedShort:self.port] forKey:@"port"];
     [coder encodeObject:[NSNumber numberWithBool:self.useTcp] forKey:@"useTcp"];
@@ -87,6 +90,7 @@
     if ( self )
     {
         self.delegate = nil;
+        self.interface = [coder decodeObjectForKey:@"interface"];
         self.host = [coder decodeObjectForKey:@"host"];
         self.port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
         self.useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
@@ -125,11 +129,31 @@
         GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
         self.socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
     }
+    self.socket.interface = self.interface;
     self.socket.host = self.host;
     self.socket.port = self.port;
 }
 
 @synthesize delegate;
+
+- (void) setInterface:(NSString *)newInterface
+{
+    if ( [newInterface isEqualToString:@""] )
+        newInterface = nil;
+
+    interface = [newInterface copy];
+    self.socket.interface = self.interface;
+}
+
+- (NSString *) interface
+{
+    // GCDAsyncSocket interprets "nil" as "allow the OS to decide what interface to use".
+    // We additionally interpret "" as nil before passing the interface along.
+    if ( [interface isEqualToString:@""] )
+        return nil;
+
+    return interface;
+}
 
 @synthesize host;
 
@@ -175,6 +199,7 @@
 - (NSDictionary *) state
 {
     return @{
+             @"interface": self.interface ? self.interface : @"",
              @"host": self.host ? self.host : @"",
              @"port": @( self.port ),
              @"useTcp": @( self.useTcp ),
@@ -184,6 +209,7 @@
 
 - (void) setState:(NSDictionary *)state
 {
+    self.interface = state[@"interface"];
     self.host = state[@"host"];
     self.port = [state[@"port"] unsignedIntValue];
     self.useTcp = [state[@"useTcp"] boolValue];
