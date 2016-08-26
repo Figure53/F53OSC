@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 //
 
-@import Foundation;
+#import <Foundation/Foundation.h>
 
 @class F53OSCTimeTag;
 
