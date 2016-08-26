@@ -16,17 +16,17 @@
 #endif
 
 #if TARGET_OS_IPHONE
-  @import CFNetwork;
-  @import UIKit;
+  #import <CFNetwork/CFNetwork.h>
+  #import <UIKit/UIKit.h>
 #endif
 
-@import Darwin.POSIX.arpa.inet;
-@import Darwin.POSIX.fcntl;
+#import <arpa/inet.h>
+#import <fcntl.h>
 #import <ifaddrs.h>
-@import Darwin.POSIX.netdb;
-#import <net/if.h>  // can't use module, name is illegal: see http://www.openradar.appspot.com/18440532
-@import Darwin.POSIX.sys.socket;
-@import Darwin.POSIX.sys.types;
+#import <netdb.h>
+#import <net/if.h>
+#import <sys/socket.h>
+#import <sys/types.h>
 
 
 #if 0
