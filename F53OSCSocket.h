@@ -65,8 +65,8 @@
 
 @property (readonly) GCDAsyncSocket *tcpSocket;
 @property (readonly) GCDAsyncUdpSocket *udpSocket;
-@property (readonly) BOOL isTcpSocket;
-@property (readonly) BOOL isUdpSocket;
+@property (atomic, readonly) BOOL isTcpSocket;
+@property (atomic, readonly) BOOL isUdpSocket;
 
 @property (nonatomic, copy) NSString *interface;
 @property (nonatomic, copy) NSString *host;
