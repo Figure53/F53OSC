@@ -123,7 +123,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 
     NSString *QUOTE_STRING_TOKEN = @"⍂"; // not trying to be perfect here; we just use an unlikely character
     NSMutableArray *allQuotedStrings = [NSMutableArray array];
-    for ( NSUInteger i = 1; i < [splitOnQuotes count]; i += 2 )
+    for ( int i = 1; i < [splitOnQuotes count]; i += 2 )
     {
         // Pull out each quoted string, which will be at each odd index.
         NSString *quotedString = [splitOnQuotes objectAtIndex:i];
@@ -224,6 +224,14 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return self;
 }
 
+- (void) dealloc
+{
+    self.addressPattern = nil;
+    self.typeTagString = nil;
+    self.arguments = nil;
+    self.userData = nil;
+}
+
 - (void) encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:self.addressPattern forKey:@"addressPattern"];
@@ -280,6 +288,8 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return NO;
 }
 
+@synthesize addressPattern;
+
 - (void) setAddressPattern:(NSString *)newAddressPattern
 {
     if ( newAddressPattern == nil ||
@@ -289,8 +299,12 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         return;
     }
     
-    _addressPattern = [newAddressPattern copy];
+    addressPattern = [newAddressPattern copy];
 }
+
+@synthesize typeTagString;
+
+@synthesize arguments;
 
 - (void) setArguments:(NSArray *)argArray
 {
@@ -338,8 +352,10 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         }
     }
     self.typeTagString = [newTypes copy];
-    _arguments = [newArgs copy];
+    arguments = [newArgs copy];
 }
+
+@synthesize userData;
 
 - (NSArray *) addressParts
 {

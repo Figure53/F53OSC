@@ -48,7 +48,7 @@
 
 @implementation F53OSCParser (private)
 
-+ (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
++ (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 {
     F53OSCMessage *inbound = [self parseOscMessageData:data];
     
@@ -115,7 +115,7 @@
                 }
                 else
                 {
-                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", (unsigned int)elementLength );
+                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", elementLength );
                     return;
                 }
                 
@@ -289,7 +289,7 @@
     }
     else
     {
-        NSLog( @"Error: Unrecognized OSC message of length %lu.", (unsigned long)length );
+        NSLog( @"Error: Unrecognized OSC message of length %lu.", length );
     }
 }
 

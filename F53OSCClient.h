@@ -51,9 +51,9 @@
 @property (nonatomic, assign) BOOL useTcp;
 @property (nonatomic, strong) id userData;
 @property (nonatomic, copy) NSDictionary *state;
-@property (atomic, readonly) NSString *title;
-@property (atomic, readonly) BOOL isValid;
-@property (atomic, readonly) BOOL isConnected;
+@property (readonly) NSString *title;
+@property (readonly) BOOL isValid;
+@property (readonly) BOOL isConnected;
 
 - (BOOL) connect;
 - (void) disconnect;
