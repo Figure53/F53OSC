@@ -58,15 +58,20 @@
 }
 
 + (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;
++ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket withSLP:(BOOL)withSLP;
+
 + (F53OSCSocket *) socketWithUdpSocket:(GCDAsyncUdpSocket *)socket;
 
 - (id) initWithTcpSocket:(GCDAsyncSocket *)socket;
+- (id) initWithTcpSocket:(GCDAsyncSocket *)socket withSLP:(BOOL)slp;
+
 - (id) initWithUdpSocket:(GCDAsyncUdpSocket *)socket;
 
 @property (readonly) GCDAsyncSocket *tcpSocket;
 @property (readonly) GCDAsyncUdpSocket *udpSocket;
 @property (atomic, readonly) BOOL isTcpSocket;
 @property (atomic, readonly) BOOL isUdpSocket;
+@property (atomic, assign) BOOL useSLP;
 
 @property (nonatomic, copy) NSString *interface;
 @property (nonatomic, copy) NSString *host;

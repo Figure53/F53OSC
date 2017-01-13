@@ -49,6 +49,8 @@
 @property (nonatomic, copy) NSString *host;
 @property (nonatomic, assign) UInt16 port;
 @property (nonatomic, assign) BOOL useTcp;
+@property (nonatomic, assign) BOOL useSLP;
+
 @property (nonatomic, strong) id userData;
 @property (nonatomic, copy) NSDictionary *state;
 @property (atomic, readonly) NSString *title;

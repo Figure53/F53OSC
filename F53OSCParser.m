@@ -257,6 +257,24 @@
                             return nil;
                         }
                         break;
+					case 'F': //False (no data)
+					case 'T': //True (no data)
+					  numberArg = [NSNumber numberWithBool:(type=='T')];
+					  if ( numberArg )
+					  {
+						[args addObject:numberArg];
+						//don't advance the buffer
+						
+						if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+						  NSLog( @"    bool: %@", numberArg );
+					  }
+					  else
+					  {
+						NSLog( @"Error: Unable to parse bool argument for OSC method %@", addressPattern );
+						return nil;
+					  }
+					break;
+
                     default:
                         NSLog( @"Error: Unrecognized type '%c' found in type tag for OSC method %@", type, addressPattern );
                         return nil;
@@ -264,7 +282,7 @@
             }
         }
     }
-    
+  
     return [F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:nil];
 }
 
@@ -357,6 +375,19 @@
             [data appendBytes:&(buffer[index]) length:1];
         }
     }
+}
+
++ (BOOL)matchAddress:(NSString*)needle inMessage:(F53OSCMessage*)message
+{
+  //swift code if ever useful
+//
+//		let index = needle.index(needle.startIndex, offsetBy: needle.characters.count)
+//		if (Message.addressPattern.characters.count >= needle.characters.count && Message.addressPattern.substring(to: index)==needle)
+  
+  long length = needle.length;
+  
+  return (message.addressPattern.length >= length && [[message.addressPattern substringToIndex:length] isEqualToString:needle]);
+  
 }
 
 @end

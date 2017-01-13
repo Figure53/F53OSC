@@ -132,9 +132,14 @@
 
 @implementation F53OSCSocket
 
++ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket withSLP:(BOOL)withSLP
+{
+    return [[F53OSCSocket alloc] initWithTcpSocket:socket withSLP:withSLP];
+}
+
 + (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket
 {
-    return [[F53OSCSocket alloc] initWithTcpSocket:socket];
+  return [[F53OSCSocket alloc] initWithTcpSocket:socket];
 }
 
 + (F53OSCSocket *) socketWithUdpSocket:(GCDAsyncUdpSocket *)socket
@@ -150,10 +155,26 @@
         self.tcpSocket = socket;
         self.udpSocket = nil;
         self.interface = nil;
+	    self.useSLP = YES;
         self.host = @"localhost";
         self.port = 0;
     }
     return self;
+}
+
+- (id) initWithTcpSocket:(GCDAsyncSocket *)socket withSLP:(BOOL)slp
+{
+  self = [super init];
+  if ( self )
+  {
+	self.tcpSocket = socket;
+	self.udpSocket = nil;
+	self.interface = nil;
+	self.useSLP = slp;
+	self.host = @"localhost";
+	self.port = 0;
+  }
+  return self;
 }
 
 - (id) initWithUdpSocket:(GCDAsyncUdpSocket *)socket
@@ -209,6 +230,8 @@
 @synthesize port;
 
 @synthesize interface;
+
+@synthesize useSLP;
 
 - (BOOL) startListening
 {
@@ -294,28 +317,41 @@
 
     if ( self.tcpSocket )
     {
-        // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
+	   if (self.useSLP)
+	   {
+		  // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
 
-        NSMutableData *slipData = [NSMutableData data];
-        Byte esc_end[2] = {ESC, ESC_END};
-        Byte esc_esc[2] = {ESC, ESC_ESC};
-        Byte end[1] = {END};
+		  NSMutableData *slipData = [NSMutableData data];
+		  Byte esc_end[2] = {ESC, ESC_END};
+		  Byte esc_esc[2] = {ESC, ESC_ESC};
+		  Byte end[1] = {END};
 
-        [slipData appendBytes:end length:1];
-        NSUInteger length = [data length];
-        const Byte *buffer = [data bytes];
-        for ( NSUInteger index = 0; index < length; index++ )
-        {
-            if ( buffer[index] == END )
-                [slipData appendBytes:esc_end length:2];
-            else if ( buffer[index] == ESC )
-                [slipData appendBytes:esc_esc length:2];
-            else
-                [slipData appendBytes:&(buffer[index]) length:1];
-        }
-        [slipData appendBytes:end length:1];
+		  [slipData appendBytes:end length:1];
+		  NSUInteger length = [data length];
+		  const Byte *buffer = [data bytes];
+		  for ( NSUInteger index = 0; index < length; index++ )
+		  {
+			  if ( buffer[index] == END )
+				  [slipData appendBytes:esc_end length:2];
+			  else if ( buffer[index] == ESC )
+				  [slipData appendBytes:esc_esc length:2];
+			  else
+				  [slipData appendBytes:&(buffer[index]) length:1];
+		  }
+		  [slipData appendBytes:end length:1];
 
-        [self.tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
+		  [self.tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
+	   } else
+	   {
+		 //OSC version 1.0 - packet length header
+		 UInt64 length = [data length];
+		 NSMutableData *tcpData = [[NSMutableData alloc] init];
+		 length = OSSwapHostToBigInt64( length );
+		 [tcpData appendBytes:&length length:sizeof( UInt64 )];
+		 [tcpData appendData:data];
+		 
+		 [self.tcpSocket writeData:tcpData withTimeout:TIMEOUT tag:[tcpData length]];
+	   }
     }
     else if ( self.udpSocket )
     {

@@ -31,6 +31,8 @@
 #import "F53OSCClient.h"
 #import "F53OSCParser.h"
 
+//#define  F53_OSC_CLIENT_DEBUG 1
+
 
 @interface F53OSCClient ()
 
@@ -55,6 +57,7 @@
         self.host = @"localhost";
         self.port = 53000;         // QLab is 53000, Stagetracker is 57115.
         self.useTcp = NO;
+	    self.useSLP = YES;
         self.userData = nil;
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -81,6 +84,7 @@
     [coder encodeObject:self.host forKey:@"host"];
     [coder encodeObject:[NSNumber numberWithUnsignedShort:self.port] forKey:@"port"];
     [coder encodeObject:[NSNumber numberWithBool:self.useTcp] forKey:@"useTcp"];
+    [coder encodeObject:[NSNumber numberWithBool:self.useSLP] forKey:@"useSLP"];
     [coder encodeObject:self.userData forKey:@"userData"];
 }
 
@@ -94,6 +98,7 @@
         self.host = [coder decodeObjectForKey:@"host"];
         self.port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
         self.useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
+	    self.useSLP = [[coder decodeObjectForKey:@"useSLP"] boolValue];
         self.userData = [coder decodeObjectForKey:@"userData"];
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -120,9 +125,10 @@
     if ( self.useTcp )
     {
         GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-        self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+        self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket withSLP:self.useSLP];
         if ( self.socket )
             [self.readState setObject:self.socket forKey:@"socket"];
+		
     }
     else // use UDP
     {
@@ -186,6 +192,17 @@
     [self destroySocket];
 }
 
+@synthesize useSLP;
+
+- (void) setUseSLP:(BOOL)flag
+{
+  if ( useSLP == flag )
+	return;
+  
+  useSLP = flag;
+  
+  [self destroySocket];
+}
 @synthesize userData;
 
 - (void) setUserData:(id)newUserData
@@ -203,6 +220,7 @@
              @"host": self.host ? self.host : @"",
              @"port": @( self.port ),
              @"useTcp": @( self.useTcp ),
+			 @"useSLP": @( self.useSLP ),
              @"userData": ( self.userData ? self.userData : [NSNull null] )
             };
 }
@@ -213,6 +231,7 @@
     self.host = state[@"host"];
     self.port = [state[@"port"] unsignedIntValue];
     self.useTcp = [state[@"useTcp"] boolValue];
+    self.useSLP = [state[@"useSLP"] boolValue];
     self.userData = state[@"userData"];
 }
 
@@ -303,8 +322,54 @@
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
-    
-    [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate];
+	
+    if (self.useSLP) //OSC 1.1
+	  [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate];
+	else //OSC 1.0 packet length headers
+	{
+	  NSUInteger length = [data length];
+	  
+	  if ( length > sizeof( UInt32 ) )
+	  {
+		  const char *buffer = [data bytes];
+		  NSData *lengthData = [data subdataWithRange: NSMakeRange(0, sizeof( UInt32))];
+		
+		
+		//RW - this was all previously reading in a UInt64 but eos seems to send UInt32 (as per spec)
+		  //UInt64 dataSize = *((UInt64 *)buffer);
+		  const char *lengthBuffer = [lengthData bytes];
+		  UInt32 dataSize = *((UInt32*)lengthBuffer);
+
+		  dataSize = OSSwapBigToHostInt32( dataSize );
+		
+		  if ( length - sizeof( UInt32 ) >= dataSize )
+		  {
+		      buffer += sizeof( UInt32 );
+			  length -= sizeof( UInt32 );
+			  NSData *oscData = [NSData dataWithBytes:buffer length:dataSize];
+			
+			  buffer += dataSize;
+			  length -= dataSize;
+			  NSData *newData = nil;
+			  if ( length )
+			     newData = [NSData dataWithBytes:buffer length:length];
+			  else
+				  newData = [NSData data];
+			
+			
+			  #if F53_OSC_CLIENT_DEBUG
+				   NSLog( @"client socket %p dispatching oscData of length %lu, leaving buffer of length %lu.", sock, [oscData length], [data length] );
+			  #endif
+			
+			  [F53OSCParser processOscData:oscData forDestination:self.delegate replyToSocket:self.socket];
+		  } else
+		  {
+			       // TODO: protect against them filling up the buffer with a huge amount of incoming data.
+		  }
+	  }
+	 
+	}
+  
     [sock readDataWithTimeout:-1 tag:tag];
 }
 
