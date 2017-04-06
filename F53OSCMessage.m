@@ -408,7 +408,8 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( [arg isKindOfClass:[NSString class]] )
         {
-            [qscString appendFormat:@" \"%@\"", arg];
+            NSString *escapedQuotesArg = [arg stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+            [qscString appendFormat:@" \"%@\"", escapedQuotesArg];
         }
         if ( [arg isKindOfClass:[NSNumber class]] )
         {
