@@ -8,8 +8,9 @@ For convenience, we've included a few public domain source files from [CocoaAsyn
 
 ## Usage Notes
 
-- F53OSC must be compiled with ARC
-- You must link against Security.framework and CFNetwork.framework
+- F53OSC must be compiled with ARC.
+- You must link against Security.framework and CFNetwork.framework.
+- F53OSC requires macOS 10.9+ or iOS 7.0+.
 
 ## Demo
 
