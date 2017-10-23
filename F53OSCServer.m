@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2017 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@
 #import "F53OSCServer.h"
 #import "F53OSCFoundationAdditions.h"
 
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCServer ()
 
@@ -134,29 +136,23 @@
 {
     [self stopListening];
 
-    self.delegate = nil;
-    self.tcpSocket = nil;
-    self.udpSocket = nil;
-    self.activeTcpSockets = nil;
-    self.activeData = nil;
-    self.activeState = nil;
+    _delegate = nil;
+    _tcpSocket = nil;
+    _udpSocket = nil;
+    _activeTcpSockets = nil;
+    _activeData = nil;
+    _activeState = nil;
 }
 
-@synthesize delegate;
-
-@synthesize port;
-
-- (void) setPort:(UInt16)newPort
+- (void) setPort:(UInt16)port
 {
-    port = newPort;
+    _port = port;
 
     [self.tcpSocket stopListening];
     [self.udpSocket stopListening];
-    self.tcpSocket.port = self.port;
-    self.udpSocket.port = self.port;
+    self.tcpSocket.port = _port;
+    self.udpSocket.port = _port;
 }
-
-@synthesize udpReplyPort;
 
 - (BOOL) startListening
 {
@@ -175,7 +171,7 @@
 
 #pragma mark - GCDAsyncSocketDelegate
 
-- (dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
+- (nullable dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
 {
     return NULL;
 }
@@ -259,7 +255,7 @@
 #endif
 }
 
-- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
+- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
 {
 #if F53_OSC_SERVER_DEBUG
     NSLog( @"server socket %p didDisconnect", sock );
@@ -298,7 +294,7 @@
 {
 }
 
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(NSError *)error
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(nullable NSError *)error
 {
 }
 
@@ -306,11 +302,11 @@
 {
 }
 
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(nullable NSError *)error
 {
 }
 
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)filterContext
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(nullable id)filterContext
 {
     GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
@@ -322,8 +318,10 @@
     [F53OSCParser processOscData:data forDestination:self.delegate replyToSocket:replySocket];
 }
 
-- (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *)error
+- (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(nullable NSError *)error
 {
 }
 
 @end
+
+NS_ASSUME_NONNULL_END
