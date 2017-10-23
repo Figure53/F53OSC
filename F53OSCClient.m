@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2017 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -32,11 +32,13 @@
 #import "F53OSCParser.h"
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface F53OSCClient ()
 
-@property (strong) F53OSCSocket *socket;
-@property (strong) NSMutableData *readData;
-@property (strong) NSMutableDictionary *readState;
+@property (strong, nullable)    F53OSCSocket *socket;
+@property (strong, nullable)    NSMutableData *readData;
+@property (strong, nullable)    NSMutableDictionary *readState;
 
 - (void) destroySocket;
 - (void) createSocket;
@@ -45,7 +47,7 @@
 
 @implementation F53OSCClient
 
-- (id) init
+- (instancetype) init
 {
     self = [super init];
     if ( self )
@@ -65,14 +67,14 @@
 
 - (void) dealloc
 {
-    self.delegate = nil;
-    self.interface = nil;
-    self.host = nil;
-    self.userData = nil;
+    _delegate = nil;
+    _interface = nil;
+    _host = nil;
+    _userData = nil;
     
     [self destroySocket];
-    self.readData = nil;
-    self.readState = nil;
+    _readData = nil;
+    _readState = nil;
 }
 
 - (void) encodeWithCoder:(NSCoder *)coder
@@ -84,7 +86,7 @@
     [coder encodeObject:self.userData forKey:@"userData"];
 }
 
-- (id) initWithCoder:(NSCoder *)coder
+- (nullable instancetype) initWithCoder:(NSCoder *)coder
 {
     self = [super init];
     if ( self )
@@ -112,7 +114,7 @@
     [self.readState removeObjectForKey:@"socket"];
     
     [self.socket disconnect];
-    self.socket = nil;
+    _socket = nil;
 }
 
 - (void) createSocket
@@ -134,66 +136,58 @@
     self.socket.port = self.port;
 }
 
-@synthesize delegate;
+@synthesize interface = _interface;
 
-- (void) setInterface:(NSString *)newInterface
-{
-    if ( [newInterface isEqualToString:@""] )
-        newInterface = nil;
-
-    interface = [newInterface copy];
-    self.socket.interface = self.interface;
-}
-
-- (NSString *) interface
+- (nullable NSString *) interface
 {
     // GCDAsyncSocket interprets "nil" as "allow the OS to decide what interface to use".
     // We additionally interpret "" as nil before passing the interface along.
-    if ( [interface isEqualToString:@""] )
+    if ( [_interface isEqualToString:@""] )
         return nil;
-
-    return interface;
+    
+    return _interface;
 }
 
-@synthesize host;
-
-- (void) setHost:(NSString *)newHost
+- (void) setInterface:(nullable NSString *)interface
 {
-    if ( [newHost isEqualToString:@""] )
-        newHost = nil;
+    if ( [interface isEqualToString:@""] )
+        interface = nil;
+
+    _interface = [interface copy];
+    self.socket.interface = _interface;
+}
+
+- (void) setHost:(nullable NSString *)host
+{
+    if ( [host isEqualToString:@""] )
+        host = nil;
     
-    host = [newHost copy];
+    _host = [host copy];
     self.socket.host = self.host;
 }
 
-@synthesize port;
-
-- (void) setPort:(UInt16)newPort
+- (void) setPort:(UInt16)port
 {
-    port = newPort;
-    self.socket.port = self.port;
+    _port = port;
+    self.socket.port = _port;
 }
-
-@synthesize useTcp;
 
 - (void) setUseTcp:(BOOL)flag
 {
-    if ( useTcp == flag )
+    if ( _useTcp == flag )
         return;
     
-    useTcp = flag;
+    _useTcp = flag;
     
     [self destroySocket];
 }
 
-@synthesize userData;
-
-- (void) setUserData:(id)newUserData
+- (void) setUserData:(nullable id)userData
 {
-    if ( newUserData == [NSNull null] )
-        newUserData = nil;
+    if ( userData == [NSNull null] )
+        userData = nil;
     
-    userData = newUserData;
+    _userData = userData;
 }
 
 - (NSDictionary *) state
@@ -276,7 +270,7 @@
 
 #pragma mark - GCDAsyncSocketDelegate
 
-- (dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
+- (nullable dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
 {
     return NULL;
 }
@@ -351,7 +345,7 @@
     [self.readState setObject:@NO forKey:@"dangling_ESC"];
 }
 
-- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(NSError *)err
+- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
 {
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didDisconnect", sock );
@@ -376,7 +370,7 @@
 {
 }
 
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(NSError *)error
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(nullable NSError *)error
 {
 }
 
@@ -387,19 +381,21 @@
 #endif
 }
 
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(nullable NSError *)error
 {
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didSendDataWithTag: %ld dueToError: %@", sock, tag, [error localizedDescription] );
 #endif
 }
 
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(id)filterContext
+- (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(nullable id)filterContext
 {
 }
 
-- (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError *)error
+- (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(nullable NSError *)error
 {
 }
 
 @end
+
+NS_ASSUME_NONNULL_END
