@@ -411,11 +411,11 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             NSString *escapedQuotesArg = [arg stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
             [qscString appendFormat:@" \"%@\"", escapedQuotesArg];
         }
-        if ( [arg isKindOfClass:[NSNumber class]] )
+        else if ( [arg isKindOfClass:[NSNumber class]] )
         {
             [qscString appendFormat:@" %@", arg]; // TODO: forcibly preserve number type (int/float)?
         }
-        if ( [arg isKindOfClass:[NSData class]] )
+        else if ( [arg isKindOfClass:[NSData class]] )
         {
             [qscString appendFormat:@" #blob%@", [arg base64EncodedStringWithOptions:0]];
         }
