@@ -109,6 +109,28 @@ NS_ASSUME_NONNULL_BEGIN
     return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", self.host, self.port ];
 }
 
+@synthesize delegateQueue = _delegateQueue;
+
+- (dispatch_queue_t) delegateQueue
+{
+    if ( _delegateQueue )
+        return _delegateQueue;
+    else
+        return dispatch_get_main_queue();
+}
+
+- (void) setDelegateQueue:(dispatch_queue_t)queue
+{
+    BOOL recreateSocket = ( self.socket != nil );
+    if ( recreateSocket )
+        [self destroySocket];
+    
+    _delegateQueue = queue;
+    
+    if ( recreateSocket )
+        [self createSocket];
+}
+
 - (void) destroySocket
 {
     [self.readState removeObjectForKey:@"socket"];
@@ -121,14 +143,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if ( self.useTcp )
     {
-        GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.delegateQueue];
         self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
         if ( self.socket )
             [self.readState setObject:self.socket forKey:@"socket"];
     }
     else // use UDP
     {
-        GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.delegateQueue];
         self.socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
     }
     self.socket.interface = self.interface;

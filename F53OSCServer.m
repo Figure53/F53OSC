@@ -113,12 +113,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id) init
 {
+    return [self initWithDelegateQueue:nil]; // use main queue
+}
+
+- (id) initWithDelegateQueue:(nullable dispatch_queue_t)queue
+{
     self = [super init];
     if ( self )
     {
-        GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-        GCDAsyncUdpSocket *rawUdpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-
+        if ( !queue )
+            queue = dispatch_get_main_queue();
+        
+        GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:queue];
+        GCDAsyncUdpSocket *rawUdpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:queue];
+        
         self.delegate = nil;
         self.port = 0;
         self.udpReplyPort = 0;
@@ -308,7 +316,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(nullable id)filterContext
 {
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.udpSocket.udpSocket.delegateQueue];
     F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
     replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
     replySocket.port = self.udpReplyPort;
