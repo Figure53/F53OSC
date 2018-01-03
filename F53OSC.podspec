@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'F53OSC'
-  s.version      = '1.0.3'
+  s.version      = '1.0.4'
   s.summary      = 'A nice open source OSC library for Objective-C.'
 
   s.description  = <<-DESC
@@ -18,8 +18,8 @@ Pod::Spec.new do |s|
 
   s.social_media_url   = 'https://twitter.com/figure53'
   
-  s.platforms     = { :ios => '8.4' }
-  #s.platforms     = { :ios => '8.4', :osx => '10.9' }
+  s.platforms     = { :ios => '8.4', :tvos => '9.0' }
+  #s.platforms     = { :ios => '8.4', :tvos => '9.0', :osx => '10.9' }
   s.source        = { :git => 'https://github.com/Figure53/F53OSC.git', :tag => "#{s.version}", }
     
   
