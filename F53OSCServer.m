@@ -85,9 +85,8 @@ NS_ASSUME_NONNULL_BEGIN
     if ( [[pattern componentsSeparatedByString:@"{"] count] != [[pattern componentsSeparatedByString:@"}"] count] )
         return nil;
 
-    NSString *validOscChars = [F53OSCServer stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
-    NSString *wildCard = [NSString stringWithFormat:@"[%@]*", validOscChars];
-    NSString *oneChar = [NSString stringWithFormat:@"[%@]{1}?", validOscChars];
+    NSString *wildCard = @".*";
+    NSString *oneChar = @".{1}?";
 
     // Escape characters that are special in regex (ICU v3) but not special in OSC.
     pattern = [F53OSCServer stringWithSpecialRegexCharactersEscaped:pattern];
