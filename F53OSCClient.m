@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2017 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -109,23 +109,23 @@ NS_ASSUME_NONNULL_BEGIN
     return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", self.host, self.port ];
 }
 
-@synthesize delegateQueue = _delegateQueue;
+@synthesize socketDelegateQueue = _socketDelegateQueue;
 
-- (dispatch_queue_t) delegateQueue
+- (dispatch_queue_t) socketDelegateQueue
 {
-    if ( _delegateQueue )
-        return _delegateQueue;
+    if ( _socketDelegateQueue )
+        return _socketDelegateQueue;
     else
         return dispatch_get_main_queue();
 }
 
-- (void) setDelegateQueue:(dispatch_queue_t)queue
+- (void) setSocketDelegateQueue:(nullable dispatch_queue_t)queue
 {
     BOOL recreateSocket = ( self.socket != nil );
     if ( recreateSocket )
         [self destroySocket];
     
-    _delegateQueue = queue;
+    _socketDelegateQueue = queue;
     
     if ( recreateSocket )
         [self createSocket];
@@ -143,14 +143,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if ( self.useTcp )
     {
-        GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.delegateQueue];
+        GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
         self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
         if ( self.socket )
             [self.readState setObject:self.socket forKey:@"socket"];
     }
     else // use UDP
     {
-        GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.delegateQueue];
+        GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
         self.socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
     }
     self.socket.interface = self.interface;
@@ -174,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if ( [interface isEqualToString:@""] )
         interface = nil;
-
+    
     _interface = [interface copy];
     self.socket.interface = _interface;
 }
@@ -220,7 +220,7 @@ NS_ASSUME_NONNULL_BEGIN
              @"port": @( self.port ),
              @"useTcp": @( self.useTcp ),
              @"userData": ( self.userData ? self.userData : [NSNull null] )
-            };
+             };
 }
 
 - (void) setState:(NSDictionary *)state
@@ -307,11 +307,11 @@ NS_ASSUME_NONNULL_BEGIN
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didConnectToHost %@:%u", sock, host, port );
 #endif
-  
-  if ( [self.delegate respondsToSelector:@selector( clientDidConnect: )] )
-  {
-      [self.delegate clientDidConnect:self];
-  }
+    
+    if ( [self.delegate respondsToSelector:@selector( clientDidConnect: )] )
+    {
+        [self.delegate clientDidConnect:self];
+    }
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
@@ -375,7 +375,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     [self.readData setData:[NSData data]];
     [self.readState setObject:@NO forKey:@"dangling_ESC"];
-  
+    
     if ( [self.delegate respondsToSelector:@selector( clientDidDisconnect: )] )
     {
         [self.delegate clientDidDisconnect:self];

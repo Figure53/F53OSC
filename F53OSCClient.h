@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2017 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -39,17 +39,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCClient : NSObject <NSCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 
-@property (nonatomic, weak, nullable)   id <F53OSCPacketDestination, F53OSCClientDelegate> delegate;
-@property (nonatomic, strong)           dispatch_queue_t delegateQueue; // defaults to main queue
-@property (nonatomic, copy, nullable)   NSString *interface;
-@property (nonatomic, copy, nullable)   NSString *host;
-@property (nonatomic, assign)           UInt16 port;
-@property (nonatomic, assign)           BOOL useTcp;
-@property (nonatomic, strong, nullable) id userData;
-@property (nonatomic, copy)             NSDictionary *state;
-@property (atomic, readonly)            NSString *title;
-@property (atomic, readonly)            BOOL isValid;
-@property (atomic, readonly)            BOOL isConnected;
+@property (nonatomic, weak, nullable)           id <F53OSCPacketDestination, F53OSCClientDelegate> delegate;
+@property (nonatomic, strong, null_resettable)  dispatch_queue_t socketDelegateQueue; // defaults to main queue
+@property (nonatomic, copy, nullable)           NSString *interface;
+@property (nonatomic, copy, nullable)           NSString *host;
+@property (nonatomic, assign)                   UInt16 port;
+@property (nonatomic, assign)                   BOOL useTcp;
+@property (nonatomic, strong, nullable)         id userData;
+@property (nonatomic, copy)                     NSDictionary *state;
+@property (atomic, readonly)                    NSString *title;
+@property (atomic, readonly)                    BOOL isValid;
+@property (atomic, readonly)                    BOOL isConnected;
 
 - (BOOL) connect;
 - (void) disconnect;
