@@ -310,7 +310,14 @@ NS_ASSUME_NONNULL_BEGIN
     
     if ( [self.delegate respondsToSelector:@selector( clientDidConnect: )] )
     {
-        [self.delegate clientDidConnect:self];
+        dispatch_block_t block = ^{
+            [self.delegate clientDidConnect:self];
+        };
+        
+        if ( [NSThread currentThread].isMainThread )
+            block();
+        else
+            dispatch_async( dispatch_get_main_queue(), block );
     }
 }
 
@@ -363,8 +370,15 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog( @"client socket %p didCloseReadStream", sock );
 #endif
     
-    [self.readData setData:[NSData data]];
-    [self.readState setObject:@NO forKey:@"dangling_ESC"];
+    dispatch_block_t block = ^{
+        [self.readData setData:[NSData data]];
+        [self.readState setObject:@NO forKey:@"dangling_ESC"];
+    };
+    
+    if ( [NSThread currentThread].isMainThread )
+        block();
+    else
+        dispatch_async( dispatch_get_main_queue(), block );
 }
 
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
@@ -373,13 +387,18 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog( @"client socket %p didDisconnect", sock );
 #endif
     
-    [self.readData setData:[NSData data]];
-    [self.readState setObject:@NO forKey:@"dangling_ESC"];
+    dispatch_block_t block = ^{
+        [self.readData setData:[NSData data]];
+        [self.readState setObject:@NO forKey:@"dangling_ESC"];
+        
+        if ( [self.delegate respondsToSelector:@selector( clientDidDisconnect: )] )
+            [self.delegate clientDidDisconnect:self];
+    };
     
-    if ( [self.delegate respondsToSelector:@selector( clientDidDisconnect: )] )
-    {
-        [self.delegate clientDidDisconnect:self];
-    }
+    if ( [NSThread currentThread].isMainThread )
+        block();
+    else
+        dispatch_async( dispatch_get_main_queue(), block );
 }
 
 - (void) socketDidSecure:(GCDAsyncSocket *)sock

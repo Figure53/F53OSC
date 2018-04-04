@@ -61,7 +61,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol F53OSCClientDelegate <NSObject>
 
 @optional
-
 - (void) clientDidConnect:(F53OSCClient *)client;
 - (void) clientDidDisconnect:(F53OSCClient *)client;
 
