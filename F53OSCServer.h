@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2017 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak, nullable)   id <F53OSCPacketDestination> delegate;
 @property (nonatomic, assign)           UInt16 port;
 @property (nonatomic, assign)           UInt16 udpReplyPort;
+
+- (instancetype) initWithDelegateQueue:(nullable dispatch_queue_t)queue;
 
 - (BOOL) startListening;
 - (void) stopListening;
