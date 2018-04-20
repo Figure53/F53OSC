@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2016 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,12 @@
 #endif
 
 #import "F53OSCMessage.h"
+
 #import "F53OSCServer.h"
 #import "F53OSCFoundationAdditions.h"
+
+
+NS_ASSUME_NONNULL_BEGIN
 
 @implementation F53OSCMessage
 
@@ -49,7 +53,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     }
 }
 
-+ (BOOL) legalAddressComponent:(NSString *)addressComponent
++ (BOOL) legalAddressComponent:(nullable NSString *)addressComponent
 {
     if ( addressComponent == nil )
         return NO;
@@ -63,7 +67,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return NO;
 }
 
-+ (BOOL) legalAddress:(NSString *)address
++ (BOOL) legalAddress:(nullable NSString *)address
 {
     if ( address == nil )
         return NO;
@@ -77,7 +81,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return NO;
 }
 
-+ (BOOL) legalMethod:(NSString *)method
++ (BOOL) legalMethod:(nullable NSString *)method
 {
     if ( method == nil )
         return NO;
@@ -88,7 +92,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         return NO;
 }
 
-+ (F53OSCMessage *) messageWithString:(NSString *)qscString
++ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString
 {
     if ( qscString == nil )
         return nil;
@@ -99,7 +103,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         return nil;
     
     // Pull out address.
-    NSString *address = [[qscString componentsSeparatedByString:@" "] objectAtIndex:0];
+    NSString *address = [qscString componentsSeparatedByString:@" "].firstObject;
     if ( ![self legalAddress:address] )
     {
         // Note: We'll return here if caller tried to parse a QSC bundle string as a message string;
@@ -191,7 +195,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     
     NSArray *arguments = [NSArray arrayWithArray:finalArgs];
     
-    return [F53OSCMessage messageWithAddressPattern:address arguments:arguments];
+    return [F53OSCMessage messageWithAddressPattern:(NSString * _Nonnull)address arguments:arguments];
 }
 
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
@@ -202,7 +206,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern 
                                     arguments:(NSArray *)arguments
-                                  replySocket:(F53OSCSocket *)replySocket
+                                  replySocket:(nullable F53OSCSocket *)replySocket
 {
     F53OSCMessage *msg = [F53OSCMessage new];
     msg.addressPattern = addressPattern;
@@ -211,7 +215,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return msg;
 }
 
-- (id) init
+- (instancetype) init
 {
     self = [super init];
     if ( self )
@@ -231,7 +235,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     [coder encodeObject:self.arguments forKey:@"arguments"];
 }
 
-- (id) initWithCoder:(NSCoder *)coder
+- (nullable instancetype) initWithCoder:(NSCoder *)coder
 {
     self = [super init];
     if ( self )
@@ -243,7 +247,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return self;
 }
 
-- (id) copyWithZone:(NSZone *)zone
+- (id) copyWithZone:(nullable NSZone *)zone
 {
     F53OSCMessage *copy = [super copyWithZone:zone];
     copy.addressPattern = [self.addressPattern copyWithZone:zone];
@@ -424,3 +428,5 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

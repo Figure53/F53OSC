@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2017 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,10 @@
 
 #import "F53OSC.h"
 
-#define F53_OSC_SERVER_DEBUG 0
-
 
 NS_ASSUME_NONNULL_BEGIN
+
+#define F53_OSC_SERVER_DEBUG 0
 
 @interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 
@@ -40,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
                      matchingOSCPattern:(NSString *)pattern;
 
 @property (nonatomic, weak, nullable)   id <F53OSCPacketDestination> delegate;
+@property (nonatomic, strong, readonly) F53OSCSocket *udpSocket;
+@property (nonatomic, strong, readonly) F53OSCSocket *tcpSocket;
 @property (nonatomic, assign)           UInt16 port;
 @property (nonatomic, assign)           UInt16 udpReplyPort;
 
@@ -47,9 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL) startListening;
 - (void) stopListening;
-
-- (F53OSCSocket *)udpSocket;
-- (F53OSCSocket *)tcpSocket;
 
 @end
 

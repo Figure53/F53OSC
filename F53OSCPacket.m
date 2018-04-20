@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -31,32 +31,34 @@
 #import "F53OSCPacket.h"
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 @implementation F53OSCPacket
 
 - (void) dealloc
 {
-    self.replySocket = nil;
+    _replySocket = nil;
 }
 
-- (id) copyWithZone:(NSZone *)zone
+- (id) copyWithZone:(nullable NSZone *)zone
 {
     F53OSCPacket *copy = [[self class] allocWithZone:zone];
     copy.replySocket = self.replySocket;
     return copy;
 }
 
-@synthesize replySocket;
-
-- (NSData *) packetData
+- (nullable NSData *) packetData
 {
     // Defined by subclasses.
     return nil;
 }
 
-- (NSString *) asQSC
+- (nullable NSString *) asQSC
 {
     // Defined by subclasses.
     return nil;
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

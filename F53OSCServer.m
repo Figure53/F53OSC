@@ -29,6 +29,7 @@
 #endif
 
 #import "F53OSCServer.h"
+
 #import "F53OSCFoundationAdditions.h"
 
 
@@ -36,8 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCServer ()
 
-@property (strong) F53OSCSocket *tcpSocket;
-@property (strong) F53OSCSocket *udpSocket;
+@property (nonatomic, strong, readwrite) F53OSCSocket *tcpSocket;
+@property (nonatomic, strong, readwrite) F53OSCSocket *udpSocket;
 @property (strong) NSMutableDictionary *activeTcpSockets;  // F53OSCSockets keyed by index of when the connection was accepted.
 @property (strong) NSMutableDictionary *activeData;        // NSMutableData keyed by index; buffers the incoming data.
 @property (strong) NSMutableDictionary *activeState;       // NSMutableDictionary keyed by index; stores state of incoming data.

@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,13 @@
 
 @class F53OSCMessage;
 
+
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol F53OSCPacketDestination
 
-- (void) takeMessage:(F53OSCMessage *)message;
+- (void) takeMessage:(nullable F53OSCMessage *)message;
 
 @end
 
+NS_ASSUME_NONNULL_END

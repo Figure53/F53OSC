@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -43,16 +43,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCMessage : F53OSCPacket <NSCoding, NSCopying>
 
-+ (BOOL) legalAddressComponent:(NSString *)addressComponent;
-+ (BOOL) legalAddress:(NSString *)address;
-+ (BOOL) legalMethod:(NSString *)method;
++ (BOOL) legalAddressComponent:(nullable NSString *)addressComponent;
++ (BOOL) legalAddress:(nullable NSString *)address;
++ (BOOL) legalMethod:(nullable NSString *)method;
 
 + (nullable F53OSCMessage *) messageWithString:(NSString *)qscString;
-+ (nullable F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
-                                             arguments:(NSArray *)arguments;
-+ (nullable F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
-                                             arguments:(NSArray *)arguments
-                                           replySocket:(nullable F53OSCSocket *)replySocket;
++ (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
+                                    arguments:(NSArray *)arguments;
++ (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
+                                    arguments:(NSArray *)arguments
+                                  replySocket:(nullable F53OSCSocket *)replySocket;
 
 @property (nonatomic, copy) NSString *addressPattern;
 @property (nonatomic, strong) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.
@@ -60,6 +60,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) id userData;
 
 - (NSArray *) addressParts;
+
+// redeclare as nonnull for this subclass
+- (NSData *) packetData;
 - (NSString *) asQSC;
 
 @end

@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013-2016 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -29,15 +29,18 @@
 #endif
 
 #import "F53OSCParser.h"
+
 #import "F53OSCMessage.h"
 #import "F53OSCSocket.h"
 #import "F53OSCFoundationAdditions.h"
+
+
+NS_ASSUME_NONNULL_BEGIN
 
 #define END             0300    /* indicates end of packet */
 #define ESC             0333    /* indicates byte stuffing */
 #define ESC_END         0334    /* ESC ESC_END means END data byte */
 #define ESC_ESC         0335    /* ESC ESC_ESC means ESC data byte */
-
 
 @interface F53OSCParser (Private)
 
@@ -46,21 +49,16 @@
 
 @end
 
-@implementation F53OSCParser (private)
+@implementation F53OSCParser (Private)
 
 + (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
 {
     F53OSCMessage *inbound = [self parseOscMessageData:data];
-    
-    if (inbound == nil)
-    {
+    if ( inbound == nil )
         return;
-    }
-    else
-    {
-        inbound.replySocket = socket;
-        [destination takeMessage:inbound];
-    }
+    
+    inbound.replySocket = socket;
+    [destination takeMessage:(F53OSCMessage * _Nonnull)inbound];
 }
 
 + (void) processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
@@ -138,7 +136,7 @@
 
 @implementation F53OSCParser
 
-+ (F53OSCMessage *) parseOscMessageData:(NSData *)data
++ (nullable F53OSCMessage *) parseOscMessageData:(NSData *)data
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
@@ -360,3 +358,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

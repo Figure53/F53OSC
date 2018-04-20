@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,15 @@
 #import <Foundation/Foundation.h>
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSNumber (F53OSCNumberAdditions)
 
 - (SInt32) oscFloatValue;
 - (SInt32) oscIntValue;
-+ (NSNumber *) numberWithOSCFloatBytes:(const char *)buf maxLength:(NSUInteger)maxLength;
-+ (NSNumber *) numberWithOSCIntBytes:(const char *)buf maxLength:(NSUInteger)maxLength;
++ (nullable NSNumber *) numberWithOSCFloatBytes:(const char *)buf maxLength:(NSUInteger)maxLength;
++ (nullable NSNumber *) numberWithOSCIntBytes:(const char *)buf maxLength:(NSUInteger)maxLength;
 
 @end
+
+NS_ASSUME_NONNULL_END

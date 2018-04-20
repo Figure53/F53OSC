@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -29,13 +29,13 @@
 #endif
 
 #import "F53OSCTimeTag.h"
+
 #import "NSDate+F53OSCTimeTag.h"
 
+
+NS_ASSUME_NONNULL_BEGIN
+
 @implementation F53OSCTimeTag
-
-@synthesize seconds;
-
-@synthesize fraction;
 
 + (F53OSCTimeTag *) timeTagWithDate:(NSDate *)date
 {
@@ -65,7 +65,7 @@
     return [data copy];
 }
 
-+ (F53OSCTimeTag *) timeTagWithOSCTimeBytes:(char *)buf
++ (nullable F53OSCTimeTag *) timeTagWithOSCTimeBytes:(char *)buf
 {
     if ( buf == NULL )
         return nil;
@@ -81,3 +81,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

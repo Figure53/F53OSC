@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,8 @@
 
 #import "NSString+F53OSCString.h"
 
+
+NS_ASSUME_NONNULL_BEGIN
 
 @implementation NSString (F53OSCStringAdditions)
 
@@ -59,7 +61,7 @@
 ///  An OSC string is a sequence of non-null ASCII characters followed by a null,
 ///  followed by 0-3 additional null characters to make the total number of bits a multiple of 32.
 ///
-+ (NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
++ (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
 {
     if ( buf == NULL || maxLength == 0 )
         return nil;
@@ -81,3 +83,5 @@ valid:;
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

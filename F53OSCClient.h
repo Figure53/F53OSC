@@ -30,12 +30,12 @@
 #import "F53OSCSocket.h"
 #import "F53OSCPacket.h"
 
-#define F53_OSC_CLIENT_DEBUG 0
-
 @protocol F53OSCClientDelegate;
 
 
 NS_ASSUME_NONNULL_BEGIN
+
+#define F53_OSC_CLIENT_DEBUG 0
 
 @interface F53OSCClient : NSObject <NSCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 

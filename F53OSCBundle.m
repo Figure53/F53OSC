@@ -29,12 +29,16 @@
 #endif
 
 #import "F53OSCBundle.h"
+
 #import "F53OSCTimeTag.h"
 #import "F53OSCFoundationAdditions.h"
 
+
+NS_ASSUME_NONNULL_BEGIN
+
 @implementation F53OSCBundle
 
-+ (F53OSCBundle *) bundleWithString:(NSString *)qscString
++ (nullable F53OSCBundle *) bundleWithString:(NSString *)qscString
 {
     NSLog( @"Error: F53OSCBundle does not yet support conversion of OSC bundles to/from a QSC form." );
     return nil;
@@ -49,7 +53,7 @@
     return bundle;
 }
 
-- (id) init
+- (instancetype) init
 {
     self = [super init];
     if ( self )
@@ -62,18 +66,14 @@
 
 - (void) dealloc
 {
-    self.timeTag = nil;
-    self.elements = nil;
+    _timeTag = nil;
+    _elements = nil;
 }
 
 - (NSString *) description
 {
     return [NSString stringWithFormat:@"%@", self.elements];
 }
-
-@synthesize timeTag;
-
-@synthesize elements;
 
 - (NSData *) packetData
 {
@@ -95,7 +95,7 @@
     return result;
 }
 
-- (NSString *) asQSC
+- (nullable NSString *) asQSC
 {
     NSLog( @"Error: F53OSCBundle does not yet support conversion of OSC bundles to/from a QSC form." );
     
@@ -109,3 +109,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

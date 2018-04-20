@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -28,14 +28,16 @@
 
 #import "F53OSCSocket.h"
 
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface F53OSCPacket : NSObject <NSCopying>
-{
-    F53OSCSocket *replySocket; ///< If this message was received from a client, this is the socket to use to reply.
-}
 
-@property (strong) F53OSCSocket *replySocket;
+@property (strong, nullable) F53OSCSocket *replySocket; ///< If this message was received from a client, this is the socket to use to reply.
 
-- (NSData *) packetData;
-- (NSString *) asQSC;
+- (nullable NSData *) packetData;
+- (nullable NSString *) asQSC;
 
 @end
+
+NS_ASSUME_NONNULL_END

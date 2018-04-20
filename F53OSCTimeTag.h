@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,10 @@
 
 #import <Foundation/Foundation.h>
 
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface F53OSCTimeTag : NSObject 
-{
-    UInt32 seconds;
-    UInt32 fraction;
-}
 
 @property (assign) UInt32 seconds;
 @property (assign) UInt32 fraction;
@@ -39,6 +38,8 @@
 + (F53OSCTimeTag *) immediateTimeTag;
 
 - (NSData *) oscTimeTagData;
-+ (F53OSCTimeTag *) timeTagWithOSCTimeBytes:(char *)buf;
++ (nullable F53OSCTimeTag *) timeTagWithOSCTimeBytes:(char *)buf;
 
 @end
+
+NS_ASSUME_NONNULL_END

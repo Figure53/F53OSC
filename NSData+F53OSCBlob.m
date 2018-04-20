@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,8 @@
 #import "NSData+F53OSCBlob.h"
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 @implementation NSData (F53OSCBlobAdditions)
 
 - (NSData *) oscBlobData
@@ -49,7 +51,7 @@
     return [newData copy];
 }
 
-+ (NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
++ (nullable NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
 {
     if ( buf == NULL || maxLength == 0 )
         return nil;
@@ -68,3 +70,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

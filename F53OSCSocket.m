@@ -29,7 +29,11 @@
 #endif
 
 #import "F53OSCSocket.h"
+
 #import "F53OSCPacket.h"
+
+
+NS_ASSUME_NONNULL_BEGIN
 
 #define TIMEOUT         3
 
@@ -54,10 +58,10 @@
 
 @implementation F53OSCStats
 
-- (id) init
+- (instancetype) init
 {
     self = [super init];
-    if (self)
+    if ( self )
     {
         self.totalBytes = 0;
         self.bytesPerSecond = 0;
@@ -72,10 +76,6 @@
         });
     }
     return self;
-}
-
-- (void) dealloc
-{
 }
 
 - (void) countBytes
@@ -124,9 +124,9 @@
 
 @interface F53OSCSocket ()
 
-@property (strong) GCDAsyncSocket *tcpSocket;
-@property (strong) GCDAsyncUdpSocket *udpSocket;
-@property (strong) F53OSCStats *stats;
+@property (strong, readwrite, nullable) GCDAsyncSocket *tcpSocket;
+@property (strong, readwrite, nullable) GCDAsyncUdpSocket *udpSocket;
+@property (strong, readwrite, nullable) F53OSCStats *stats;
 
 @end
 
@@ -142,7 +142,7 @@
     return [[F53OSCSocket alloc] initWithUdpSocket:socket];
 }
 
-- (id) initWithTcpSocket:(GCDAsyncSocket *)socket
+- (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket
 {
     self = [super init];
     if ( self )
@@ -156,7 +156,7 @@
     return self;
 }
 
-- (id) initWithUdpSocket:(GCDAsyncUdpSocket *)socket
+- (instancetype) initWithUdpSocket:(GCDAsyncUdpSocket *)socket
 {
     self = [super init];
     if ( self )
@@ -173,17 +173,17 @@
 
 - (void) dealloc
 {
-    [self.tcpSocket setDelegate:nil];
-    [self.tcpSocket disconnect];
-    self.tcpSocket = nil;
+    [_tcpSocket setDelegate:nil];
+    [_tcpSocket disconnect];
+    _tcpSocket = nil;
 
-    [self.udpSocket setDelegate:nil];
-    self.udpSocket = nil;
+    [_udpSocket setDelegate:nil];
+    _udpSocket = nil;
 
-    self.host = nil;
+    _host = nil;
 
-    [self.stats stop];
-    self.stats = nil;
+    [_stats stop];
+    _stats = nil;
 }
 
 - (NSString *) description
@@ -203,12 +203,6 @@
 {
     return ( self.udpSocket != nil );
 }
-
-@synthesize host;
-
-@synthesize port;
-
-@synthesize interface;
 
 - (BOOL) startListening
 {
@@ -337,10 +331,14 @@
             NSString *errString = error ? [error localizedDescription] : @"(unknown error)";
             NSLog( @"Warning: %@ unable to enable UDP broadcast - %@", self, errString );
         }
-
-        [self.udpSocket sendData:data toHost:self.host port:self.port withTimeout:TIMEOUT tag:0];
+        
+        if ( self.host )
+            [self.udpSocket sendData:data toHost:(NSString * _Nonnull)self.host port:self.port withTimeout:TIMEOUT tag:0];
+        
         [self.udpSocket closeAfterSending];
     }
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

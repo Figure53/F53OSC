@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2013-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2018 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,9 @@
 #import "GCDAsyncSocket.h"
 #import "GCDAsyncUdpSocket.h"
 
+
+NS_ASSUME_NONNULL_BEGIN
+
 #define F53_OSC_SOCKET_DEBUG 0
 
 @class F53OSCPacket;
@@ -51,28 +54,23 @@
 ///
 
 @interface F53OSCSocket : NSObject
-{
-    NSString *interface;
-    NSString *host;
-    UInt16 port;
-}
 
 + (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;
 + (F53OSCSocket *) socketWithUdpSocket:(GCDAsyncUdpSocket *)socket;
 
-- (id) initWithTcpSocket:(GCDAsyncSocket *)socket;
-- (id) initWithUdpSocket:(GCDAsyncUdpSocket *)socket;
+- (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket;
+- (instancetype) initWithUdpSocket:(GCDAsyncUdpSocket *)socket;
 
-@property (readonly) GCDAsyncSocket *tcpSocket;
-@property (readonly) GCDAsyncUdpSocket *udpSocket;
-@property (atomic, readonly) BOOL isTcpSocket;
-@property (atomic, readonly) BOOL isUdpSocket;
+@property (strong, readonly, nullable) GCDAsyncSocket *tcpSocket;
+@property (strong, readonly, nullable) GCDAsyncUdpSocket *udpSocket;
+@property (nonatomic, readonly) BOOL isTcpSocket;
+@property (nonatomic, readonly) BOOL isUdpSocket;
 
-@property (nonatomic, copy) NSString *interface;
-@property (nonatomic, copy) NSString *host;
+@property (nonatomic, copy, nullable) NSString *interface;
+@property (nonatomic, copy, nullable) NSString *host;
 @property (nonatomic, assign) UInt16 port;
 
-@property (readonly) F53OSCStats *stats;
+@property (strong, readonly, nullable) F53OSCStats *stats;
 
 - (BOOL) startListening;
 - (void) stopListening;
@@ -84,3 +82,5 @@
 - (void) sendPacket:(F53OSCPacket *)packet;
 
 @end
+
+NS_ASSUME_NONNULL_END
