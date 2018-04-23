@@ -173,11 +173,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) dealloc
 {
-    [_tcpSocket setDelegate:nil];
+    [_tcpSocket synchronouslySetDelegate:nil delegateQueue:nil];
     [_tcpSocket disconnect];
     _tcpSocket = nil;
 
-    [_udpSocket setDelegate:nil];
+    [_udpSocket synchronouslySetDelegate:nil delegateQueue:nil];
     _udpSocket = nil;
 
     _host = nil;

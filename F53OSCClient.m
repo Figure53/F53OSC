@@ -135,6 +135,10 @@ NS_ASSUME_NONNULL_BEGIN
     [self.readState removeObjectForKey:@"socket"];
     
     [self.socket disconnect];
+    if ( self.useTcp )
+        [self.socket.tcpSocket synchronouslySetDelegate:nil delegateQueue:nil];
+    else
+        [self.socket.udpSocket synchronouslySetDelegate:nil delegateQueue:nil];
     _socket = nil;
 }
 
