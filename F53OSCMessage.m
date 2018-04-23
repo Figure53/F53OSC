@@ -187,7 +187,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             
             NSNumber *number = [formatter numberFromString:arg];
             if ( number == nil )
-                [finalArgs addObject:arg];     // unquoted OSC string
+                [finalArgs addObject:[arg stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""]]; // unquoted OSC string
             else
                 [finalArgs addObject:number];  // OSC int or float
         }
