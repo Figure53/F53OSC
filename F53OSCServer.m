@@ -39,10 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, readwrite) F53OSCSocket *tcpSocket;
 @property (nonatomic, strong, readwrite) F53OSCSocket *udpSocket;
-@property (strong) NSMutableDictionary *activeTcpSockets;  // F53OSCSockets keyed by index of when the connection was accepted.
-@property (strong) NSMutableDictionary *activeData;        // NSMutableData keyed by index; buffers the incoming data.
-@property (strong) NSMutableDictionary *activeState;       // NSMutableDictionary keyed by index; stores state of incoming data.
-@property (assign) NSInteger activeIndex;
+@property (strong) NSMutableDictionary<NSNumber *, F53OSCSocket *> *activeTcpSockets;   // F53OSCSockets keyed by index of when the connection was accepted.
+@property (strong) NSMutableDictionary<NSNumber *, NSMutableData *> *activeData;        // NSMutableData keyed by index; buffers the incoming data.
+@property (strong) NSMutableDictionary<NSNumber *, NSMutableDictionary *> *activeState; // NSMutableDictionary keyed by index; stores state of incoming data.
+@property (assign) long activeIndex;
 
 + (NSString *) stringWithSpecialRegexCharactersEscaped:(NSString *)string;
 
@@ -195,10 +195,11 @@ NS_ASSUME_NONNULL_BEGIN
     activeSocket.host = newSocket.connectedHost;
     activeSocket.port = newSocket.connectedPort;
 
-    NSNumber *key = [NSNumber numberWithInteger:self.activeIndex];
+    NSNumber *key = [NSNumber numberWithLong:self.activeIndex];
     [self.activeTcpSockets setObject:activeSocket forKey:key];
     [self.activeData setObject:[NSMutableData data] forKey:key];
-    [self.activeState setObject:[@{ @"socket": activeSocket, @"dangling_ESC": @NO } mutableCopy] forKey:key];
+    [self.activeState setObject:[NSMutableDictionary dictionaryWithDictionary:@{ @"socket" : activeSocket,
+                                                                                 @"dangling_ESC" : @NO }] forKey:key];
 
     [newSocket readDataWithTimeout:-1 tag:self.activeIndex];
 
@@ -214,9 +215,10 @@ NS_ASSUME_NONNULL_BEGIN
 #if F53_OSC_SERVER_DEBUG
     NSLog( @"server socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
-
-    NSMutableData *activeData = [self.activeData objectForKey:[NSNumber numberWithInteger:tag]];
-    NSMutableDictionary *activeState = [self.activeState objectForKey:[NSNumber numberWithInteger:tag]];
+    
+    NSNumber *key = [NSNumber numberWithLong:tag];
+    NSMutableData *activeData = [self.activeData objectForKey:key];
+    NSMutableDictionary *activeState = [self.activeState objectForKey:key];
     if ( activeData && activeState )
     {
         [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate];
@@ -270,8 +272,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog( @"server socket %p didDisconnect", sock );
 #endif
 
-    id keyOfDyingSocket = nil;
-    for ( id key in [self.activeTcpSockets allKeys] )
+    NSNumber *keyOfDyingSocket = nil;
+    for ( NSNumber *key in [self.activeTcpSockets allKeys] )
     {
         F53OSCSocket *socket = [self.activeTcpSockets objectForKey:key];
         if ( socket.tcpSocket == sock )
