@@ -162,6 +162,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL) startListening
 {
+    // delegateQueue must be set before starting listening
+    [self.tcpSocket.tcpSocket synchronouslySetDelegateQueue:self.queue];
+    [self.udpSocket.udpSocket synchronouslySetDelegateQueue:self.queue];
+    
     BOOL success;
     success = [self.tcpSocket startListening];
     if ( success )
@@ -173,6 +177,12 @@ NS_ASSUME_NONNULL_BEGIN
 {
     [self.tcpSocket stopListening];
     [self.udpSocket stopListening];
+    
+    // unset delegate queue
+    // - this prevents the socket from holding a strong reference to this object. If the socket holds the final reference, this object will dealloc on the delegateQueue which could be a background thread.
+    // - one way this can happen is with a retain cycle caused by the socket capturing a strong reference to its delegate (which here is `self`) inside a block dispatched to the delegate queue, i.e. -[GCDAsyncUdpSocket closeAfterSending:] captures `closeWithError:` -> `notifyDidCloseWithError:` which casts `__strong id theDelegate = delegate;` and then captures theDelegate inside another dispatch_async() block on delegateQueue
+    [self.tcpSocket.tcpSocket synchronouslySetDelegateQueue:nil];
+    [self.udpSocket.udpSocket synchronouslySetDelegateQueue:nil];
 }
 
 #pragma mark - GCDAsyncSocketDelegate
