@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCServer ()
 
+@property (atomic, strong) dispatch_queue_t queue;
 @property (nonatomic, strong, readwrite) F53OSCSocket *tcpSocket;
 @property (nonatomic, strong, readwrite) F53OSCSocket *udpSocket;
 @property (strong) NSMutableDictionary<NSNumber *, F53OSCSocket *> *activeTcpSockets;   // F53OSCSockets keyed by index of when the connection was accepted.
@@ -124,6 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if ( !queue )
             queue = dispatch_get_main_queue();
+        self.queue = queue;
         
         GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:queue];
         GCDAsyncUdpSocket *rawUdpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:queue];
@@ -133,6 +135,8 @@ NS_ASSUME_NONNULL_BEGIN
         self.udpReplyPort = 0;
         self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket];
         self.udpSocket = [F53OSCSocket socketWithUdpSocket:rawUdpSocket];
+        
+        // NOTE: after init, only read/write to these on the delegate queue
         self.activeTcpSockets = [NSMutableDictionary dictionaryWithCapacity:1];
         self.activeData = [NSMutableDictionary dictionaryWithCapacity:1];
         self.activeState = [NSMutableDictionary dictionaryWithCapacity:1];
@@ -144,13 +148,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) dealloc
 {
     [self stopListening];
-
-    _delegate = nil;
-    _tcpSocket = nil;
-    _udpSocket = nil;
-    _activeTcpSockets = nil;
-    _activeData = nil;
-    _activeState = nil;
 }
 
 - (void) setPort:(UInt16)port
@@ -182,7 +179,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
 {
-    return NULL;
+    return self.queue;
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
