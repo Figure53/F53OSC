@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
     self = [super init];
     if ( self )
     {
+        _socketDelegateQueue = dispatch_get_main_queue();
         self.delegate = nil;
         self.interface = nil;
         self.host = @"localhost";
@@ -92,6 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
     self = [super init];
     if ( self )
     {
+        _socketDelegateQueue = dispatch_get_main_queue();
         self.delegate = nil;
         self.interface = [coder decodeObjectForKey:@"interface"];
         self.host = [coder decodeObjectForKey:@"host"];
@@ -110,23 +112,19 @@ NS_ASSUME_NONNULL_BEGIN
     return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", self.host, self.port ];
 }
 
-@synthesize socketDelegateQueue = _socketDelegateQueue;
-
-- (dispatch_queue_t) socketDelegateQueue
-{
-    if ( _socketDelegateQueue )
-        return _socketDelegateQueue;
-    else
-        return dispatch_get_main_queue();
-}
-
 - (void) setSocketDelegateQueue:(nullable dispatch_queue_t)queue
 {
     BOOL recreateSocket = ( self.socket != nil );
     if ( recreateSocket )
         [self destroySocket];
     
-    _socketDelegateQueue = queue;
+    if ( !queue )
+        queue = dispatch_get_main_queue();
+    
+    @synchronized( self )
+    {
+        _socketDelegateQueue = queue;
+    }
     
     if ( recreateSocket )
         [self createSocket];
@@ -295,7 +293,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
 {
-    return NULL;
+    return self.socketDelegateQueue;
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
