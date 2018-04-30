@@ -189,7 +189,7 @@ NS_ASSUME_NONNULL_BEGIN
                 {
                     case 's':
                         stringArg = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
-                        if ( stringArg )
+                        if ( stringArg != nil )
                         {
                             [args addObject:stringArg];
                             buffer += dataLength;
@@ -206,7 +206,7 @@ NS_ASSUME_NONNULL_BEGIN
                         break;
                     case 'b':
                         dataArg = [NSData dataWithOSCBlobBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
-                        if ( dataArg )
+                        if ( dataArg != nil )
                         {
                             [args addObject:dataArg];
                             buffer += dataLength + 4;
@@ -223,7 +223,7 @@ NS_ASSUME_NONNULL_BEGIN
                         break;
                     case 'i':
                         numberArg = [NSNumber numberWithOSCIntBytes:buffer maxLength:lengthOfRemainingBuffer];
-                        if ( numberArg )
+                        if ( numberArg != nil )
                         {
                             [args addObject:numberArg];
                             buffer += 4;
@@ -240,7 +240,7 @@ NS_ASSUME_NONNULL_BEGIN
                         break;
                     case 'f':
                         numberArg = [NSNumber numberWithOSCFloatBytes:buffer maxLength:lengthOfRemainingBuffer];
-                        if ( numberArg )
+                        if ( numberArg != nil )
                         {
                             [args addObject:numberArg];
                             buffer += 4;

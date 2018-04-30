@@ -64,12 +64,6 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
-- (void) dealloc
-{
-    _timeTag = nil;
-    _elements = nil;
-}
-
 - (NSString *) description
 {
     return [NSString stringWithFormat:@"%@", self.elements];

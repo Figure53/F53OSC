@@ -35,11 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation F53OSCPacket
 
-- (void) dealloc
-{
-    _replySocket = nil;
-}
-
 - (id) copyWithZone:(nullable NSZone *)zone
 {
     F53OSCPacket *copy = [[self class] allocWithZone:zone];

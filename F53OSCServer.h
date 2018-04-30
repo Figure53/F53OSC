@@ -36,8 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 
 + (NSString *) validCharsForOSCMethod;
-+ (NSPredicate *) predicateForAttribute:(NSString *)attributeName 
-                     matchingOSCPattern:(NSString *)pattern;
++ (nullable NSPredicate *) predicateForAttribute:(NSString *)attributeName 
+                              matchingOSCPattern:(NSString *)pattern;
 
 @property (nonatomic, weak, nullable)   id <F53OSCPacketDestination> delegate;
 @property (nonatomic, strong, readonly) F53OSCSocket *udpSocket;

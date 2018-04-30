@@ -76,8 +76,8 @@ NS_ASSUME_NONNULL_BEGIN
     return @"\"$%&'()+-.0123456789:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\^_`abcdefghijklmnopqrstuvwxyz|~!";
 }
 
-+ (NSPredicate *) predicateForAttribute:(NSString *)attributeName
-                     matchingOSCPattern:(NSString *)pattern
++ (nullable NSPredicate *) predicateForAttribute:(NSString *)attributeName
+                              matchingOSCPattern:(NSString *)pattern
 {
     //NSLog( @"pattern   : %@", pattern );
 
@@ -290,7 +290,7 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    if ( keyOfDyingSocket )
+    if ( keyOfDyingSocket != nil )
     {
         [self.activeTcpSockets removeObjectForKey:keyOfDyingSocket];
         [self.activeData removeObjectForKey:keyOfDyingSocket];
