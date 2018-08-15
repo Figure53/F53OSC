@@ -75,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) startListening;
 - (void) stopListening;
 
-- (BOOL) connect;
+- (BOOL) connect;       // when using TCP, returns NO if already connected
 - (void) disconnect;
 - (BOOL) isConnected;
 

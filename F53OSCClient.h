@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (atomic, readonly)                    BOOL isValid;
 @property (atomic, readonly)                    BOOL isConnected;
 
-- (BOOL) connect;
+- (BOOL) connect;   // NOTE: returns NO if internal F53OSCSocket uses TCP and is already connected
 - (void) disconnect;
 
 - (void) sendPacket:(F53OSCPacket *)packet;

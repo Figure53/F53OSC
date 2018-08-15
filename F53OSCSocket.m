@@ -246,7 +246,7 @@ NS_ASSUME_NONNULL_BEGIN
     if ( self.tcpSocket )
     {
         if ( self.host && self.port )
-            return [self.tcpSocket connectToHost:self.host onPort:self.port viaInterface:self.interface withTimeout:-1 error:nil];
+            return [self.tcpSocket connectToHost:self.host onPort:self.port viaInterface:self.interface withTimeout:-1 error:nil]; // NOTE: this returns NO if the GCDAsyncSocket is already connected
         else
             return NO;
     }
