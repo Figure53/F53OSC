@@ -47,9 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign)                   BOOL useTcp;
 @property (nonatomic, strong, nullable)         id userData;
 @property (nonatomic, copy)                     NSDictionary *state;
-@property (atomic, readonly)                    NSString *title;
-@property (atomic, readonly)                    BOOL isValid;
-@property (atomic, readonly)                    BOOL isConnected;
+@property (nonatomic, readonly)                 NSString *title;
+@property (nonatomic, readonly)                 BOOL isValid;
+@property (nonatomic, readonly)                 BOOL isConnected;
 
 - (BOOL) connect;   // NOTE: returns NO if internal F53OSCSocket uses TCP and is already connected
 - (void) disconnect;
