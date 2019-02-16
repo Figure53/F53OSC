@@ -12,6 +12,12 @@ For convenience, we've included a few public domain source files from [CocoaAsyn
 - You must link against `Security.framework` and `CFNetwork.framework`.
 - F53OSC requires Xcode 6.3 or later and a deployment target of macOS 10.9+ or iOS 8.4+.
 
+You can also use CocoaPods to include F53OSC into your project:
+
+```
+pod 'F53OSC', :git => 'https://github.com/Figure53/F53OSC.git'
+```
+
 ## Demo
 
 Inluded is a small demo app "F53OSC Monitor", which logs OSC messages sent to it via port 9999 and displays some basic stats about incoming traffic.
