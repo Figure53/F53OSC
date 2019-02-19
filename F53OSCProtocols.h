@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2019 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,21 @@
 //  THE SOFTWARE.
 //
 
+@protocol F53OSCPacketDestination;
 @class F53OSCMessage;
 
 
 NS_ASSUME_NONNULL_BEGIN
+
+@protocol F53OSCServer <NSObject>
+
+@property (nonatomic, weak, nullable)   id <F53OSCPacketDestination> delegate;
+
+- (BOOL) startListening;
+- (void) stopListening;
+
+@end
+
 
 @protocol F53OSCPacketDestination
 
