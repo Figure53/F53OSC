@@ -184,7 +184,6 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
             [formatter setLocale:[NSLocale currentLocale]];
             [formatter setAllowsFloats:YES];
-            [formatter setMinimumIntegerDigits:0]; // protect against a different default on a newer OS
             
             NSNumber *number = [formatter numberFromString:arg];
             if ( number == nil )
