@@ -33,6 +33,7 @@
 #import "F53OSCMessage.h"
 #import "F53OSCSocket.h"
 #import "F53OSCFoundationAdditions.h"
+#import "F53OSCImpulse.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -256,6 +257,30 @@ NS_ASSUME_NONNULL_BEGIN
                             NSLog( @"Error: Unable to parse float argument for OSC method %@", addressPattern );
                             return nil;
                         }
+                        break;
+                    case 'T':
+                        [args addObject:@YES]; // no data - do not advance the buffer
+                        
+                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            NSLog( @"    TRUE" );
+                        break;
+                    case 'F':
+                        [args addObject:@NO]; // no data - do not advance the buffer
+                        
+                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            NSLog( @"    FALSE" );
+                        break;
+                    case 'N':
+                        [args addObject:[NSNull null]]; // no data - do not advance the buffer
+                        
+                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            NSLog( @"    NULL" );
+                        break;
+                    case 'I':
+                        [args addObject:[F53OSCImpluse impluse]]; // no data - do not advance the buffer
+                        
+                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            NSLog( @"    IMPLUSE" );
                         break;
                     default:
                         NSLog( @"Error: Unrecognized type '%c' found in type tag for OSC method %@", type, addressPattern );

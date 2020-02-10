@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *addressPattern;
 @property (nonatomic, strong) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.
-@property (nonatomic, strong) NSArray *arguments;        ///< May contain NSString, NSData, or NSNumber objects. This could be extended in the future, but those three cover the four mandatory OSC 1.0 types.
+@property (nonatomic, strong) NSArray *arguments;        ///< May contain NSString, NSData, NSNumber, NSNull, or F53OSCImpulse objects. This could be extended in the future, but this covers the required types for OSC 1.0 and OSC 1.1 (with the exception of "timetag").
 @property (nonatomic, strong, nullable) id userData;
 
 - (NSArray *) addressParts;
