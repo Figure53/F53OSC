@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -59,6 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.host = @"localhost";
         self.port = 53000;         // QLab is 53000, Stagetracker is 57115.
         self.useTcp = NO;
+        self.tcpDataFraming = F53OSCDataFramingSLIP;
         self.userData = nil;
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -85,6 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
     [coder encodeObject:self.host forKey:@"host"];
     [coder encodeObject:[NSNumber numberWithUnsignedShort:self.port] forKey:@"port"];
     [coder encodeObject:[NSNumber numberWithBool:self.useTcp] forKey:@"useTcp"];
+    [coder encodeObject:[NSNumber numberWithUnsignedInteger:self.tcpDataFraming] forKey:@"tcpDataFraming"];
     [coder encodeObject:self.userData forKey:@"userData"];
 }
 
@@ -99,6 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.host = [coder decodeObjectForKey:@"host"];
         self.port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
         self.useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
+        self.tcpDataFraming = [[coder decodeObjectForKey:@"tcpDataFraming"] unsignedIntegerValue];
         self.userData = [coder decodeObjectForKey:@"userData"];
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -109,7 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", self.host, self.port ];
+    return [NSString stringWithFormat:@"<F53OSCClient %@:%hu>", self.host, self.port ];
 }
 
 - (void) setSocketDelegateQueue:(nullable dispatch_queue_t)queue
@@ -147,7 +150,7 @@ NS_ASSUME_NONNULL_BEGIN
     if ( self.useTcp )
     {
         GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
-        self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+        self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket dataFraming:self.tcpDataFraming];
         if ( self.socket )
             [self.readState setObject:self.socket forKey:@"socket"];
     }
@@ -222,6 +225,7 @@ NS_ASSUME_NONNULL_BEGIN
              @"host": self.host ? self.host : @"",
              @"port": @( self.port ),
              @"useTcp": @( self.useTcp ),
+             @"tcpDataFraming": @( self.tcpDataFraming ),
              @"userData": ( self.userData ? self.userData : [NSNull null] )
              };
 }
@@ -232,13 +236,14 @@ NS_ASSUME_NONNULL_BEGIN
     self.host = state[@"host"];
     self.port = [state[@"port"] unsignedIntValue];
     self.useTcp = [state[@"useTcp"] boolValue];
+    self.tcpDataFraming = [state[@"tcpDataFraming"] unsignedIntegerValue];
     self.userData = state[@"userData"];
 }
 
 - (NSString *) title
 {
     if ( self.isValid )
-        return [NSString stringWithFormat:@"%@ : %u", self.host, self.port ];
+        return [NSString stringWithFormat:@"%@ : %hu", self.host, self.port ];
     else
         return [NSString stringWithFormat:@"<invalid>" ];
 }
@@ -330,7 +335,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog( @"client socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
     
-    [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate];
+    [F53OSCParser translateData:data withFraming:self.tcpDataFraming toOscData:self.readData withState:self.readState destination:self.delegate];
     [sock readDataWithTimeout:-1 tag:tag];
 }
 
@@ -428,7 +433,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(nullable NSError *)error
 {
 #if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didSendDataWithTag: %ld dueToError: %@", sock, tag, [error localizedDescription] );
+    NSLog( @"client socket %p didNotSendDataWithTag: %ld dueToError: %@", sock, tag, [error localizedDescription] );
 #endif
 }
 

@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2013-2015 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -127,14 +127,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, readwrite, nullable) GCDAsyncSocket *tcpSocket;
 @property (strong, readwrite, nullable) GCDAsyncUdpSocket *udpSocket;
 @property (strong, readwrite, nullable) F53OSCStats *stats;
+@property (nonatomic, readwrite)        F53OSCDataFraming tcpDataFraming;
 
 @end
 
 @implementation F53OSCSocket
 
-+ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket
++ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket dataFraming:(F53OSCDataFraming)dataFraming
 {
-    return [[F53OSCSocket alloc] initWithTcpSocket:socket];
+    return [[F53OSCSocket alloc] initWithTcpSocket:socket dataFraming:dataFraming];
 }
 
 + (F53OSCSocket *) socketWithUdpSocket:(GCDAsyncUdpSocket *)socket
@@ -142,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
     return [[F53OSCSocket alloc] initWithUdpSocket:socket];
 }
 
-- (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket
+- (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket dataFraming:(F53OSCDataFraming)dataFraming
 {
     self = [super init];
     if ( self )
@@ -152,6 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.interface = nil;
         self.host = @"localhost";
         self.port = 0;
+        self.tcpDataFraming = dataFraming;
     }
     return self;
 }
@@ -189,9 +191,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *) description
 {
     if ( self.isTcpSocket )
-        return [NSString stringWithFormat:@"<F53OSCSocket TCP %@:%u isConnected = %i>", self.host, self.port, self.isConnected ];
+        return [NSString stringWithFormat:@"<F53OSCSocket TCP %@:%hu isConnected = %i>", self.host, self.port, self.isConnected ];
     else
-        return [NSString stringWithFormat:@"<F53OSCSocket UDP %@:%u>", self.host, self.port ];
+        return [NSString stringWithFormat:@"<F53OSCSocket UDP %@:%hu>", self.host, self.port ];
 }
 
 - (BOOL) isTcpSocket
@@ -284,32 +286,54 @@ NS_ASSUME_NONNULL_BEGIN
 
     NSData *data = [packet packetData];
 
-    //NSLog( @"%@ sending message with native length: %li", self, [data length] );
-
     if ( self.tcpSocket )
     {
-        // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
-
-        NSMutableData *slipData = [NSMutableData data];
-        Byte esc_end[2] = {ESC, ESC_END};
-        Byte esc_esc[2] = {ESC, ESC_ESC};
-        Byte end[1] = {END};
-
-        [slipData appendBytes:end length:1];
-        NSUInteger length = [data length];
-        const Byte *buffer = [data bytes];
-        for ( NSUInteger index = 0; index < length; index++ )
+        switch ( self.tcpDataFraming )
         {
-            if ( buffer[index] == END )
-                [slipData appendBytes:esc_end length:2];
-            else if ( buffer[index] == ESC )
-                [slipData appendBytes:esc_esc length:2];
-            else
-                [slipData appendBytes:&(buffer[index]) length:1];
+            case F53OSCDataFramingSLIP: {
+                
+                // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
+                
+                //NSLog( @"%@ sending message with native length: %li", self, [data length] );
+                
+                NSMutableData *slipData = [NSMutableData data];
+                Byte esc_end[2] = {ESC, ESC_END};
+                Byte esc_esc[2] = {ESC, ESC_ESC};
+                Byte end[1] = {END};
+                
+                [slipData appendBytes:end length:1];
+                NSUInteger length = [data length];
+                const Byte *buffer = [data bytes];
+                for ( NSUInteger index = 0; index < length; index++ )
+                {
+                    if ( buffer[index] == END )
+                        [slipData appendBytes:esc_end length:2];
+                    else if ( buffer[index] == ESC )
+                        [slipData appendBytes:esc_esc length:2];
+                    else
+                        [slipData appendBytes:&(buffer[index]) length:1];
+                }
+                [slipData appendBytes:end length:1];
+                
+                [self.tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
+                
+            } break;
+                
+            case F53OSCDataFramingSizeCount: {
+                
+                // Prepend the message with the length of the data.
+                // NOTE: OSC 1.0 spec calls for int32
+                NSUInteger length = [data length];
+                NSMutableData *newData = [NSMutableData dataWithCapacity:length];
+                uint32_t len = OSSwapHostToBigInt32( length );
+                [newData appendBytes:&len length:sizeof( uint32_t )];
+                [newData appendData:data];
+                data = [NSData dataWithData:newData];
+                
+                [self.tcpSocket writeData:data withTimeout:TIMEOUT tag:[data length]];
+                
+            } break;
         }
-        [slipData appendBytes:end length:1];
-
-        [self.tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
     }
     else if ( self.udpSocket )
     {

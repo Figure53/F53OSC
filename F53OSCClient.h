@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable)           NSString *host;
 @property (nonatomic, assign)                   UInt16 port;
 @property (nonatomic, assign)                   BOOL useTcp;
+@property (nonatomic, assign)                   F53OSCDataFraming tcpDataFraming; // Default SLIP
 @property (nonatomic, strong, nullable)         id userData;
 @property (nonatomic, copy)                     NSDictionary *state;
 @property (nonatomic, readonly)                 NSString *title;

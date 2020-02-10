@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 + (void) processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
+
++ (void) translateSlipData:(NSData *)slipData toOscData:(NSMutableData *)data withState:(NSMutableDictionary *)state destination:(id <F53OSCPacketDestination>)destination;
++ (void) translateData:(NSData *)data toOscData:(NSMutableData *)data withState:(NSMutableDictionary *)state destination:(id <F53OSCPacketDestination>)destination;
 
 @end
 
@@ -129,6 +132,119 @@ NS_ASSUME_NONNULL_BEGIN
     else
     {
         NSLog( @"Error: Received an invalid OSC bundle message." );
+    }
+}
+
++ (void) translateSlipData:(NSData *)slipData toOscData:(NSMutableData *)data withState:(NSMutableDictionary *)state destination:(id <F53OSCPacketDestination>)destination
+{
+    // Incoming data is framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
+    
+    F53OSCSocket *socket = [state objectForKey:@"socket"];
+    if ( socket == nil )
+    {
+        NSLog( @"Error: F53OSCParser can not translate SLIP data without a socket." );
+        return;
+    }
+    
+    BOOL dangling_ESC = [[state objectForKey:@"dangling_ESC"] boolValue];
+    
+    Byte end[1] = {END};
+    Byte esc[1] = {ESC};
+    
+    NSUInteger length = [slipData length];
+    const Byte *buffer = [slipData bytes];
+    for ( NSUInteger index = 0; index < length; index++ )
+    {
+        if ( dangling_ESC )
+        {
+            dangling_ESC = NO;
+            [state setObject:@NO forKey:@"dangling_ESC"];
+            if ( buffer[index] == ESC_END )
+                [data appendBytes:end length:1];
+            else if ( buffer[index] == ESC_ESC )
+                [data appendBytes:esc length:1];
+            else // Protocol violation. Pass the byte along and hope for the best.
+                [data appendBytes:&(buffer[index]) length:1];
+        }
+        else if ( buffer[index] == END )
+        {
+            // The data is now a complete message.
+            //NSLog( @"socket %p dispatching OSC data of length %lu", sock, [data length] );
+            [F53OSCParser processOscData:[NSData dataWithData:data] forDestination:destination replyToSocket:socket];
+            [data setData:[NSData data]];
+        }
+        else if ( buffer[index] == ESC )
+        {
+            if ( index + 1 < length )
+            {
+                index++;
+                if ( buffer[index] == ESC_END )
+                    [data appendBytes:end length:1];
+                else if ( buffer[index] == ESC_ESC )
+                    [data appendBytes:esc length:1];
+                else // Protocol violation. Pass the byte along and hope for the best.
+                    [data appendBytes:&(buffer[index]) length:1];
+            }
+            else
+            {
+                // The incoming raw data stopped in the middle of an escape sequence.
+                [state setObject:@YES forKey:@"dangling_ESC"];
+            }
+        }
+        else
+        {
+            [data appendBytes:&(buffer[index]) length:1];
+        }
+    }
+}
+
++ (void) translateData:(NSData *)data toOscData:(NSMutableData *)readData withState:(NSMutableDictionary *)state destination:(id <F53OSCPacketDestination>)destination
+{
+    // Incoming data is expected to be prepended by the length of the message when sent via TCP.
+    // Each time we get more data we look to see if we now have a complete message to process.
+    
+    F53OSCSocket *socket = [state objectForKey:@"socket"];
+    if ( socket == nil )
+    {
+        NSLog( @"Error: F53OSCParser can not translate data without a socket." );
+        return;
+    }
+    
+    [readData appendData:data];
+    
+    // OSC 1.0 spec calls for int32
+    NSUInteger length = [readData length];
+    if ( length > sizeof( UInt32 ) )
+    {
+        const char *buffer = [readData bytes];
+        UInt32 dataSize = *((UInt32 *)buffer);
+        dataSize = OSSwapBigToHostInt32( dataSize );
+        
+        if ( length - sizeof( UInt32 ) >= dataSize )
+        {
+            buffer += sizeof( UInt32 );
+            length -= sizeof( UInt32 );
+            NSData *oscData = [NSData dataWithBytes:buffer length:dataSize];
+            
+            buffer += dataSize;
+            length -= dataSize;
+            NSData *newData = nil;
+            if ( length )
+                newData = [NSData dataWithBytes:buffer length:length];
+            else
+                newData = [NSData data];
+            [readData setData:newData];
+            
+#if F53_OSC_CLIENT_DEBUG
+            NSLog( @"socket %p dispatching oscData of length %lu, leaving buffer of length %lu.", sock, [oscData length], [readData length] );
+#endif
+            
+            [F53OSCParser processOscData:oscData forDestination:destination replyToSocket:socket];
+        }
+        else
+        {
+            // TODO: protect against them filling up the buffer with a huge amount of incoming data.
+        }
     }
 }
 
@@ -291,69 +407,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-+ (void) translateSlipData:(NSData *)slipData
-                    toData:(NSMutableData *)data
-                 withState:(NSMutableDictionary *)state
-               destination:(id <F53OSCPacketDestination>)destination
++ (void) translateData:(NSData *)data withFraming:(F53OSCDataFraming)framing toOscData:(NSMutableData *)readData withState:(NSMutableDictionary *)state destination:(id <F53OSCPacketDestination>)destination
 {
-    // Incoming OSC messages are framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
-    
-    F53OSCSocket *socket = [state objectForKey:@"socket"];
-    if ( socket == nil )
+    switch ( framing )
     {
-        NSLog( @"Error: F53OSCParser can not translate SLIP data without a socket." );
-        return;
-    }
-    
-    BOOL dangling_ESC = [[state objectForKey:@"dangling_ESC"] boolValue];
-    
-    Byte end[1] = {END};
-    Byte esc[1] = {ESC};
-    
-    NSUInteger length = [slipData length];
-    const Byte *buffer = [slipData bytes];
-    for ( NSUInteger index = 0; index < length; index++ )
-    {
-        if ( dangling_ESC )
-        {
-            dangling_ESC = NO;
-            [state setObject:@NO forKey:@"dangling_ESC"];
-            if ( buffer[index] == ESC_END )
-                [data appendBytes:end length:1];
-            else if ( buffer[index] == ESC_ESC )
-                [data appendBytes:esc length:1];
-            else // Protocol violation. Pass the byte along and hope for the best.
-                [data appendBytes:&(buffer[index]) length:1];
-        }
-        else if ( buffer[index] == END )
-        {
-            // The data is now a complete message.
-            //NSLog( @"socket %p dispatching OSC data of length %lu", sock, [data length] );
-            [F53OSCParser processOscData:[NSData dataWithData:data] forDestination:destination replyToSocket:socket];
-            [data setData:[NSData data]];
-        }
-        else if ( buffer[index] == ESC )
-        {
-            if ( index + 1 < length )
-            {
-                index++;
-                if ( buffer[index] == ESC_END )
-                    [data appendBytes:end length:1];
-                else if ( buffer[index] == ESC_ESC )
-                    [data appendBytes:esc length:1];
-                else // Protocol violation. Pass the byte along and hope for the best.
-                    [data appendBytes:&(buffer[index]) length:1];
-            }
-            else
-            {
-                // The incoming raw data stopped in the middle of an escape sequence.
-                [state setObject:@YES forKey:@"dangling_ESC"];
-            }
-        }
-        else
-        {
-            [data appendBytes:&(buffer[index]) length:1];
-        }
+        case F53OSCDataFramingSLIP:
+            [[self class] translateSlipData:data toOscData:readData withState:state destination:destination];
+            break;
+            
+        case F53OSCDataFramingSizeCount:
+            [[self class] translateData:data toOscData:readData withState:state destination:destination];
+            break;
     }
 }
 

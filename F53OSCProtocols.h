@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013-2019 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,11 @@
 
 
 NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM( NSUInteger, F53OSCDataFraming ) {
+    F53OSCDataFramingSLIP = 0,    // OSC 1.1
+    F53OSCDataFramingSizeCount,   // OSC 1.0
+};
 
 @protocol F53OSCServer <NSObject>
 

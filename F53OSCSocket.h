@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2013-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "F53OSCParser.h"
 #import "GCDAsyncSocket.h"
 #import "GCDAsyncUdpSocket.h"
 
@@ -55,22 +56,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCSocket : NSObject
 
-+ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;
++ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket dataFraming:(F53OSCDataFraming)dataFraming;
 + (F53OSCSocket *) socketWithUdpSocket:(GCDAsyncUdpSocket *)socket;
 
-- (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket;
+- (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket dataFraming:(F53OSCDataFraming)dataFraming;
 - (instancetype) initWithUdpSocket:(GCDAsyncUdpSocket *)socket;
 
-@property (strong, readonly, nullable) GCDAsyncSocket *tcpSocket;
-@property (strong, readonly, nullable) GCDAsyncUdpSocket *udpSocket;
-@property (nonatomic, readonly) BOOL isTcpSocket;
-@property (nonatomic, readonly) BOOL isUdpSocket;
+@property (strong, readonly, nullable)  GCDAsyncSocket *tcpSocket;
+@property (strong, readonly, nullable)  GCDAsyncUdpSocket *udpSocket;
+@property (nonatomic, readonly)         BOOL isTcpSocket;
+@property (nonatomic, readonly)         BOOL isUdpSocket;
+@property (nonatomic, readonly)         F53OSCDataFraming tcpDataFraming;
 
-@property (nonatomic, copy, nullable) NSString *interface;
-@property (nonatomic, copy, nullable) NSString *host;
-@property (nonatomic, assign) UInt16 port;
+@property (nonatomic, copy, nullable)   NSString *interface;
+@property (nonatomic, copy, nullable)   NSString *host;
+@property (nonatomic, assign)           UInt16 port;
 
-@property (strong, readonly, nullable) F53OSCStats *stats;
+@property (strong, readonly, nullable)  F53OSCStats *stats;
 
 - (BOOL) startListening;
 - (void) stopListening;
@@ -80,6 +82,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) isConnected;
 
 - (void) sendPacket:(F53OSCPacket *)packet;
+
+// unavailable
++ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket __attribute__((unavailable("Use +socketWithTcpSocket:dataFraming: and F53OSCDataFramingSLIP")));
+- (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket __attribute__((unavailable("Use -initWithTcpSocket:dataFraming: and F53OSCDataFramingSLIP")));
 
 @end
 

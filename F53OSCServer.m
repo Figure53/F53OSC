@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -133,7 +133,8 @@ NS_ASSUME_NONNULL_BEGIN
         self.delegate = nil;
         self.port = 0;
         self.udpReplyPort = 0;
-        self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket];
+        self.tcpDataFraming = F53OSCDataFramingSLIP;
+        self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket dataFraming:self.tcpDataFraming];
         self.udpSocket = [F53OSCSocket socketWithUdpSocket:rawUdpSocket];
         
         // NOTE: after init, only read/write to these on the delegate queue
@@ -158,6 +159,21 @@ NS_ASSUME_NONNULL_BEGIN
     [self.udpSocket stopListening];
     self.tcpSocket.port = _port;
     self.udpSocket.port = _port;
+}
+
+- (void) setTcpDataFraming:(F53OSCDataFraming)tcpDataFraming
+{
+    if ( _tcpDataFraming != tcpDataFraming )
+    {
+        _tcpDataFraming = tcpDataFraming;
+        
+        [self stopListening];
+        
+        GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.queue];
+        self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket dataFraming:_tcpDataFraming];
+        
+        [self startListening];
+    }
 }
 
 - (BOOL) startListening
@@ -198,7 +214,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog( @"server socket %p didAcceptNewSocket %p", sock, newSocket );
 #endif
 
-    F53OSCSocket *activeSocket = [F53OSCSocket socketWithTcpSocket:newSocket];
+    F53OSCSocket *activeSocket = [F53OSCSocket socketWithTcpSocket:newSocket dataFraming:self.tcpDataFraming];
     activeSocket.host = newSocket.connectedHost;
     activeSocket.port = newSocket.connectedPort;
 
@@ -228,7 +244,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableDictionary *activeState = [self.activeState objectForKey:key];
     if ( activeData && activeState )
     {
-        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate];
+        [F53OSCParser translateData:data withFraming:self.tcpDataFraming toOscData:activeData withState:activeState destination:self.delegate];
         [sock readDataWithTimeout:-1 tag:tag];
     }
 }
