@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
 {
     if ( buf == NULL || maxLength == 0 )
+    {
+        if ( outLength != NULL )
+            *outLength = 0;
         return nil;
+    }
     
     UInt32 dataSize = 0;
     
@@ -62,9 +66,15 @@ NS_ASSUME_NONNULL_BEGIN
     dataSize = OSSwapBigToHostInt32( dataSize );
     
     if ( dataSize + 4 > maxLength )
+    {
+        if ( outLength != NULL )
+            *outLength = 0;
         return nil;
+    }
     
-    *outLength = dataSize;
+    if ( outLength != NULL )
+        *outLength = dataSize;
+    
     buf += 4;
     return [NSData dataWithBytes:buf length:dataSize];
 }
