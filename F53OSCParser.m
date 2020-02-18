@@ -211,8 +211,8 @@ NS_ASSUME_NONNULL_BEGIN
                         if ( dataArg != nil )
                         {
                             [args addObject:dataArg];
-                            buffer += dataLength + 4;
-                            lengthOfRemainingBuffer -= (dataLength + 4);
+                            buffer += dataLength;
+                            lengthOfRemainingBuffer -= dataLength;
                             
                             if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                                 NSLog( @"    blob: %@", dataArg );

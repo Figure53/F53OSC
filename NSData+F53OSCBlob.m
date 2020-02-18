@@ -51,6 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
     return [newData copy];
 }
 
+///
+///  An OSC blob is an int32 size count followed by a sequence of 8-bit bytes,
+///  followed by 0-3 additional null characters to make the total number of bits a multiple of 32.
+///
 + (nullable NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
 {
     if ( buf == NULL || maxLength == 0 )
@@ -76,7 +80,15 @@ NS_ASSUME_NONNULL_BEGIN
         *outLength = dataSize;
     
     buf += 4;
-    return [NSData dataWithBytes:buf length:dataSize];
+    NSData *result = [NSData dataWithBytes:buf length:dataSize];
+    
+    if ( outLength != NULL )
+    {
+        NSUInteger length = result.length + 4; // include length of size count byte
+        *outLength = ( 4 * ceil( length / 4.0 ) ); // round up to a multiple of 32 bits
+    }
+    
+    return result;
 }
 
 @end
