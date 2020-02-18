@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2013-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -188,6 +188,7 @@ NS_ASSUME_NONNULL_BEGIN
                 switch ( type )
                 {
                     case 's':
+                        dataLength = 0; // reset
                         stringArg = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
                         if ( stringArg != nil )
                         {
@@ -205,6 +206,7 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                         break;
                     case 'b':
+                        dataLength = 0; // reset
                         dataArg = [NSData dataWithOSCBlobBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
                         if ( dataArg != nil )
                         {

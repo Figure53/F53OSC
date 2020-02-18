@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -64,21 +64,30 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
 {
     if ( buf == NULL || maxLength == 0 )
+    {
+        if ( outLength != NULL )
+            *outLength = 0;
         return nil;
+    }
     
     for ( NSUInteger index = 0; index < maxLength; index++ )
     {
         if ( buf[index] == 0 )
             goto valid; // found a NULL character within the buffer
     }
-    return nil; // Buffer wasn't null terminated, so it's not a valid OSC string.
+    
+    // Buffer wasn't null terminated, so it's not a valid OSC string.
+    if ( outLength != NULL )
+        *outLength = 0;
+    return nil;
     
 valid:;
     
-    NSString *result = nil;
+    NSString *result = [NSString stringWithUTF8String:buf];
     
-    result = [NSString stringWithUTF8String:buf];
-    *outLength = 4 * ceil( ([result length] + 1) / 4.0 );
+    if ( outLength != NULL )
+        *outLength = 4 * ceil( ([result length] + 1) / 4.0 );
+    
     return result;
 }
 
