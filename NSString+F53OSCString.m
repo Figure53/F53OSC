@@ -86,7 +86,10 @@ valid:;
     NSString *result = [NSString stringWithUTF8String:buf];
     
     if ( outLength != NULL )
-        *outLength = 4 * ceil( ([result length] + 1) / 4.0 );
+    {
+        NSUInteger length = result.length + 1; // include length of null terminator character
+        *outLength = 4 * ceil( length / 4.0 ); // round up to a multiple of 32 bits
+    }
     
     return result;
 }
