@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2013 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -28,3 +28,4 @@
 #import "NSString+F53OSCString.h"
 #import "NSData+F53OSCBlob.h"
 #import "NSNumber+F53OSCNumber.h"
+#import "NSValue+F53OSCTypes.h"
