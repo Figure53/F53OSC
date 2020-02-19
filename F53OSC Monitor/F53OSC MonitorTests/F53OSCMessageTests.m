@@ -106,16 +106,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     else if ( [typeTag isEqualToString:@"T"] ) // 'T'
-        arg = @YES;
+        arg = [NSValue oscTrue];
     
     else if ( [typeTag isEqualToString:@"F"] ) // 'F'
-        arg = @NO;
+        arg = [NSValue oscFalse];
     
     else if ( [typeTag isEqualToString:@"N"] ) // 'N'
-        arg = [NSNull null];
+        arg = [NSValue oscNull];
     
     else if ( [typeTag isEqualToString:@"I"] ) // 'I'
-        arg = [F53OSCImpluse impluse];
+        arg = [NSValue oscImpulse];
     
     return arg;
 }
@@ -313,7 +313,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // given
     NSString *address = @"/thump";
-    NSArray *arguments = @[ @YES ];
+    NSArray *arguments = @[ [NSValue oscTrue] ];
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
     [self.messageExpectations addObject:expectation];
     
@@ -349,7 +349,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // given
     NSString *address = @"/thump";
-    NSArray *arguments = @[ @NO ];
+    NSArray *arguments = @[ [NSValue oscFalse] ];
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
     [self.messageExpectations addObject:expectation];
     
@@ -385,7 +385,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // given
     NSString *address = @"/thump";
-    NSArray *arguments = @[ [NSNull null] ];
+    NSArray *arguments = @[ [NSValue oscNull] ];
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
     [self.messageExpectations addObject:expectation];
     
@@ -421,7 +421,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // given
     NSString *address = @"/thump";
-    NSArray *arguments = @[ [F53OSCImpluse impluse] ];
+    NSArray *arguments = @[ [NSValue oscImpulse] ];
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
     [self.messageExpectations addObject:expectation];
     
@@ -851,10 +851,10 @@ NS_ASSUME_NONNULL_BEGIN
                            [@"thump" dataUsingEncoding:NSUTF8StringEncoding],
                            @(INT32_MAX),
                            @(FLT_MAX),
-                           @YES,
-                           @NO,
-                           [NSNull null],
-                           [F53OSCImpluse impluse],
+                           [NSValue oscTrue],
+                           [NSValue oscFalse],
+                           [NSValue oscNull],
+                           [NSValue oscImpulse],
                            ];
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
     [self.messageExpectations addObject:expectation];

@@ -33,7 +33,7 @@
 #import "F53OSCMessage.h"
 #import "F53OSCSocket.h"
 #import "F53OSCFoundationAdditions.h"
-#import "F53OSCImpulse.h"
+#import "NSValue+F53OSCTypes.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -259,25 +259,25 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                         break;
                     case 'T':
-                        [args addObject:@YES]; // no data - do not advance the buffer
+                        [args addObject:[NSValue oscTrue]]; // no data - do not advance the buffer
                         
                         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                             NSLog( @"    TRUE" );
                         break;
                     case 'F':
-                        [args addObject:@NO]; // no data - do not advance the buffer
+                        [args addObject:[NSValue oscFalse]]; // no data - do not advance the buffer
                         
                         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                             NSLog( @"    FALSE" );
                         break;
                     case 'N':
-                        [args addObject:[NSNull null]]; // no data - do not advance the buffer
+                        [args addObject:[NSValue oscNull]]; // no data - do not advance the buffer
                         
                         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                             NSLog( @"    NULL" );
                         break;
                     case 'I':
-                        [args addObject:[F53OSCImpluse impluse]]; // no data - do not advance the buffer
+                        [args addObject:[NSValue oscImpulse]]; // no data - do not advance the buffer
                         
                         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                             NSLog( @"    IMPLUSE" );

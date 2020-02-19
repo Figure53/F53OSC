@@ -1,7 +1,7 @@
 //
-//  F53OSCImpluse.h
+//  NSValue+F53OSCTypes.h
 //
-//  Created by Brent Lord on 2/12/20.
+//  Created by Brent Lord on 2/19/20.
 //
 //  Copyright (c) 2020 Figure 53 LLC, https://figure53.com
 //
@@ -24,14 +24,47 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+#if !__has_feature(objc_arc)
+#error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
+#endif
+
+#import "NSValue+F53OSCTypes.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface F53OSCImpluse : NSObject <NSCopying, NSSecureCoding>
+@implementation NSValue (F53OSCTypes)
 
-+ (F53OSCImpluse *) impluse; // Returns the singleton instance of F53OSCImpluse.
++ (instancetype) oscTrue
+{
+    const char value = 'T';
+    return [self valueWithBytes:&value objCType:@encode(char)];
+}
+
++ (instancetype) oscFalse
+{
+    const char value = 'F';
+    return [self valueWithBytes:&value objCType:@encode(char)];
+}
+
++ (instancetype) oscNull
+{
+    const char value = 'N';
+    return [self valueWithBytes:&value objCType:@encode(char)];
+}
+
++ (instancetype) oscImpulse
+{
+    const char value = 'I';
+    return [self valueWithBytes:&value objCType:@encode(char)];
+}
+
+- (char) oscTypeValue
+{
+    char value;
+    [self getValue:&value];
+    return value;
+}
 
 @end
 

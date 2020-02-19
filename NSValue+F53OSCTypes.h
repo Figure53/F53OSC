@@ -1,7 +1,7 @@
 //
-//  F53OSCImpluse.m
+//  NSValue+F53OSCTypes.h
 //
-//  Created by Brent Lord on 2/12/20.
+//  Created by Brent Lord on 2/19/20.
 //
 //  Copyright (c) 2020 Figure 53 LLC, https://figure53.com
 //
@@ -24,55 +24,19 @@
 //  THE SOFTWARE.
 //
 
-#if !__has_feature(objc_arc)
-#error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
-#endif
-
-#import "F53OSCImpulse.h"
+#import <Foundation/Foundation.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation F53OSCImpluse
+@interface NSValue (F53OSCTypes)
 
-static F53OSCImpluse *_sharedImpluse = nil;
++ (instancetype) oscTrue;
++ (instancetype) oscFalse;
++ (instancetype) oscNull;
++ (instancetype) oscImpulse;
 
-+ (F53OSCImpluse *) impluse
-{
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _sharedImpluse = [[F53OSCImpluse alloc] init];
-    });
-    return _sharedImpluse;
-}
-
-#pragma mark - NSCopying
-
-- (id) copyWithZone:(nullable NSZone *)zone
-{
-    F53OSCImpluse *copy = [[self class] allocWithZone:zone];
-    return copy;
-}
-
-#pragma mark - NSSecureCoding
-
-- (nullable instancetype) initWithCoder:(NSCoder *)aDecoder
-{
-    self = [super init];
-    if ( self )
-    {
-    }
-    return self;
-}
-
-- (void) encodeWithCoder:(NSCoder *)aCoder
-{
-}
-
-+ (BOOL) supportsSecureCoding
-{
-    return YES;
-}
+- (char) oscTypeValue;
 
 @end
 

@@ -34,7 +34,7 @@
 
 #import "F53OSCServer.h"
 #import "F53OSCFoundationAdditions.h"
-#import "F53OSCImpulse.h"
+#import "NSValue+F53OSCTypes.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -180,19 +180,19 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         }
         else if ( [arg isEqualToString:@"\\T"] )
         {
-            [finalArgs addObject:@YES];         // OSC true - 'T'
+            [finalArgs addObject:[NSValue oscTrue]];    // 'T'
         }
         else if ( [arg isEqualToString:@"\\F"] )
         {
-            [finalArgs addObject:@NO];          // OSC false - 'F'
+            [finalArgs addObject:[NSValue oscFalse]];   // 'F'
         }
         else if ( [arg isEqualToString:@"\\N"] )
         {
-            [finalArgs addObject:[NSNull null]]; // OSC null - 'N'
+            [finalArgs addObject:[NSValue oscNull]];    // 'N'
         }
         else if ( [arg isEqualToString:@"\\I"] )
         {
-            [finalArgs addObject:[F53OSCImpluse impluse]]; // OSC impulse - 'I'
+            [finalArgs addObject:[NSValue oscImpulse]]; // 'I'
         }
         else
         {
@@ -279,17 +279,14 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( [[arg class] isSubclassOfClass:[NSString class]] )
             [description appendFormat:@" \"%@\"", [arg description]]; // make strings clear in debug logs
-        else if ( [arg isKindOfClass:[NSNumber class]] && CFNumberGetType( (CFNumberRef)arg ) == kCFNumberCharType )
-        {
-            if ( [arg boolValue] )                                    // make bool values clear in debug logs
-                [description appendString:@" \\T"];
-            else
-                [description appendString:@" \\F"];
-        }
-        else if ( arg == [NSNull null] )
-            [description appendString:@" \\N"];                       // make null clear in debug logs
-        else if ( arg == [F53OSCImpluse impluse] )
-            [description appendString:@" \\I"];                       // make impulse clear in debug logs
+        else if ( [arg isEqual:[NSValue oscTrue]] )
+            [description appendString:@" \\T"];                       // make True clear in debug logs
+        else if ( [arg isEqual:[NSValue oscFalse]] )
+            [description appendString:@" \\F"];                       // make False clear in debug logs
+        else if ( [arg isEqual:[NSValue oscNull]] )
+            [description appendString:@" \\N"];                       // make Null clear in debug logs
+        else if ( [arg isEqual:[NSValue oscImpulse]] )
+            [description appendString:@" \\I"];                       // make Impulse clear in debug logs
         else
             [description appendFormat:@" %@", [arg description]];
     }
@@ -347,6 +344,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberSInt16Type:
                 case kCFNumberSInt32Type:
                 case kCFNumberSInt64Type:
+                case kCFNumberCharType:
                 case kCFNumberShortType:
                 case kCFNumberIntType:
                 case kCFNumberLongType:
@@ -361,24 +359,28 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberCGFloatType:
                     [newTypes appendString:@"f"]; // OSC float - 'f'
                     break;
-                case kCFNumberCharType:
-                    if ( [obj boolValue] )
-                        [newTypes appendString:@"T"]; // OSC true - 'T'
-                    else
-                        [newTypes appendString:@"F"]; // OSC false - 'F'
-                    break;
                 default:
                     NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, obj );
                     continue;
             }
             [newArgs addObject:obj];
         }
-        else if ( obj == [NSNull null] )
+        else if ( [obj isEqual:[NSValue oscTrue]] )
+        {
+            [newTypes appendString:@"T"]; // OSC true - 'T'
+            [newArgs addObject:obj];
+        }
+        else if ( [obj isEqual:[NSValue oscFalse]] )
+        {
+            [newTypes appendString:@"F"]; // OSC false - 'F'
+            [newArgs addObject:obj];
+        }
+        else if ( [obj isEqual:[NSValue oscNull]] )
         {
             [newTypes appendString:@"N"]; // OSC null - 'N'
             [newArgs addObject:obj];
         }
-        else if ( obj == [F53OSCImpluse impluse] )
+        else if ( [obj isEqual:[NSValue oscImpulse]] )
         {
             [newTypes appendString:@"I"]; // OSC impulse - 'I'
             [newArgs addObject:obj];
@@ -421,6 +423,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberSInt16Type:
                 case kCFNumberSInt32Type:
                 case kCFNumberSInt64Type:
+                case kCFNumberCharType:
                 case kCFNumberShortType:
                 case kCFNumberIntType:
                 case kCFNumberLongType:
@@ -437,21 +440,14 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                     intValue = [(NSNumber *)obj oscFloatValue]; // 'f'
                     [result appendBytes:&intValue length:sizeof( SInt32 )];
                     break;
-                case kCFNumberCharType:
-                    // no bytes are allocated for 'T' and 'F'
-                    break;
                 default:
                     NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, obj );
                     continue;
             }
         }
-        else if ( obj == [NSNull null] )
+        else if ( [obj isKindOfClass:[NSValue class]] )
         {
-            // no bytes are allocated for 'N'
-        }
-        else if ( obj == [F53OSCImpluse impluse] )
-        {
-            // no bytes are allocated for 'I'
+            // no bytes are allocated for 'T', 'F', 'I', or 'N'
         }
     }
     
@@ -468,7 +464,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             NSString *escapedQuotesArg = [arg stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
             [qscString appendFormat:@" \"%@\"", escapedQuotesArg];
         }
-        else if ( [arg isKindOfClass:[NSNumber class]] ) // 'i', 'f', 'T', 'F'
+        else if ( [arg isKindOfClass:[NSNumber class]] ) // 'i' or 'f'
         {
             CFNumberType numberType = CFNumberGetType( (CFNumberRef)arg );
             switch ( numberType )
@@ -477,6 +473,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberSInt16Type:
                 case kCFNumberSInt32Type:
                 case kCFNumberSInt64Type:
+                case kCFNumberCharType:
                 case kCFNumberShortType:
                 case kCFNumberIntType:
                 case kCFNumberLongType:
@@ -491,12 +488,6 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberCGFloatType:
                     [qscString appendFormat:@" %@", arg]; // 'f'
                     break;
-                case kCFNumberCharType:
-                    if ( [arg boolValue] )
-                        [qscString appendString:@" \\T"]; // 'T'
-                    else
-                        [qscString appendString:@" \\F"]; // 'F'
-                    break;
                 default:
                     NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, arg );
                     [qscString appendFormat:@" %@", arg];
@@ -507,11 +498,19 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         {
             [qscString appendFormat:@" #blob%@", [arg base64EncodedStringWithOptions:0]];
         }
-        else if ( arg == [NSNull null] ) // 'N'
+        else if ( [arg isEqual:[NSValue oscTrue]] ) // 'T'
+        {
+            [qscString appendString:@" \\T"];
+        }
+        else if ( [arg isEqual:[NSValue oscFalse]] ) // 'F'
+        {
+            [qscString appendString:@" \\F"];
+        }
+        else if ( [arg isEqual:[NSValue oscNull]] ) // 'N'
         {
             [qscString appendString:@" \\N"];
         }
-        else if ( arg == [F53OSCImpluse impluse] ) // 'I'
+        else if ( [arg isEqual:[NSValue oscImpulse]] ) // 'I'
         {
             [qscString appendString:@" \\I"];
         }
