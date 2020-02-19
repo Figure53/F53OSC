@@ -61,12 +61,12 @@ NS_ASSUME_NONNULL_BEGIN
 ///  An OSC string is a sequence of non-null ASCII characters followed by a null,
 ///  followed by 0-3 additional null characters to make the total number of bits a multiple of 32.
 ///
-+ (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
++ (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength bytesRead:(out NSUInteger *)outBytesRead
 {
     if ( buf == NULL || maxLength == 0 )
     {
-        if ( outLength != NULL )
-            *outLength = 0;
+        if ( outBytesRead != NULL )
+            *outBytesRead = 0;
         return nil;
     }
     
@@ -77,18 +77,18 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     // Buffer wasn't null terminated, so it's not a valid OSC string.
-    if ( outLength != NULL )
-        *outLength = 0;
+    if ( outBytesRead != NULL )
+        *outBytesRead = 0;
     return nil;
     
 valid:;
     
     NSString *result = [NSString stringWithUTF8String:buf];
     
-    if ( outLength != NULL )
+    if ( outBytesRead != NULL )
     {
-        NSUInteger length = result.length + 1; // include length of null terminator character
-        *outLength = 4 * ceil( length / 4.0 ); // round up to a multiple of 32 bits
+        NSUInteger bytesRead = result.length + 1; // include length of null terminator character
+        *outBytesRead = 4 * ceil( bytesRead / 4.0 ); // round up to a multiple of 32 bits
     }
     
     return result;

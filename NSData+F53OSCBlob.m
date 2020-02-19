@@ -55,12 +55,12 @@ NS_ASSUME_NONNULL_BEGIN
 ///  An OSC blob is an int32 size count followed by a sequence of 8-bit bytes,
 ///  followed by 0-3 additional null characters to make the total number of bits a multiple of 32.
 ///
-+ (nullable NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
++ (nullable NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength bytesRead:(out NSUInteger *)outBytesRead
 {
     if ( buf == NULL || maxLength == 0 )
     {
-        if ( outLength != NULL )
-            *outLength = 0;
+        if ( outBytesRead != NULL )
+            *outBytesRead = 0;
         return nil;
     }
     
@@ -71,21 +71,21 @@ NS_ASSUME_NONNULL_BEGIN
     
     if ( dataSize + 4 > maxLength )
     {
-        if ( outLength != NULL )
-            *outLength = 0;
+        if ( outBytesRead != NULL )
+            *outBytesRead = 0;
         return nil;
     }
     
-    if ( outLength != NULL )
-        *outLength = dataSize;
+    if ( outBytesRead != NULL )
+        *outBytesRead = dataSize;
     
     buf += 4;
     NSData *result = [NSData dataWithBytes:buf length:dataSize];
     
-    if ( outLength != NULL )
+    if ( outBytesRead != NULL )
     {
-        NSUInteger length = result.length + 4; // include length of size count byte
-        *outLength = ( 4 * ceil( length / 4.0 ) ); // round up to a multiple of 32 bits
+        NSUInteger bytesRead = result.length + 4; // include length of size count byte
+        *outBytesRead = ( 4 * ceil( bytesRead / 4.0 ) ); // round up to a multiple of 32 bits
     }
     
     return result;
