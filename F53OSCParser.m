@@ -67,9 +67,9 @@ NS_ASSUME_NONNULL_BEGIN
     const char *buffer = [data bytes];
     
     NSUInteger lengthOfRemainingBuffer = length;
-    NSUInteger dataLength = 0;
-    NSString *bundlePrefix = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
-    if ( bundlePrefix == nil || dataLength == 0 || dataLength > length )
+    NSUInteger bytesRead = 0;
+    NSString *bundlePrefix = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer bytesRead:&bytesRead];
+    if ( bundlePrefix == nil || bytesRead == 0 || bytesRead > length )
     {
         NSLog( @"Error: Unable to parse OSC bundle prefix." );
         return;
@@ -77,8 +77,8 @@ NS_ASSUME_NONNULL_BEGIN
     
     if ( [bundlePrefix isEqualToString:@"#bundle"] )
     {
-        buffer += dataLength;
-        lengthOfRemainingBuffer -= dataLength;
+        buffer += bytesRead;
+        lengthOfRemainingBuffer -= bytesRead;
         
         if ( lengthOfRemainingBuffer > 8 )
         {
@@ -142,29 +142,29 @@ NS_ASSUME_NONNULL_BEGIN
     const char *buffer = [data bytes];
     
     NSUInteger lengthOfRemainingBuffer = length;
-    NSUInteger dataLength = 0;
-    NSString *addressPattern = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
-    if ( addressPattern == nil || dataLength == 0 || dataLength > length )
+    NSUInteger bytesRead = 0;
+    NSString *addressPattern = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer bytesRead:&bytesRead];
+    if ( addressPattern == nil || bytesRead == 0 || bytesRead > length )
     {
         NSLog( @"Error: Unable to parse OSC method address." );
         return nil;
     }
     
-    buffer += dataLength;
-    lengthOfRemainingBuffer -= dataLength;
+    buffer += bytesRead;
+    lengthOfRemainingBuffer -= bytesRead;
     
     NSMutableArray *args = [NSMutableArray array];
     BOOL hasArguments = (lengthOfRemainingBuffer > 0);
     if ( hasArguments && buffer[0] == ',' )
     {
-        NSString *typeTag = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+        NSString *typeTag = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer bytesRead:&bytesRead];
         if ( typeTag == nil )
         {
             NSLog( @"Error: Unable to parse type tag for OSC method %@", addressPattern );
             return nil;
         }
-        buffer += dataLength;
-        lengthOfRemainingBuffer -= dataLength;
+        buffer += bytesRead;
+        lengthOfRemainingBuffer -= bytesRead;
         
         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
         {
@@ -188,13 +188,13 @@ NS_ASSUME_NONNULL_BEGIN
                 switch ( type )
                 {
                     case 's':
-                        dataLength = 0; // reset
-                        stringArg = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+                        bytesRead = 0; // reset
+                        stringArg = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer bytesRead:&bytesRead];
                         if ( stringArg != nil )
                         {
                             [args addObject:stringArg];
-                            buffer += dataLength;
-                            lengthOfRemainingBuffer -= dataLength;
+                            buffer += bytesRead;
+                            lengthOfRemainingBuffer -= bytesRead;
                             
                             if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                                 NSLog( @"    string: \"%@\"", stringArg );
@@ -206,13 +206,13 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                         break;
                     case 'b':
-                        dataLength = 0; // reset
-                        dataArg = [NSData dataWithOSCBlobBytes:buffer maxLength:lengthOfRemainingBuffer length:&dataLength];
+                        bytesRead = 0; // reset
+                        dataArg = [NSData dataWithOSCBlobBytes:buffer maxLength:lengthOfRemainingBuffer bytesRead:&bytesRead];
                         if ( dataArg != nil )
                         {
                             [args addObject:dataArg];
-                            buffer += dataLength;
-                            lengthOfRemainingBuffer -= dataLength;
+                            buffer += bytesRead;
+                            lengthOfRemainingBuffer -= bytesRead;
                             
                             if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                                 NSLog( @"    blob: %@", dataArg );

@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSData (F53OSCBlobAdditions)
 
 - (NSData *) oscBlobData;
-+ (nullable NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;
++ (nullable NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength bytesRead:(out NSUInteger *)outBytesRead;
 
 @end
 

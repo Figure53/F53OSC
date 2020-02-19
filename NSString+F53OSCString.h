@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSString (F53OSCStringAdditions)
 
 - (NSData *) oscStringData;
-+ (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength;
++ (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength bytesRead:(out NSUInteger *)outBytesRead;
 
 @end
 
