@@ -34,6 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSData *) oscStringData;
 + (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength bytesRead:(out NSUInteger *)outBytesRead;
 
+// deprecated
++ (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength DEPRECATED_MSG_ATTRIBUTE("Use +stringWithOSCStringBytes:maxLength:bytesRead: instead");
+
 @end
 
 NS_ASSUME_NONNULL_END

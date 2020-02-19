@@ -91,6 +91,13 @@ NS_ASSUME_NONNULL_BEGIN
     return result;
 }
 
+#pragma mark - deprecations
+
++ (nullable NSData *) dataWithOSCBlobBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
+{
+    return [NSData dataWithOSCBlobBytes:buf maxLength:maxLength bytesRead:outLength];
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

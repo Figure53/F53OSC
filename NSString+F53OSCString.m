@@ -94,6 +94,14 @@ valid:;
     return result;
 }
 
+#pragma mark - deprecations
+
++ (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength
+{
+    return [NSString stringWithOSCStringBytes:buf maxLength:maxLength bytesRead:outLength];
+}
+
+
 @end
 
 NS_ASSUME_NONNULL_END
