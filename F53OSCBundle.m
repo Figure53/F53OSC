@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2015 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 + (F53OSCBundle *) bundleWithTimeTag:(F53OSCTimeTag *)timeTag
-                            elements:(NSArray *)elements
+                            elements:(NSArray<NSData *> *)elements
 {
     F53OSCBundle *bundle = [F53OSCBundle new];
     bundle.timeTag = timeTag;

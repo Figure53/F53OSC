@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable F53OSCBundle *) bundleWithString:(NSString *)qscString;
 + (F53OSCBundle *) bundleWithTimeTag:(F53OSCTimeTag *)timeTag
-                            elements:(NSArray *)elements;     ///< Elements must be an array of NSData objects; convert F53OSCMessages using their packetData method.
+                            elements:(NSArray<NSData *> *)elements; ///< Elements must be an array of NSData objects; convert F53OSCMessages using their packetData method.
 
 @property (strong) F53OSCTimeTag *timeTag;
-@property (strong) NSArray *elements;
+@property (strong) NSArray<NSData *> *elements;
 
 // redeclare as nonnull for this subclass
 - (NSData *) packetData;
