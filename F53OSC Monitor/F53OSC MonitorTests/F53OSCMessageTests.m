@@ -105,6 +105,18 @@ NS_ASSUME_NONNULL_BEGIN
         arg = [formatter numberFromString:qsc]; // 'i' or 'f'
     }
     
+    else if ( [typeTag isEqualToString:@"T"] ) // 'T'
+        arg = [NSValue oscTrue];
+    
+    else if ( [typeTag isEqualToString:@"F"] ) // 'F'
+        arg = [NSValue oscFalse];
+    
+    else if ( [typeTag isEqualToString:@"N"] ) // 'N'
+        arg = [NSValue oscNull];
+    
+    else if ( [typeTag isEqualToString:@"I"] ) // 'I'
+        arg = [NSValue oscImpulse];
+    
     return arg;
 }
 
@@ -297,7 +309,151 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
 }
 
-- (void) testThat_06_testF53OSCMessageCanSendQSCAddressOnly
+- (void) testThat_06_testF53OSCMessageCanSendArgumentTrue
+{
+    // given
+    NSString *address = @"/thump";
+    NSArray *arguments = @[ [NSValue oscTrue] ];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
+    [self.messageExpectations addObject:expectation];
+    
+    // when
+    F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:address arguments:arguments];
+    [self.oscClient sendPacket:message];
+    
+    // then
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ expectation ] timeout:5.0];
+    XCTAssert( result == XCTWaiterResultCompleted, @"OSC message failed to arrive - %@", address );
+    
+    F53OSCMessage *messageReceived = self.matchedExpectations[expectation.description];
+    XCTAssertNotNil( message );
+    XCTAssertNotNil( messageReceived );
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+    XCTAssertEqualObjects( message.addressPattern, address );
+    XCTAssertEqualObjects( messageReceived.addressPattern, address );
+    XCTAssertEqualObjects( message.typeTagString, @",T" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",T" );
+    XCTAssertEqual( message.arguments.count, arguments.count );
+    XCTAssertEqual( messageReceived.arguments.count, arguments.count );
+    for ( NSUInteger i = 0; i < arguments.count; i++ )
+    {
+        id arg = arguments[i];
+        XCTAssertEqualObjects( messageReceived.arguments[i], arg, @"arg index %ld not equal - %@", (unsigned long)i, arg );
+    }
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+}
+
+- (void) testThat_07_testF53OSCMessageCanSendArgumentFalse
+{
+    // given
+    NSString *address = @"/thump";
+    NSArray *arguments = @[ [NSValue oscFalse] ];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
+    [self.messageExpectations addObject:expectation];
+    
+    // when
+    F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:address arguments:arguments];
+    [self.oscClient sendPacket:message];
+    
+    // then
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ expectation ] timeout:5.0];
+    XCTAssert( result == XCTWaiterResultCompleted, @"OSC message failed to arrive - %@", address );
+    
+    F53OSCMessage *messageReceived = self.matchedExpectations[expectation.description];
+    XCTAssertNotNil( message );
+    XCTAssertNotNil( messageReceived );
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+    XCTAssertEqualObjects( message.addressPattern, address );
+    XCTAssertEqualObjects( messageReceived.addressPattern, address );
+    XCTAssertEqualObjects( message.typeTagString, @",F" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",F" );
+    XCTAssertEqual( message.arguments.count, arguments.count );
+    XCTAssertEqual( messageReceived.arguments.count, arguments.count );
+    for ( NSUInteger i = 0; i < arguments.count; i++ )
+    {
+        id arg = arguments[i];
+        XCTAssertEqualObjects( messageReceived.arguments[i], arg, @"arg index %ld not equal - %@", (unsigned long)i, arg );
+    }
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+}
+
+- (void) testThat_08_testF53OSCMessageCanSendArgumentNull
+{
+    // given
+    NSString *address = @"/thump";
+    NSArray *arguments = @[ [NSValue oscNull] ];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
+    [self.messageExpectations addObject:expectation];
+    
+    // when
+    F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:address arguments:arguments];
+    [self.oscClient sendPacket:message];
+    
+    // then
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ expectation ] timeout:5.0];
+    XCTAssert( result == XCTWaiterResultCompleted, @"OSC message failed to arrive - %@", address );
+    
+    F53OSCMessage *messageReceived = self.matchedExpectations[expectation.description];
+    XCTAssertNotNil( message );
+    XCTAssertNotNil( messageReceived );
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+    XCTAssertEqualObjects( message.addressPattern, address );
+    XCTAssertEqualObjects( messageReceived.addressPattern, address );
+    XCTAssertEqualObjects( message.typeTagString, @",N" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",N" );
+    XCTAssertEqual( message.arguments.count, arguments.count );
+    XCTAssertEqual( messageReceived.arguments.count, arguments.count );
+    for ( NSUInteger i = 0; i < arguments.count; i++ )
+    {
+        id arg = arguments[i];
+        XCTAssertEqualObjects( messageReceived.arguments[i], arg, @"arg index %ld not equal - %@", (unsigned long)i, arg );
+    }
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+}
+
+- (void) testThat_09_testF53OSCMessageCanSendArgumentImpluse
+{
+    // given
+    NSString *address = @"/thump";
+    NSArray *arguments = @[ [NSValue oscImpulse] ];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
+    [self.messageExpectations addObject:expectation];
+    
+    // when
+    F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:address arguments:arguments];
+    [self.oscClient sendPacket:message];
+    
+    // then
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ expectation ] timeout:5.0];
+    XCTAssert( result == XCTWaiterResultCompleted, @"OSC message failed to arrive - %@", address );
+    
+    F53OSCMessage *messageReceived = self.matchedExpectations[expectation.description];
+    XCTAssertNotNil( message );
+    XCTAssertNotNil( messageReceived );
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+    XCTAssertEqualObjects( message.addressPattern, address );
+    XCTAssertEqualObjects( messageReceived.addressPattern, address );
+    XCTAssertEqualObjects( message.typeTagString, @",I" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",I" );
+    XCTAssertEqual( message.arguments.count, arguments.count );
+    XCTAssertEqual( messageReceived.arguments.count, arguments.count );
+    for ( NSUInteger i = 0; i < arguments.count; i++ )
+    {
+        id arg = arguments[i];
+        XCTAssertEqualObjects( messageReceived.arguments[i], arg, @"arg index %ld not equal - %@", (unsigned long)i, arg );
+    }
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+}
+
+- (void) testThat_10_testF53OSCMessageCanSendQSCAddressOnly
 {
     // given
     NSString *address = @"/thump";
@@ -327,7 +483,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
 }
 
-- (void) testThat_07_testF53OSCMessageCanSendQSCArgumentString
+- (void) testThat_11_testF53OSCMessageCanSendQSCArgumentString
 {
     // given
     NSString *address = @"/thump";
@@ -372,7 +528,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
 }
 
-- (void) testThat_08_testF53OSCMessageCanSendQSCArgumentBlob
+- (void) testThat_12_testF53OSCMessageCanSendQSCArgumentBlob
 {
     // given
     NSString *address = @"/thump";
@@ -417,7 +573,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
 }
 
-- (void) testThat_09_testF53OSCMessageCanSendQSCArgumentInteger
+- (void) testThat_13_testF53OSCMessageCanSendQSCArgumentInteger
 {
     // given
     NSString *address = @"/thump";
@@ -462,7 +618,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
 }
 
-- (void) testThat_10_testF53OSCMessageCanSendQSCArgumentFloat
+- (void) testThat_14_testF53OSCMessageCanSendQSCArgumentFloat
 {
     // given
     NSString *address = @"/thump";
@@ -507,7 +663,187 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
 }
 
-- (void) testThat_11_testF53OSCMessageCanSendMultipleArguments
+- (void) testThat_14_testF53OSCMessageCanSendQSCArgumentTrue
+{
+    // given
+    NSString *address = @"/thump";
+    NSArray<NSString *> *arguments = @[ @"\\T" ];
+    NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
+    [self.messageExpectations addObject:expectation];
+    
+    // when
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    [self.oscClient sendPacket:message];
+    
+    // then
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ expectation ] timeout:5.0];
+    XCTAssert( result == XCTWaiterResultCompleted, @"OSC message failed to arrive - %@", address );
+    
+    F53OSCMessage *messageReceived = self.matchedExpectations[expectation.description];
+    XCTAssertNotNil( message );
+    XCTAssertNotNil( messageReceived );
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+    XCTAssertEqualObjects( message.addressPattern, address );
+    XCTAssertEqualObjects( messageReceived.addressPattern, address );
+    XCTAssertEqualObjects( message.typeTagString, @",T" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",T" );
+    
+    NSUInteger argIndex = 0;
+    for ( NSUInteger t = 0; t < messageReceived.typeTagString.length; t++ )
+    {
+        NSString *typeTag = [messageReceived.typeTagString substringWithRange:NSMakeRange( t, 1 )];
+        if ( [typeTag isEqualToString:@","] )
+            continue;
+        
+        NSString *argStr = arguments[argIndex];
+        id arg = [self oscMessageArgumentFromString:argStr typeTag:typeTag];
+        XCTAssertEqualObjects( messageReceived.arguments[argIndex], arg, @"arg index %ld not equal - %@", (unsigned long)argIndex, arg );
+        
+        argIndex++;
+    }
+    
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+}
+
+- (void) testThat_14_testF53OSCMessageCanSendQSCArgumentFalse
+{
+    // given
+    NSString *address = @"/thump";
+    NSArray<NSString *> *arguments = @[ @"\\F" ];
+    NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
+    [self.messageExpectations addObject:expectation];
+    
+    // when
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    [self.oscClient sendPacket:message];
+    
+    // then
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ expectation ] timeout:5.0];
+    XCTAssert( result == XCTWaiterResultCompleted, @"OSC message failed to arrive - %@", address );
+    
+    F53OSCMessage *messageReceived = self.matchedExpectations[expectation.description];
+    XCTAssertNotNil( message );
+    XCTAssertNotNil( messageReceived );
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+    XCTAssertEqualObjects( message.addressPattern, address );
+    XCTAssertEqualObjects( messageReceived.addressPattern, address );
+    XCTAssertEqualObjects( message.typeTagString, @",F" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",F" );
+    
+    NSUInteger argIndex = 0;
+    for ( NSUInteger t = 0; t < messageReceived.typeTagString.length; t++ )
+    {
+        NSString *typeTag = [messageReceived.typeTagString substringWithRange:NSMakeRange( t, 1 )];
+        if ( [typeTag isEqualToString:@","] )
+            continue;
+        
+        NSString *argStr = arguments[argIndex];
+        id arg = [self oscMessageArgumentFromString:argStr typeTag:typeTag];
+        XCTAssertEqualObjects( messageReceived.arguments[argIndex], arg, @"arg index %ld not equal - %@", (unsigned long)argIndex, arg );
+        
+        argIndex++;
+    }
+    
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+}
+
+- (void) testThat_14_testF53OSCMessageCanSendQSCArgumentNull
+{
+    // given
+    NSString *address = @"/thump";
+    NSArray<NSString *> *arguments = @[ @"\\N" ];
+    NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
+    [self.messageExpectations addObject:expectation];
+    
+    // when
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    [self.oscClient sendPacket:message];
+    
+    // then
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ expectation ] timeout:5.0];
+    XCTAssert( result == XCTWaiterResultCompleted, @"OSC message failed to arrive - %@", address );
+    
+    F53OSCMessage *messageReceived = self.matchedExpectations[expectation.description];
+    XCTAssertNotNil( message );
+    XCTAssertNotNil( messageReceived );
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+    XCTAssertEqualObjects( message.addressPattern, address );
+    XCTAssertEqualObjects( messageReceived.addressPattern, address );
+    XCTAssertEqualObjects( message.typeTagString, @",N" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",N" );
+    
+    NSUInteger argIndex = 0;
+    for ( NSUInteger t = 0; t < messageReceived.typeTagString.length; t++ )
+    {
+        NSString *typeTag = [messageReceived.typeTagString substringWithRange:NSMakeRange( t, 1 )];
+        if ( [typeTag isEqualToString:@","] )
+            continue;
+        
+        NSString *argStr = arguments[argIndex];
+        id arg = [self oscMessageArgumentFromString:argStr typeTag:typeTag];
+        XCTAssertEqualObjects( messageReceived.arguments[argIndex], arg, @"arg index %ld not equal - %@", (unsigned long)argIndex, arg );
+        
+        argIndex++;
+    }
+    
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+}
+
+- (void) testThat_14_testF53OSCMessageCanSendQSCArgumentImpluse
+{
+    // given
+    NSString *address = @"/thump";
+    NSArray<NSString *> *arguments = @[ @"\\I" ];
+    NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
+    [self.messageExpectations addObject:expectation];
+    
+    // when
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    [self.oscClient sendPacket:message];
+    
+    // then
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[ expectation ] timeout:5.0];
+    XCTAssert( result == XCTWaiterResultCompleted, @"OSC message failed to arrive - %@", address );
+    
+    F53OSCMessage *messageReceived = self.matchedExpectations[expectation.description];
+    XCTAssertNotNil( message );
+    XCTAssertNotNil( messageReceived );
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+    XCTAssertEqualObjects( message.addressPattern, address );
+    XCTAssertEqualObjects( messageReceived.addressPattern, address );
+    XCTAssertEqualObjects( message.typeTagString, @",I" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",I" );
+    
+    NSUInteger argIndex = 0;
+    for ( NSUInteger t = 0; t < messageReceived.typeTagString.length; t++ )
+    {
+        NSString *typeTag = [messageReceived.typeTagString substringWithRange:NSMakeRange( t, 1 )];
+        if ( [typeTag isEqualToString:@","] )
+            continue;
+        
+        NSString *argStr = arguments[argIndex];
+        id arg = [self oscMessageArgumentFromString:argStr typeTag:typeTag];
+        XCTAssertEqualObjects( messageReceived.arguments[argIndex], arg, @"arg index %ld not equal - %@", (unsigned long)argIndex, arg );
+        
+        argIndex++;
+    }
+    
+    XCTAssertNil( message.userData );
+    XCTAssertNil( messageReceived.userData );
+}
+
+- (void) testThat_14_testF53OSCMessageCanSendMultipleArguments
 {
     // given
     NSString *address = @"/thump";
@@ -515,6 +851,10 @@ NS_ASSUME_NONNULL_BEGIN
                            [@"thump" dataUsingEncoding:NSUTF8StringEncoding],
                            @(INT32_MAX),
                            @(FLT_MAX),
+                           [NSValue oscTrue],
+                           [NSValue oscFalse],
+                           [NSValue oscNull],
+                           [NSValue oscImpulse],
                            ];
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
     [self.messageExpectations addObject:expectation];
@@ -534,8 +874,8 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
     XCTAssertEqualObjects( message.addressPattern, address );
     XCTAssertEqualObjects( messageReceived.addressPattern, address );
-    XCTAssertEqualObjects( message.typeTagString, @",sbif" );
-    XCTAssertEqualObjects( messageReceived.typeTagString, @",sbif" );
+    XCTAssertEqualObjects( message.typeTagString, @",sbifTFNI" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",sbifTFNI" );
     XCTAssertEqual( message.arguments.count, arguments.count );
     XCTAssertEqual( messageReceived.arguments.count, arguments.count );
     for ( NSUInteger i = 0; i < arguments.count; i++ )
@@ -547,7 +887,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
 }
 
-- (void) testThat_12_testF53OSCMessageCanSendMultipleQSCArguments
+- (void) testThat_15_testF53OSCMessageCanSendMultipleQSCArguments
 {
     // given
     NSString *address = @"/thump";
@@ -555,6 +895,10 @@ NS_ASSUME_NONNULL_BEGIN
                                         [NSString stringWithFormat:@"#blob%@", [[@"thump" dataUsingEncoding:NSUTF8StringEncoding] base64EncodedStringWithOptions:0] ],
                                         [NSString stringWithFormat:@"%d", INT32_MAX ],
                                         [NSString stringWithFormat:@"%F", FLT_MAX ],
+                                        @"\\T",
+                                        @"\\F",
+                                        @"\\N",
+                                        @"\\I",
                                         ];
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:address];
@@ -575,8 +919,8 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil( messageReceived.userData );
     XCTAssertEqualObjects( message.addressPattern, address );
     XCTAssertEqualObjects( messageReceived.addressPattern, address );
-    XCTAssertEqualObjects( message.typeTagString, @",sbif" );
-    XCTAssertEqualObjects( messageReceived.typeTagString, @",sbif" );
+    XCTAssertEqualObjects( message.typeTagString, @",sbifTFNI" );
+    XCTAssertEqualObjects( messageReceived.typeTagString, @",sbifTFNI" );
     
     NSUInteger argIndex = 0;
     for ( NSUInteger t = 0; t < messageReceived.typeTagString.length; t++ )

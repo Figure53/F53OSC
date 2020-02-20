@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #import <Foundation/Foundation.h>
 
 #import "F53OSCPacket.h"
+#import "F53OSCFoundationAdditions.h"
 
 ///
 ///  Example usage:
@@ -56,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString *addressPattern;
 @property (nonatomic, strong) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.
-@property (nonatomic, strong) NSArray *arguments;        ///< May contain NSString, NSData, or NSNumber objects. This could be extended in the future, but those three cover the four mandatory OSC 1.0 types.
+@property (nonatomic, strong) NSArray *arguments;        ///< May contain NSString, NSData, NSNumber, or NSValue objects. This could be extended in the future, but this covers the required types for OSC 1.0 and OSC 1.1 (with the exception of "timetag").
 @property (nonatomic, strong, nullable) id userData;
 
 - (NSArray *) addressParts;

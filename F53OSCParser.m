@@ -257,6 +257,30 @@ NS_ASSUME_NONNULL_BEGIN
                             return nil;
                         }
                         break;
+                    case 'T':
+                        [args addObject:[NSValue oscTrue]]; // no data - do not advance the buffer
+                        
+                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            NSLog( @"    TRUE" );
+                        break;
+                    case 'F':
+                        [args addObject:[NSValue oscFalse]]; // no data - do not advance the buffer
+                        
+                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            NSLog( @"    FALSE" );
+                        break;
+                    case 'N':
+                        [args addObject:[NSValue oscNull]]; // no data - do not advance the buffer
+                        
+                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            NSLog( @"    NULL" );
+                        break;
+                    case 'I':
+                        [args addObject:[NSValue oscImpulse]]; // no data - do not advance the buffer
+                        
+                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            NSLog( @"    IMPLUSE" );
+                        break;
                     default:
                         NSLog( @"Error: Unrecognized type '%c' found in type tag for OSC method %@", type, addressPattern );
                         return nil;

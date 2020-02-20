@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@
 #import "F53OSCMessage.h"
 
 #import "F53OSCServer.h"
-#import "F53OSCFoundationAdditions.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -113,8 +112,6 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     
     // Pull out arguments...
     
-    // TODO: support \T for true, \F for false, \N for null, and \I for impulse
-    
     // Create a working copy and place a token for each escaped " character.
     NSString *QUOTE_CHAR_TOKEN = @"⍁"; // not trying to be perfect here; we just use an unlikely character
     NSString *workingArguments = [qscString substringFromIndex:[address length]];
@@ -161,7 +158,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         }
         else if ( [arg isEqual:QUOTE_CHAR_TOKEN] )
         {
-            [finalArgs addObject:@"\""];       // single character OSC string
+            [finalArgs addObject:@"\""];       // single character OSC string - 's'
         }
         else if ( [arg hasPrefix:@"#blob"] )
         {
@@ -172,12 +169,28 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             NSData *blob = [[NSData alloc] initWithBase64EncodedString:encodedBlob options:0];
             if ( blob )
             {
-                [finalArgs addObject:blob];    // OSC blob
+                [finalArgs addObject:blob];    // OSC blob - 'b'
             }
             else
             {
                 NSLog( @"Error: F53OSCMessage: Unable to decode base64 encoded string: %@", encodedBlob );
             }
+        }
+        else if ( [arg isEqualToString:@"\\T"] )
+        {
+            [finalArgs addObject:[NSValue oscTrue]];    // 'T'
+        }
+        else if ( [arg isEqualToString:@"\\F"] )
+        {
+            [finalArgs addObject:[NSValue oscFalse]];   // 'F'
+        }
+        else if ( [arg isEqualToString:@"\\N"] )
+        {
+            [finalArgs addObject:[NSValue oscNull]];    // 'N'
+        }
+        else if ( [arg isEqualToString:@"\\I"] )
+        {
+            [finalArgs addObject:[NSValue oscImpulse]]; // 'I'
         }
         else
         {
@@ -187,9 +200,9 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             
             NSNumber *number = [formatter numberFromString:arg];
             if ( number == nil )
-                [finalArgs addObject:[arg stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""]]; // unquoted OSC string
+                [finalArgs addObject:[arg stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""]]; // unquoted OSC string - 's'
             else
-                [finalArgs addObject:number];  // OSC int or float
+                [finalArgs addObject:number];  // OSC int or float - 'i' or 'f'
         }
     }
     
@@ -264,6 +277,14 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( [[arg class] isSubclassOfClass:[NSString class]] )
             [description appendFormat:@" \"%@\"", [arg description]]; // make strings clear in debug logs
+        else if ( [arg isEqual:[NSValue oscTrue]] )
+            [description appendString:@" \\T"];                       // make True clear in debug logs
+        else if ( [arg isEqual:[NSValue oscFalse]] )
+            [description appendString:@" \\F"];                       // make False clear in debug logs
+        else if ( [arg isEqual:[NSValue oscNull]] )
+            [description appendString:@" \\N"];                       // make Null clear in debug logs
+        else if ( [arg isEqual:[NSValue oscImpulse]] )
+            [description appendString:@" \\I"];                       // make Impulse clear in debug logs
         else
             [description appendFormat:@" %@", [arg description]];
     }
@@ -304,12 +325,12 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( [obj isKindOfClass:[NSString class]] )
         {
-            [newTypes appendString:@"s"]; // OSC string
+            [newTypes appendString:@"s"]; // OSC string - 's'
             [newArgs addObject:obj];
         }
         else if ( [obj isKindOfClass:[NSData class]] )
         {
-            [newTypes appendString:@"b"]; // OSC blob
+            [newTypes appendString:@"b"]; // OSC blob - 'b'
             [newArgs addObject:obj];
         }
         else if ( [obj isKindOfClass:[NSNumber class]] )
@@ -327,17 +348,39 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberLongType:
                 case kCFNumberLongLongType:
                 case kCFNumberNSIntegerType:
-                    [newTypes appendString:@"i"]; break; // OSC integer
+                    [newTypes appendString:@"i"]; // OSC integer - 'i'
+                    break;
                 case kCFNumberFloat32Type:
                 case kCFNumberFloat64Type:
                 case kCFNumberFloatType:
                 case kCFNumberDoubleType:
                 case kCFNumberCGFloatType:
-                    [newTypes appendString:@"f"]; break; // OSC float
+                    [newTypes appendString:@"f"]; // OSC float - 'f'
+                    break;
                 default:
                     NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, obj );
                     continue;
             }
+            [newArgs addObject:obj];
+        }
+        else if ( [obj isEqual:[NSValue oscTrue]] )
+        {
+            [newTypes appendString:@"T"]; // OSC true - 'T'
+            [newArgs addObject:obj];
+        }
+        else if ( [obj isEqual:[NSValue oscFalse]] )
+        {
+            [newTypes appendString:@"F"]; // OSC false - 'F'
+            [newArgs addObject:obj];
+        }
+        else if ( [obj isEqual:[NSValue oscNull]] )
+        {
+            [newTypes appendString:@"N"]; // OSC null - 'N'
+            [newArgs addObject:obj];
+        }
+        else if ( [obj isEqual:[NSValue oscImpulse]] )
+        {
+            [newTypes appendString:@"I"]; // OSC impulse - 'I'
             [newArgs addObject:obj];
         }
     }
@@ -362,11 +405,11 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( [obj isKindOfClass:[NSString class]] )
         {
-            [result appendData:[(NSString *)obj oscStringData]];
+            [result appendData:[(NSString *)obj oscStringData]]; // 's'
         }
         else if ( [obj isKindOfClass:[NSData class]] )
         {
-            [result appendData:[(NSData *)obj oscBlobData]];
+            [result appendData:[(NSData *)obj oscBlobData]]; // 'b'
         }
         else if ( [obj isKindOfClass:[NSNumber class]] )
         {
@@ -384,7 +427,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberLongType:
                 case kCFNumberLongLongType:
                 case kCFNumberNSIntegerType:
-                    intValue = [(NSNumber *)obj oscIntValue];
+                    intValue = [(NSNumber *)obj oscIntValue]; // 'i'
                     [result appendBytes:&intValue length:sizeof( SInt32 )];
                     break;
                 case kCFNumberFloat32Type:
@@ -392,13 +435,17 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                 case kCFNumberFloatType:
                 case kCFNumberDoubleType:
                 case kCFNumberCGFloatType:
-                    intValue = [(NSNumber *)obj oscFloatValue];
+                    intValue = [(NSNumber *)obj oscFloatValue]; // 'f'
                     [result appendBytes:&intValue length:sizeof( SInt32 )];
                     break;
                 default:
                     NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, obj );
                     continue;
             }
+        }
+        else if ( [obj isKindOfClass:[NSValue class]] )
+        {
+            // no bytes are allocated for 'T', 'F', 'I', or 'N'
         }
     }
     
@@ -410,18 +457,60 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     NSMutableString *qscString = [NSMutableString stringWithString:self.addressPattern];
     for ( id arg in self.arguments )
     {
-        if ( [arg isKindOfClass:[NSString class]] )
+        if ( [arg isKindOfClass:[NSString class]] ) // 's'
         {
             NSString *escapedQuotesArg = [arg stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
             [qscString appendFormat:@" \"%@\"", escapedQuotesArg];
         }
-        else if ( [arg isKindOfClass:[NSNumber class]] )
+        else if ( [arg isKindOfClass:[NSNumber class]] ) // 'i' or 'f'
         {
-            [qscString appendFormat:@" %@", arg]; // TODO: forcibly preserve number type (int/float)?
+            CFNumberType numberType = CFNumberGetType( (CFNumberRef)arg );
+            switch ( numberType )
+            {
+                case kCFNumberSInt8Type:
+                case kCFNumberSInt16Type:
+                case kCFNumberSInt32Type:
+                case kCFNumberSInt64Type:
+                case kCFNumberCharType:
+                case kCFNumberShortType:
+                case kCFNumberIntType:
+                case kCFNumberLongType:
+                case kCFNumberLongLongType:
+                case kCFNumberNSIntegerType:
+                    [qscString appendFormat:@" %ld", ((NSNumber *)arg).longValue]; // 'i'
+                    break;
+                case kCFNumberFloat32Type:
+                case kCFNumberFloat64Type:
+                case kCFNumberFloatType:
+                case kCFNumberDoubleType:
+                case kCFNumberCGFloatType:
+                    [qscString appendFormat:@" %@", arg]; // 'f'
+                    break;
+                default:
+                    NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, arg );
+                    [qscString appendFormat:@" %@", arg];
+                    break;
+            }
         }
-        else if ( [arg isKindOfClass:[NSData class]] )
+        else if ( [arg isKindOfClass:[NSData class]] ) // 'b'
         {
             [qscString appendFormat:@" #blob%@", [arg base64EncodedStringWithOptions:0]];
+        }
+        else if ( [arg isEqual:[NSValue oscTrue]] ) // 'T'
+        {
+            [qscString appendString:@" \\T"];
+        }
+        else if ( [arg isEqual:[NSValue oscFalse]] ) // 'F'
+        {
+            [qscString appendString:@" \\F"];
+        }
+        else if ( [arg isEqual:[NSValue oscNull]] ) // 'N'
+        {
+            [qscString appendString:@" \\N"];
+        }
+        else if ( [arg isEqual:[NSValue oscImpulse]] ) // 'I'
+        {
+            [qscString appendString:@" \\I"];
         }
     }
     return [NSString stringWithString:qscString];

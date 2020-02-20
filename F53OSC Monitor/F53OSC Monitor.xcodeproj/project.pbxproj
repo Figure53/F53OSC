@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		3D608AF623F6C987000D1C3A /* F53OSCMessageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D608AF523F6C987000D1C3A /* F53OSCMessageTests.m */; };
+		3DC205FD23F469E4005C46E2 /* NSValue+F53OSCTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DC205FB23F469E4005C46E2 /* NSValue+F53OSCTypes.m */; };
 		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
 		66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17581B729EA0008B6743 /* AppDelegate.m */; };
 		66EE175B1B729EA0008B6743 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE175A1B729EA0008B6743 /* main.m */; };
 		66EE175D1B729EA0008B6743 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66EE175C1B729EA0008B6743 /* Images.xcassets */; };
 		66EE17601B729EA0008B6743 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66EE175E1B729EA0008B6743 /* MainMenu.xib */; };
+		66EE176C1B729EA0008B6743 /* F53OSC_NSNumberTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE176B1B729EA0008B6743 /* F53OSC_NSNumberTests.m */; };
 		66EE17951B729EFB008B6743 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17781B729EFB008B6743 /* F53OSCBundle.m */; };
 		66EE17961B729EFB008B6743 /* F53OSCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE177A1B729EFB008B6743 /* F53OSCClient.m */; };
 		66EE17971B729EFB008B6743 /* F53OSCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE177D1B729EFB008B6743 /* F53OSCMessage.m */; };
@@ -42,6 +44,8 @@
 
 /* Begin PBXFileReference section */
 		3D608AF523F6C987000D1C3A /* F53OSCMessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCMessageTests.m; sourceTree = "<group>"; };
+		3DC205FB23F469E4005C46E2 /* NSValue+F53OSCTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSValue+F53OSCTypes.m"; path = "../../NSValue+F53OSCTypes.m"; sourceTree = "<group>"; };
+		3DC205FC23F469E4005C46E2 /* NSValue+F53OSCTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSValue+F53OSCTypes.h"; path = "../../NSValue+F53OSCTypes.h"; sourceTree = "<group>"; };
 		66AFE43A1B79485100985C54 /* ActivityChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityChartView.h; sourceTree = "<group>"; };
 		66AFE43B1B79485100985C54 /* ActivityChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityChartView.m; sourceTree = "<group>"; };
 		66EE17521B729EA0008B6743 /* F53OSC Monitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "F53OSC Monitor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -53,6 +57,7 @@
 		66EE175F1B729EA0008B6743 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		66EE17651B729EA0008B6743 /* F53OSC MonitorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "F53OSC MonitorTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		66EE176A1B729EA0008B6743 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66EE176B1B729EA0008B6743 /* F53OSC_NSNumberTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NSNumberTests.m; sourceTree = "<group>"; };
 		66EE17761B729EFB008B6743 /* F53OSC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = F53OSC.h; path = ../../F53OSC.h; sourceTree = "<group>"; };
 		66EE17771B729EFB008B6743 /* F53OSCBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = F53OSCBundle.h; path = ../../F53OSCBundle.h; sourceTree = "<group>"; };
 		66EE17781B729EFB008B6743 /* F53OSCBundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = F53OSCBundle.m; path = ../../F53OSCBundle.m; sourceTree = "<group>"; };
@@ -162,6 +167,7 @@
 			isa = PBXGroup;
 			children = (
 				3D608AF523F6C987000D1C3A /* F53OSCMessageTests.m */,
+				66EE176B1B729EA0008B6743 /* F53OSC_NSNumberTests.m */,
 				66EE17691B729EA0008B6743 /* Supporting Files */,
 			);
 			path = "F53OSC MonitorTests";
@@ -209,6 +215,8 @@
 				66EE17921B729EFB008B6743 /* NSNumber+F53OSCNumber.m */,
 				66EE17931B729EFB008B6743 /* NSString+F53OSCString.h */,
 				66EE17941B729EFB008B6743 /* NSString+F53OSCString.m */,
+				3DC205FC23F469E4005C46E2 /* NSValue+F53OSCTypes.h */,
+				3DC205FB23F469E4005C46E2 /* NSValue+F53OSCTypes.m */,
 			);
 			name = F53OSC;
 			sourceTree = "<group>";
@@ -330,6 +338,7 @@
 				66EE17A51B72AC59008B6743 /* DemoServer.m in Sources */,
 				66EE179D1B729EFB008B6743 /* GCDAsyncSocket.m in Sources */,
 				66EE17991B729EFB008B6743 /* F53OSCParser.m in Sources */,
+				3DC205FD23F469E4005C46E2 /* NSValue+F53OSCTypes.m in Sources */,
 				66EE17A21B729EFB008B6743 /* NSString+F53OSCString.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,6 +348,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D608AF623F6C987000D1C3A /* F53OSCMessageTests.m in Sources */,
+				66EE176C1B729EA0008B6743 /* F53OSC_NSNumberTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

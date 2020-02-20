@@ -1,9 +1,9 @@
 //
-//  F53OSC.h
+//  NSValue+F53OSCTypes.h
 //
-//  Created by Sean Dougall on 1/17/11.
+//  Created by Brent Lord on 2/19/20.
 //
-//  Copyright (c) 2011-2020 Figure 53 LLC, http://figure53.com
+//  Copyright (c) 2020 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,20 @@
 //  THE SOFTWARE.
 //
 
-#import "F53OSCProtocols.h"
-#import "F53OSCParser.h"
-#import "F53OSCSocket.h"
-#import "F53OSCPacket.h"
-#import "F53OSCMessage.h"
-#import "F53OSCBundle.h"
-#import "F53OSCClient.h"
-#import "F53OSCServer.h"
-#import "F53OSCTimeTag.h"
+#import <Foundation/Foundation.h>
+
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface NSValue (F53OSCTypes)
+
++ (instancetype) oscTrue;
++ (instancetype) oscFalse;
++ (instancetype) oscNull;
++ (instancetype) oscImpulse;
+
+- (char) oscTypeValue;
+
+@end
+
+NS_ASSUME_NONNULL_END
