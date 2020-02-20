@@ -94,6 +94,24 @@ valid:;
     return result;
 }
 
+///
+///  Regex docs: http://userguide.icu-project.org/strings/regexp#TOC-Regular-Expression-Metacharacters
+///  OSC docs: http://opensoundcontrol.org/spec-1_0
+///
++ (NSString *) stringWithSpecialRegexCharactersEscaped:(NSString *)string
+{
+    string = [string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"]; // Do this first!
+    string = [string stringByReplacingOccurrencesOfString:@"+" withString:@"\\+"];
+    string = [string stringByReplacingOccurrencesOfString:@"-" withString:@"\\-"];
+    string = [string stringByReplacingOccurrencesOfString:@"(" withString:@"\\("];
+    string = [string stringByReplacingOccurrencesOfString:@")" withString:@"\\)"];
+    string = [string stringByReplacingOccurrencesOfString:@"^" withString:@"\\^"];
+    string = [string stringByReplacingOccurrencesOfString:@"$" withString:@"\\$"];
+    string = [string stringByReplacingOccurrencesOfString:@"|" withString:@"\\|"];
+    string = [string stringByReplacingOccurrencesOfString:@"." withString:@"\\."];
+    return string;
+}
+
 #pragma mark - deprecations
 
 + (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength

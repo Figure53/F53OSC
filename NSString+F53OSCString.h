@@ -34,6 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSData *) oscStringData;
 + (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength bytesRead:(out NSUInteger *)outBytesRead;
 
+// Escapes characters that are special in regex (ICU v3) but not special in OSC.
++ (NSString *) stringWithSpecialRegexCharactersEscaped:(NSString *)string;
+
 // deprecated
 + (nullable NSString *) stringWithOSCStringBytes:(const char *)buf maxLength:(NSUInteger)maxLength length:(NSUInteger *)outLength DEPRECATED_MSG_ATTRIBUTE("Use +stringWithOSCStringBytes:maxLength:bytesRead: instead");
 

@@ -45,31 +45,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong) NSMutableDictionary<NSNumber *, NSMutableDictionary *> *activeState; // NSMutableDictionary keyed by index; stores state of incoming data.
 @property (assign) long activeIndex;
 
-+ (NSString *) stringWithSpecialRegexCharactersEscaped:(NSString *)string;
-
 @end
 
 
 @implementation F53OSCServer
-
-///
-///  Escape characters that are special in regex (ICU v3) but not special in OSC.
-///  Regex docs: http://userguide.icu-project.org/strings/regexp#TOC-Regular-Expression-Metacharacters
-///  OSC docs: http://opensoundcontrol.org/spec-1_0
-///
-+ (NSString *) stringWithSpecialRegexCharactersEscaped:(NSString *)string
-{
-    string = [string stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"]; // Do this first!
-    string = [string stringByReplacingOccurrencesOfString:@"+" withString:@"\\+"];
-    string = [string stringByReplacingOccurrencesOfString:@"-" withString:@"\\-"];
-    string = [string stringByReplacingOccurrencesOfString:@"(" withString:@"\\("];
-    string = [string stringByReplacingOccurrencesOfString:@")" withString:@"\\)"];
-    string = [string stringByReplacingOccurrencesOfString:@"^" withString:@"\\^"];
-    string = [string stringByReplacingOccurrencesOfString:@"$" withString:@"\\$"];
-    string = [string stringByReplacingOccurrencesOfString:@"|" withString:@"\\|"];
-    string = [string stringByReplacingOccurrencesOfString:@"." withString:@"\\."];
-    return string;
-}
 
 + (NSString *) validCharsForOSCMethod
 {
@@ -87,12 +66,12 @@ NS_ASSUME_NONNULL_BEGIN
     if ( [[pattern componentsSeparatedByString:@"{"] count] != [[pattern componentsSeparatedByString:@"}"] count] )
         return nil;
 
-    NSString *validOscChars = [F53OSCServer stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
+    NSString *validOscChars = [NSString stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
     NSString *wildCard = [NSString stringWithFormat:@"[%@]*", validOscChars];
     NSString *oneChar = [NSString stringWithFormat:@"[%@]{1}?", validOscChars];
 
     // Escape characters that are special in regex (ICU v3) but not special in OSC.
-    pattern = [F53OSCServer stringWithSpecialRegexCharactersEscaped:pattern];
+    pattern = [NSString stringWithSpecialRegexCharactersEscaped:pattern];
     //NSLog( @"cleaned   : %@", pattern );
 
     // Replace characters that are special in OSC with their equivalents in regex (ICU v3).
