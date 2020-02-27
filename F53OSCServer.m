@@ -66,23 +66,27 @@ NS_ASSUME_NONNULL_BEGIN
     if ( [[pattern componentsSeparatedByString:@"{"] count] != [[pattern componentsSeparatedByString:@"}"] count] )
         return nil;
 
-    NSString *validOscChars = [NSString stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
-    NSString *wildCard = [NSString stringWithFormat:@"[%@]*", validOscChars];
-    NSString *oneChar = [NSString stringWithFormat:@"[%@]{1}?", validOscChars];
-
     // Escape characters that are special in regex (ICU v3) but not special in OSC.
     pattern = [NSString stringWithSpecialRegexCharactersEscaped:pattern];
     //NSLog( @"cleaned   : %@", pattern );
 
+    // Unescape a minus sign separating two characters inside square brackets, which is special in OSC (matches a range of characters).
+    pattern = [pattern stringByReplacingOccurrencesOfString:@"\\[(\\S)\\\\-(\\S)\\]" withString:@"[$1-$2]" options:NSRegularExpressionSearch range:NSMakeRange( 0, pattern.length )];
+    
     // Replace characters that are special in OSC with their equivalents in regex (ICU v3).
-    pattern = [pattern stringByReplacingOccurrencesOfString:@"*" withString:wildCard];
-    pattern = [pattern stringByReplacingOccurrencesOfString:@"?" withString:oneChar];
     pattern = [pattern stringByReplacingOccurrencesOfString:@"[!" withString:@"[^"];
     pattern = [pattern stringByReplacingOccurrencesOfString:@"{" withString:@"("];
     pattern = [pattern stringByReplacingOccurrencesOfString:@"}" withString:@")"];
     pattern = [pattern stringByReplacingOccurrencesOfString:@"," withString:@"|"];
+    
+    // Replace OSC wildcard characters with their equivalents in regex (ICU v3).
+    NSString *validOscChars = [NSString stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
+    NSString *wildCard = [NSString stringWithFormat:@"[%@]*", validOscChars]; // matches any sequence of zero or more valid OSC characters
+    NSString *oneChar = [NSString stringWithFormat:@"[%@]", validOscChars];   // matches any single valid OSC character
+    pattern = [pattern stringByReplacingOccurrencesOfString:@"*" withString:wildCard];
+    pattern = [pattern stringByReplacingOccurrencesOfString:@"?" withString:oneChar];
     //NSLog( @"translated: %@", pattern );
-
+    
     // MATCHES:
     // The left hand expression equals the right hand expression
     // using a regex-style comparison according to ICU v3. See:

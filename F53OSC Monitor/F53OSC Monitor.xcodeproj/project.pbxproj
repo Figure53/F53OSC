@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3D608AF623F6C987000D1C3A /* F53OSCMessageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D608AF523F6C987000D1C3A /* F53OSCMessageTests.m */; };
+		3DA1FD7A24045D3300DBDAD4 /* F53OSCServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA1FD7924045D3300DBDAD4 /* F53OSCServerTests.m */; };
 		3DC205FD23F469E4005C46E2 /* NSValue+F53OSCTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DC205FB23F469E4005C46E2 /* NSValue+F53OSCTypes.m */; };
 		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
 		66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17581B729EA0008B6743 /* AppDelegate.m */; };
@@ -44,6 +45,7 @@
 
 /* Begin PBXFileReference section */
 		3D608AF523F6C987000D1C3A /* F53OSCMessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCMessageTests.m; sourceTree = "<group>"; };
+		3DA1FD7924045D3300DBDAD4 /* F53OSCServerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCServerTests.m; sourceTree = "<group>"; };
 		3DC205FB23F469E4005C46E2 /* NSValue+F53OSCTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSValue+F53OSCTypes.m"; path = "../../NSValue+F53OSCTypes.m"; sourceTree = "<group>"; };
 		3DC205FC23F469E4005C46E2 /* NSValue+F53OSCTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSValue+F53OSCTypes.h"; path = "../../NSValue+F53OSCTypes.h"; sourceTree = "<group>"; };
 		66AFE43A1B79485100985C54 /* ActivityChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityChartView.h; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				3D608AF523F6C987000D1C3A /* F53OSCMessageTests.m */,
+				3DA1FD7924045D3300DBDAD4 /* F53OSCServerTests.m */,
 				66EE176B1B729EA0008B6743 /* F53OSC_NSNumberTests.m */,
 				66EE17691B729EA0008B6743 /* Supporting Files */,
 			);
@@ -349,6 +352,7 @@
 			files = (
 				3D608AF623F6C987000D1C3A /* F53OSCMessageTests.m in Sources */,
 				66EE176C1B729EA0008B6743 /* F53OSC_NSNumberTests.m in Sources */,
+				3DA1FD7A24045D3300DBDAD4 /* F53OSCServerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
