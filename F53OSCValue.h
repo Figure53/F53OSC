@@ -1,5 +1,5 @@
 //
-//  NSValue+F53OSCTypes.h
+//  F53OSCValue.h
 //
 //  Created by Brent Lord on 2/19/20.
 //
@@ -29,14 +29,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSValue (F53OSCTypes)
+@interface F53OSCValue : NSValue
 
+// NOTE: these convenience initializers return singleton instances
 + (instancetype) oscTrue;
 + (instancetype) oscFalse;
 + (instancetype) oscNull;
 + (instancetype) oscImpulse;
 
-- (char) oscTypeValue;
+- (BOOL) boolValue;
 
 @end
 
