@@ -1,5 +1,5 @@
 //
-//  F53OSC_F53OSCMessageTests.m
+//  F53OSCMessageTests.m
 //  F53OSC
 //
 //  Created by Brent Lord on 2/14/20.
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifdef MAC_OS_X_VERSION_10_12
 
-@interface F53OSC_F53OSCMessageTests : XCTestCase <F53OSCPacketDestination, F53OSCClientDelegate>
+@interface F53OSCMessageTests : XCTestCase <F53OSCPacketDestination, F53OSCClientDelegate>
 
 @property (nonatomic, strong)           XCTestExpectation *clientConnectExpectation;
 @property (nonatomic, strong)           NSMutableArray<XCTestExpectation *> *messageExpectations;
@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 
-@implementation F53OSC_F53OSCMessageTests
+@implementation F53OSCMessageTests
 
 #pragma mark - XCTest setup/teardown
 
