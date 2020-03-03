@@ -108,6 +108,10 @@ static F53OSCValue *_oscImpulse;
         char *charType = @encode(char);
         if ( *type == *charType )
             self.oscTypeTag = *(char *)value;
+        else
+            [[NSException exceptionWithName:@"Invalid parameter"
+                                     reason:[NSString stringWithFormat:@"F53OSCValue: objCType type '%s' is unsupported, must be char type 'c'", type]
+                                   userInfo:nil] raise];
     }
     return self;
 }
@@ -183,6 +187,10 @@ static F53OSCValue *_oscImpulse;
         int oscTypeTag = [aDecoder decodeIntForKey:@"oscTypeTag"];
         if ( oscTypeTag <= CHAR_MAX )
             self.oscTypeTag = (char)oscTypeTag;
+        else
+            [[NSException exceptionWithName:@"Invalid value"
+                                     reason:[NSString stringWithFormat:@"F53OSCValue: value decoded for key \"oscTypeTag\" is too large, must be type char: %d", oscTypeTag]
+                                   userInfo:nil] raise];
     }
     return self;
 }

@@ -1481,6 +1481,38 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue( [[NSValue value:&I withObjCType:@encode(char)] isEqual:oscImpulse] );
     XCTAssertTrue( [[NSValue value:&I withObjCType:@encode(char)] isEqualToValue:oscImpulse] );
     
+    // valid objCType and exception throwing
+    XCTAssertNoThrow( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(char)] );
+    XCTAssertNoThrow( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(signed char)] );
+    XCTAssertNoThrow( [F53OSCValue value:&T withObjCType:@encode(char)] );
+    XCTAssertNoThrow( [F53OSCValue value:&T withObjCType:@encode(signed char)] );
+    
+    // invalid objCType
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(unsigned char)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(short)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(unsigned short)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(int)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(unsigned int)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(long)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(unsigned long)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(long long)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(unsigned long long)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(float)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(double)] );
+    XCTAssertThrows( [[F53OSCValue alloc] initWithBytes:&T objCType:@encode(long double)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(unsigned char)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(short)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(unsigned short)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(int)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(unsigned int)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(long)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(unsigned long)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(long long)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(unsigned long long)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(float)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(double)] );
+    XCTAssertThrows( [F53OSCValue value:&T withObjCType:@encode(long double)] );
+    
     // guarantee inequality to avoid false positives
     XCTAssertFalse( [oscTrue isMemberOfClass:[NSValue class]] );
     XCTAssertFalse( [oscFalse isMemberOfClass:[NSValue class]] );
