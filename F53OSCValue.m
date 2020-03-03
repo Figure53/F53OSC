@@ -105,7 +105,8 @@ static F53OSCValue *_oscImpulse;
     self = [super init];
     if ( self )
     {
-        if ( strncmp( type, @encode(char), 1 ) == 0 )
+        char *charType = @encode(char);
+        if ( *type == *charType )
             self.oscTypeTag = *(char *)value;
     }
     return self;
