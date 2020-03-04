@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation F53OSCClient
+
++ (BOOL) supportsSecureCoding
+{
+    return YES;
+}
 
 - (instancetype) init
 {
@@ -95,11 +100,11 @@ NS_ASSUME_NONNULL_BEGIN
     {
         _socketDelegateQueue = dispatch_get_main_queue();
         self.delegate = nil;
-        self.interface = [coder decodeObjectForKey:@"interface"];
-        self.host = [coder decodeObjectForKey:@"host"];
-        self.port = [[coder decodeObjectForKey:@"port"] unsignedShortValue];
-        self.useTcp = [[coder decodeObjectForKey:@"useTcp"] boolValue];
-        self.userData = [coder decodeObjectForKey:@"userData"];
+        self.interface = [coder decodeObjectOfClass:[NSString class] forKey:@"interface"];
+        self.host = [coder decodeObjectOfClass:[NSString class] forKey:@"host"];
+        self.port = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"port"] unsignedShortValue];
+        self.useTcp = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"useTcp"] boolValue];
+        self.userData = [coder decodeObjectOfClass:[NSObject class] forKey:@"userData"];
         self.socket = nil;
         self.readData = [NSMutableData data];
         self.readState = [NSMutableDictionary dictionary];

@@ -42,7 +42,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface F53OSCMessage : F53OSCPacket <NSCoding, NSCopying>
+@interface F53OSCMessage : F53OSCPacket <NSSecureCoding, NSCopying>
 
 + (BOOL) legalAddressComponent:(nullable NSString *)addressComponent;
 + (BOOL) legalAddress:(nullable NSString *)address;

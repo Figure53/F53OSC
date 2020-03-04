@@ -52,6 +52,11 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     }
 }
 
++ (BOOL) supportsSecureCoding
+{
+    return YES;
+}
+
 + (BOOL) legalAddressComponent:(nullable NSString *)addressComponent
 {
     if ( addressComponent == nil )
@@ -253,9 +258,9 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     self = [super init];
     if ( self )
     {
-        [self setAddressPattern:[coder decodeObjectForKey:@"addressPattern"]];
-        [self setTypeTagString:[coder decodeObjectForKey:@"typeTagString"]];
-        [self setArguments:[coder decodeObjectForKey:@"arguments"]];
+        [self setAddressPattern:[coder decodeObjectOfClass:[NSString class] forKey:@"addressPattern"]];
+        [self setTypeTagString:[coder decodeObjectOfClass:[NSString class] forKey:@"typeTagString"]];
+        [self setArguments:[coder decodeObjectOfClass:[NSArray class] forKey:@"arguments"]];
     }
     return self;
 }
