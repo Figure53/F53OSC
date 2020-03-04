@@ -28,4 +28,4 @@
 #import "NSString+F53OSCString.h"
 #import "NSData+F53OSCBlob.h"
 #import "NSNumber+F53OSCNumber.h"
-#import "NSValue+F53OSCTypes.h"
+#import "F53OSCValue.h"
