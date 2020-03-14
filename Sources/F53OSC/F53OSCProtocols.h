@@ -27,6 +27,8 @@
 @protocol F53OSCPacketDestination;
 @class F53OSCMessage;
 
+#import <Foundation/Foundation.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
