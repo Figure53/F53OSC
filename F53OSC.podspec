@@ -20,12 +20,11 @@ Pod::Spec.new do |s|
   
   s.platforms     = { :ios => '8.4', :tvos => '9.0', :osx => '10.9' }
   s.source        = { :git => 'https://github.com/Figure53/F53OSC.git', :tag => "#{s.version}", }
-    
   
-  s.source_files = '*.{h,m}'
   s.requires_arc = true
+  s.source_files = [
+    'F53OSC/Sources/F53OSC/*.{h,m}',
+  ]
   
-  s.exclude_files = 'F53OSC Monitor/*'
-    
   s.frameworks = 'Security', 'CFNetwork'
 end
