@@ -47,476 +47,535 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue( YES );
 }
 
-- (void) testThat_01_F53OSCCServerPredicateMatchesString
+- (void) testThat_stringMatchesPredicateWithString
 {
     // given
+    // - match exact string '1'
     NSString *oscPattern = @"1";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1."] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_02_F53OSCCServerPredicateMatchesAsteriskWildcard
+- (void) testThat_stringMatchesPredicateWithOSCWildcardAsterisk
 {
     // given
+    // - match any sequence of zero or more characters
     NSString *oscPattern = @"*";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"21"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1."] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_03_F53OSCCServerPredicateMatchesAsteriskWildcardPrefix
+- (void) testThat_stringMatchesPredicateWithOSCWildcardAsteriskPrefix
 {
+    // given
+    // - match any sequence of zero or more characters followed by '3'
     NSString *oscPattern = @"*3";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1."] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_04_F53OSCCServerPredicateMatchesAsteriskWildcardSuffix
+- (void) testThat_stringMatchesPredicateWithOSCWildcardAsteriskSuffix
 {
+    // given
+    // - match '1' followed by any sequence of zero or more characters
     NSString *oscPattern = @"1*";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1."] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_05_F53OSCCServerPredicateMatchesAsteriskWildcardMiddle
+- (void) testThat_stringMatchesPredicateWithOSCWildcardAsteriskMiddle
 {
+    // given
+    // - match '1' followed by any sequence of zero or more characters followed by '3'
     NSString *oscPattern = @"1*3";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1."] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_06_F53OSCCServerPredicateMatchesQuestionMarkWildcard
+- (void) testThat_stringMatchesPredicateWithOSCWildcardQuestionMark
 {
+    // given
+    // - match any single character
     NSString *oscPattern = @"?";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1."] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_07_F53OSCCServerPredicateMatches2QuestionMarkWildcards
+- (void) testThat_stringMatchesPredicateWithOSC2QuestionMarkWildcards
 {
+    // given
+    // - match any two characters
     NSString *oscPattern = @"??";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"21"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1."] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_08_F53OSCCServerPredicateMatches3QuestionMarkWildcards
+- (void) testThat_stringMatchesPredicateWithOSC3QuestionMarkWildcards
 {
+    // given
+    // - match any three characters
     NSString *oscPattern = @"???";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1."] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_09_F53OSCCServerPredicateMatchesQuestionMarkWildcardPrefix
+- (void) testThat_stringMatchesPredicateWithOSCWildcardQuestionMarkPrefix
 {
+    // given
+    // - match any single character followed by a period
     NSString *oscPattern = @"?.";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1."] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_10_F53OSCCServerPredicateMatchesQuestionMarkWildcardSuffix
+- (void) testThat_stringMatchesPredicateWithOSCWildcardQuestionMarkSuffix
 {
+    // given
+    // - match '1' followed by any single character
     NSString *oscPattern = @"1?";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
-    NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     
     // then
     XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1."] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_11_F53OSCCServerPredicateMatchesQuestionMarkWildcardMiddle
+- (void) testThat_stringMatchesPredicateWithOSCWildcardQuestionMarkMiddle
 {
+    // given
+    // - match '1' followed by any single character followed by '3'
     NSString *oscPattern = @"1?3";
     
-    NSString *str1 = @"1";
-    NSString *str2 = @"21";
-    NSString *str3 = @"1.";
-    NSString *str4 = @"1.3";
-    NSString *str5 = @"1?3"; // ? invalid in OSC address
-    NSString *str6 = @"1 3"; // space invalid in OSC address
-    
     // when
+    NSPredicate *predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    
+    // then
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"21"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1."] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1.3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1?3"] ); // ? invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+}
+
+- (void) testThat_stringMatchesPredicateWithOSCWildcardStringRange
+{
+    NSString *oscPattern;
+    NSPredicate *predicate;
+    
+    // given
+    // when
+    // then
+    oscPattern = @"12"; // match exact string '12'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    
+    oscPattern = @"[12]"; // match single characters '1' or '2'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    
+    oscPattern = @"1-3"; // match exact string '1-3'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    
+    oscPattern = @"[1-3]"; // match any single character in range of '1' thru '3', inclusive
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    
+    oscPattern = @"[1][2]"; // match single character '1' followed by single character '2'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    
+    oscPattern = @"[!1]"; // match any single character except for '1'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    
+    oscPattern = @"{1,2,12}"; // match any exact string in list: '1', '2', or '12'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1,2,12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    
+    oscPattern = @"{1,2,3}-{1,2,3}"; // match any exact string in list: '1', '2', or '3'; followed by minus sign, followed by any exact string in list: '1', '2', or '3'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{1,2,3}-{1,2,3}"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"123"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+}
+
+- (void) testThat_stringMatchesPredicateWithOSCWildcardStringList
+{
+    NSString *oscPattern;
+    NSPredicate *predicate;
+    
+    // given
+    // when
+    // then
+    oscPattern = @"{12}"; // match exact string in list: '12'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{12}"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"11"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    
+    oscPattern = @"{12,13}"; // match any exact string in list: '12' or '13'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12,13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{12,13}"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"11"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    
+    oscPattern = @"{[1-3],[1][1-3]}"; // match any string in list: (any single character in range of '1' thru '3', inclusive), or (exact string '1' followed by any single character in range of '1' thru '3', inclusive)
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1-3]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1][1-3]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{[1-3],[1][1-3]}"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"0"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"4"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"01"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"11"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"14"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"111"] );
+    
+    oscPattern = @"{[1-3],[1][2-3]}"; // match any string in list: (any single character in range of '1' thru '3', inclusive), or (exact string '1' followed by any single character in range of '2' thru '3', inclusive)
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[2-3]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1][2-3]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{[1-3],[1][2-3]}"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"0"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"4"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"01"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"11"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"14"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"111"] );
+    
+    oscPattern = @"{[!1-3],[1][1-3]}"; // match any string in list: (any single character NOT in range of '1' thru '3', inclusive), or (exact string '1' followed by any single character in range of '1' thru '3', inclusive)
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1-3]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1][1-3]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{[!1-3],[1][1-3]}"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"0"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"4"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"01"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"11"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"14"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"111"] );
+    
+    oscPattern = @"{[!12],[1][A-C]}"; // match any string in list: (any single character NOT '1' or '2'), or (exact string '1' followed by any single character in range of 'A' thru 'C', inclusive)
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[!12]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[2-3]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"[1][2-3]"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{[!12],[1][2-3]}"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"0"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"4"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"11"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1A"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1B"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1C"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1a"] ); // matching is case-sensitive
+    XCTAssertFalse( [predicate evaluateWithObject:@"1b"] ); // matching is case-sensitive
+    XCTAssertFalse( [predicate evaluateWithObject:@"1c"] ); // matching is case-sensitive
+    XCTAssertFalse( [predicate evaluateWithObject:@"111"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"313"] );
+    
+    oscPattern = @"{2,?3}"; // match any string in list: (exact string '2'), or (any single character followed by '3')
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2,?3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{2,?3}"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"0"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"4"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"11"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"14"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"x0"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"x1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"x2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"x3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"x4"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"213"] );
+    
+    oscPattern = @"{1*,1}"; // match any string in list: ('1' followed by any sequence of zero or more characters), or (exact string '1')
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1*,1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"{1*,1}"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"0"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"4"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"10"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"11"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1A"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1B"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1C"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"111"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"222"] );
+}
+
+#pragma mark - helpers
+
+- (NSPredicate *) stringTestPredicateWithOSCPattern:(NSString *)oscPattern
+{
     NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
     
-    // then
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-}
-
-- (void) testThat_12_F53OSCCServerPredicateMatchesStringRangeWildcard
-{
-    NSString *str1 = @"1";
-    NSString *str2 = @"2";
-    NSString *str3 = @"3";
-    NSString *str4 = @"12";
-    NSString *str5 = @"13";
-    NSString *str6 = @"1 3";
-    
-    // when
-    NSString *oscPattern;
-    NSPredicate *predicate;
-    
-    // then
-    oscPattern = @"12";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"[12]";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"1-3";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"[1-3]";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"[1][2]";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"1,2,12";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"{1,2,12}";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-}
-
-- (void) testThat_13_F53OSCCServerPredicateMatchesStringListWildcard
-{
-    NSString *str1 = @"1";
-    NSString *str2 = @"2";
-    NSString *str3 = @"3";
-    NSString *str4 = @"11";
-    NSString *str5 = @"12";
-    NSString *str6 = @"13";
-    
-    // when
-    NSString *oscPattern;
-    NSPredicate *predicate;
-    
-    // then
-    oscPattern = @"{12}";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertTrue( [predicate evaluateWithObject:str5] );
-    XCTAssertFalse( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"{12,13}";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertTrue( [predicate evaluateWithObject:str5] );
-    XCTAssertTrue( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"{[1-3],[1][1-3]}";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertTrue( [predicate evaluateWithObject:str5] );
-    XCTAssertTrue( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"{[1-3],[1][2-3]}";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertTrue( [predicate evaluateWithObject:str5] );
-    XCTAssertTrue( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"{[!1-3],[1][1-3]}"; // NOT characters 1, -, or 3; character sequences 11 thru 13
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertTrue( [predicate evaluateWithObject:str5] );
-    XCTAssertTrue( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"{[!12],[1][2-3]}"; // NOT characters 1 or 2; character sequences 12 thru 13
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertTrue( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertTrue( [predicate evaluateWithObject:str5] );
-    XCTAssertTrue( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"{2,?3}";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertFalse( [predicate evaluateWithObject:str1] );
-    XCTAssertTrue( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertFalse( [predicate evaluateWithObject:str4] );
-    XCTAssertFalse( [predicate evaluateWithObject:str5] );
-    XCTAssertTrue( [predicate evaluateWithObject:str6] );
-    
-    oscPattern = @"{1*,1}";
-    predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
-    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]]; // hack around passing reserved word to `predicateWithFormat:`
-    XCTAssertNotNil( predicate );
-    XCTAssertTrue( [predicate evaluateWithObject:str1] );
-    XCTAssertFalse( [predicate evaluateWithObject:str2] );
-    XCTAssertFalse( [predicate evaluateWithObject:str3] );
-    XCTAssertTrue( [predicate evaluateWithObject:str4] );
-    XCTAssertTrue( [predicate evaluateWithObject:str5] );
-    XCTAssertTrue( [predicate evaluateWithObject:str6] );
+    // hack around passing reserved word to `predicateWithFormat:`
+    predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]];
+    return predicate;
 }
 
 @end
