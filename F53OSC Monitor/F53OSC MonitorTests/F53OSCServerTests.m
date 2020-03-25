@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) testThat_stringMatchesPredicateWithString
 {
     // given
-    // - match exact string '1'
+    // - match character '1'
     NSString *oscPattern = @"1";
     
     // when
@@ -94,7 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) testThat_stringMatchesPredicateWithOSCWildcardAsteriskPrefix
 {
     // given
-    // - match any sequence of zero or more characters followed by '3'
+    // - match any sequence of zero or more characters, followed by character '3'
     NSString *oscPattern = @"*3";
     
     // when
@@ -116,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) testThat_stringMatchesPredicateWithOSCWildcardAsteriskSuffix
 {
     // given
-    // - match '1' followed by any sequence of zero or more characters
+    // - match character '1', followed by any sequence of zero or more characters
     NSString *oscPattern = @"1*";
     
     // when
@@ -138,7 +138,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) testThat_stringMatchesPredicateWithOSCWildcardAsteriskMiddle
 {
     // given
-    // - match '1' followed by any sequence of zero or more characters followed by '3'
+    // - match character '1', followed by any sequence of zero or more characters, followed by character '3'
     NSString *oscPattern = @"1*3";
     
     // when
@@ -179,7 +179,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_stringMatchesPredicateWithOSC2QuestionMarkWildcards
+- (void) testThat_stringMatchesPredicateWithOSCWildcardTwoQuestionMarks
 {
     // given
     // - match any two characters
@@ -201,7 +201,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
 }
 
-- (void) testThat_stringMatchesPredicateWithOSC3QuestionMarkWildcards
+- (void) testThat_stringMatchesPredicateWithOSCWildcardThreeQuestionMarks
 {
     // given
     // - match any three characters
@@ -226,7 +226,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) testThat_stringMatchesPredicateWithOSCWildcardQuestionMarkPrefix
 {
     // given
-    // - match any single character followed by a period
+    // - match any single character, followed by character '.'
     NSString *oscPattern = @"?.";
     
     // when
@@ -248,7 +248,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) testThat_stringMatchesPredicateWithOSCWildcardQuestionMarkSuffix
 {
     // given
-    // - match '1' followed by any single character
+    // - match character '1', followed by any single character
     NSString *oscPattern = @"1?";
     
     // when
@@ -270,7 +270,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) testThat_stringMatchesPredicateWithOSCWildcardQuestionMarkMiddle
 {
     // given
-    // - match '1' followed by any single character followed by '3'
+    // - match character '1', followed by any single character, followed by character '3'
     NSString *oscPattern = @"1?3";
     
     // when
@@ -309,7 +309,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
     
-    oscPattern = @"[12]"; // match single characters '1' or '2'
+    oscPattern = @"[12]"; // match either character '1' or character '2'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -333,7 +333,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(  [predicate evaluateWithObject:@"1-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
     
-    oscPattern = @"[1-3]"; // match any single character in range of '1' thru '3', inclusive
+    oscPattern = @"[1-3]"; // match any single character in range of '1' thru '3' inclusive
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -345,7 +345,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
     
-    oscPattern = @"[1][2]"; // match single character '1' followed by single character '2'
+    oscPattern = @"[1][2]"; // match character '1', followed by character '2'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -369,7 +369,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
     
-    oscPattern = @"{1,2,12}"; // match any exact string in list: '1', '2', or '12'
+    oscPattern = @"{1,2,12}"; // match exact string '1', '2', or '12'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -382,7 +382,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
     
-    oscPattern = @"{1,2,3}-{1,2,3}"; // match any exact string in list: '1', '2', or '3'; followed by minus sign, followed by any exact string in list: '1', '2', or '3'
+    oscPattern = @"{1,2,3}-{1,2,3}"; // match characters '1', '2', or '3', followed by minus sign, followed by characters '1', '2', or '3'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -405,7 +405,7 @@ NS_ASSUME_NONNULL_BEGIN
     // given
     // when
     // then
-    oscPattern = @"{12}"; // match exact string in list: '12'
+    oscPattern = @"{12}"; // match exact string '12'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -417,7 +417,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
     
-    oscPattern = @"{12,13}"; // match any exact string in list: '12' or '13'
+    oscPattern = @"{12,13}"; // match exact string '12' or '13'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -430,7 +430,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
     
-    oscPattern = @"{[1-3],[1][1-3]}"; // match any string in list: (any single character in range of '1' thru '3', inclusive), or (exact string '1' followed by any single character in range of '1' thru '3', inclusive)
+    oscPattern = @"{[1-3],[1][1-3]}"; // match (any single character in range of '1' thru '3' inclusive), or (character '1', followed by any single character in range of '1' thru '3' inclusive)
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -452,7 +452,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"14"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"111"] );
     
-    oscPattern = @"{[1-3],[1][2-3]}"; // match any string in list: (any single character in range of '1' thru '3', inclusive), or (exact string '1' followed by any single character in range of '2' thru '3', inclusive)
+    oscPattern = @"{[1-3],[1][2-3]}"; // match (any single character in range of '1' thru '3' inclusive), or (character '1', followed by any single character in range of '2' thru '3' inclusive)
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -474,7 +474,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"14"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"111"] );
     
-    oscPattern = @"{[!1-3],[1][1-3]}"; // match any string in list: (any single character NOT in range of '1' thru '3', inclusive), or (exact string '1' followed by any single character in range of '1' thru '3', inclusive)
+    oscPattern = @"{[!1-3],[1][1-3]}"; // match (any single character NOT in range of '1' thru '3' inclusive), or (character '1', followed by any single character in range of '1' thru '3' inclusive)
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -497,7 +497,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"14"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"111"] );
     
-    oscPattern = @"{[!12],[1][A-C]}"; // match any string in list: (any single character NOT '1' or '2'), or (exact string '1' followed by any single character in range of 'A' thru 'C', inclusive)
+    oscPattern = @"{[!12],[1][A-C]}"; // match (any single character excluding '1' or '2'), or (character '1', followed by any single character in range of 'A' thru 'C' inclusive)
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -522,7 +522,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"111"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"313"] );
     
-    oscPattern = @"{2,?3}"; // match any string in list: (exact string '2'), or (any single character followed by '3')
+    oscPattern = @"{2,?3}"; // match (character '2'), or (any single character, followed by '3')
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
@@ -545,7 +545,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"x4"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"213"] );
     
-    oscPattern = @"{1*,1}"; // match any string in list: ('1' followed by any sequence of zero or more characters), or (exact string '1')
+    oscPattern = @"{1*,1}"; // match (character '1', followed by any sequence of zero or more characters), or (character '1')
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
