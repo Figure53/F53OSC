@@ -58,6 +58,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSPredicate *) predicateForAttribute:(NSString *)attributeName
                               matchingOSCPattern:(NSString *)pattern
 {
+    // the `pattern` string is presumed to be an OSC message address component, so we do not filter the pattern itself for valid OSC chars
+    // - NOTE however that OSC wildcards in the pattern will only match with valid OSC characters
+    
     //NSLog( @"pattern   : %@", pattern );
 
     // Basic validity checks.
@@ -71,13 +74,41 @@ NS_ASSUME_NONNULL_BEGIN
     //NSLog( @"cleaned   : %@", pattern );
 
     // Unescape a minus sign separating two characters inside square brackets, which is special in OSC (matches a range of characters).
-    pattern = [pattern stringByReplacingOccurrencesOfString:@"\\[(\\S)\\\\-(\\S)\\]" withString:@"[$1-$2]" options:NSRegularExpressionSearch range:NSMakeRange( 0, pattern.length )];
+    // NOTE: the +? quantifier is needed to match multiple escaped minus signs in a complex pattern like {[1\-3],[1][1\-3]}
+    if ( [pattern containsString:@"["] )
+        pattern = [pattern stringByReplacingOccurrencesOfString:@"\\[([^\\]]+?)\\\\-(\\S+?)\\]" withString:@"[$1-$2]" options:NSRegularExpressionSearch range:NSMakeRange( 0, pattern.length )];
+    
+    // Replace commas inside curly braces with equivalent in regex (ICU v3)
+    if ( [pattern containsString:@"{"] )
+    {
+        NSUInteger open = NSNotFound;
+        NSUInteger close = NSNotFound;
+        for ( NSUInteger i = 0; i < pattern.length; i++ )
+        {
+            NSString *character = [pattern substringWithRange:NSMakeRange( i, 1 )];
+            if ( [character isEqualToString:@"{"] )
+                open = i;
+            else if ( [character isEqualToString:@"}"] )
+                close = i;
+            
+            if ( open != NSNotFound && close != NSNotFound )
+            {
+                pattern = [pattern stringByReplacingOccurrencesOfString:@","
+                                                             withString:@"|"
+                                                                options:0
+                                                                  range:NSMakeRange( open, close - open + 1 )];
+                
+                // reset
+                open = NSNotFound;
+                close = NSNotFound;
+            }
+        }
+    }
     
     // Replace characters that are special in OSC with their equivalents in regex (ICU v3).
     pattern = [pattern stringByReplacingOccurrencesOfString:@"[!" withString:@"[^"];
     pattern = [pattern stringByReplacingOccurrencesOfString:@"{" withString:@"("];
     pattern = [pattern stringByReplacingOccurrencesOfString:@"}" withString:@")"];
-    pattern = [pattern stringByReplacingOccurrencesOfString:@"," withString:@"|"];
     
     // Replace OSC wildcard characters with their equivalents in regex (ICU v3).
     NSString *validOscChars = [NSString stringWithSpecialRegexCharactersEscaped:[F53OSCServer validCharsForOSCMethod]];
