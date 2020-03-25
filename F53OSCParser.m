@@ -258,25 +258,25 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                         break;
                     case 'T':
-                        [args addObject:[NSValue oscTrue]]; // no data - do not advance the buffer
+                        [args addObject:[F53OSCValue oscTrue]]; // no data - do not advance the buffer
                         
                         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                             NSLog( @"    TRUE" );
                         break;
                     case 'F':
-                        [args addObject:[NSValue oscFalse]]; // no data - do not advance the buffer
+                        [args addObject:[F53OSCValue oscFalse]]; // no data - do not advance the buffer
                         
                         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                             NSLog( @"    FALSE" );
                         break;
                     case 'N':
-                        [args addObject:[NSValue oscNull]]; // no data - do not advance the buffer
+                        [args addObject:[F53OSCValue oscNull]]; // no data - do not advance the buffer
                         
                         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                             NSLog( @"    NULL" );
                         break;
                     case 'I':
-                        [args addObject:[NSValue oscImpulse]]; // no data - do not advance the buffer
+                        [args addObject:[F53OSCValue oscImpulse]]; // no data - do not advance the buffer
                         
                         if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
                             NSLog( @"    IMPLUSE" );

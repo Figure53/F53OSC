@@ -52,6 +52,11 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     }
 }
 
++ (BOOL) supportsSecureCoding
+{
+    return YES;
+}
+
 + (BOOL) legalAddressComponent:(nullable NSString *)addressComponent
 {
     if ( addressComponent == nil )
@@ -178,19 +183,19 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         }
         else if ( [arg isEqualToString:@"\\T"] )
         {
-            [finalArgs addObject:[NSValue oscTrue]];    // 'T'
+            [finalArgs addObject:[F53OSCValue oscTrue]];    // 'T'
         }
         else if ( [arg isEqualToString:@"\\F"] )
         {
-            [finalArgs addObject:[NSValue oscFalse]];   // 'F'
+            [finalArgs addObject:[F53OSCValue oscFalse]];   // 'F'
         }
         else if ( [arg isEqualToString:@"\\N"] )
         {
-            [finalArgs addObject:[NSValue oscNull]];    // 'N'
+            [finalArgs addObject:[F53OSCValue oscNull]];    // 'N'
         }
         else if ( [arg isEqualToString:@"\\I"] )
         {
-            [finalArgs addObject:[NSValue oscImpulse]]; // 'I'
+            [finalArgs addObject:[F53OSCValue oscImpulse]]; // 'I'
         }
         else
         {
@@ -253,9 +258,9 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     self = [super init];
     if ( self )
     {
-        [self setAddressPattern:[coder decodeObjectForKey:@"addressPattern"]];
-        [self setTypeTagString:[coder decodeObjectForKey:@"typeTagString"]];
-        [self setArguments:[coder decodeObjectForKey:@"arguments"]];
+        [self setAddressPattern:[coder decodeObjectOfClass:[NSString class] forKey:@"addressPattern"]];
+        [self setTypeTagString:[coder decodeObjectOfClass:[NSString class] forKey:@"typeTagString"]];
+        [self setArguments:[coder decodeObjectOfClass:[NSArray class] forKey:@"arguments"]];
     }
     return self;
 }
@@ -277,13 +282,13 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( [[arg class] isSubclassOfClass:[NSString class]] )
             [description appendFormat:@" \"%@\"", [arg description]]; // make strings clear in debug logs
-        else if ( [arg isEqual:[NSValue oscTrue]] )
+        else if ( [arg isEqual:[F53OSCValue oscTrue]] )
             [description appendString:@" \\T"];                       // make True clear in debug logs
-        else if ( [arg isEqual:[NSValue oscFalse]] )
+        else if ( [arg isEqual:[F53OSCValue oscFalse]] )
             [description appendString:@" \\F"];                       // make False clear in debug logs
-        else if ( [arg isEqual:[NSValue oscNull]] )
+        else if ( [arg isEqual:[F53OSCValue oscNull]] )
             [description appendString:@" \\N"];                       // make Null clear in debug logs
-        else if ( [arg isEqual:[NSValue oscImpulse]] )
+        else if ( [arg isEqual:[F53OSCValue oscImpulse]] )
             [description appendString:@" \\I"];                       // make Impulse clear in debug logs
         else
             [description appendFormat:@" %@", [arg description]];
@@ -363,22 +368,22 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             }
             [newArgs addObject:obj];
         }
-        else if ( [obj isEqual:[NSValue oscTrue]] )
+        else if ( [obj isEqual:[F53OSCValue oscTrue]] )
         {
             [newTypes appendString:@"T"]; // OSC true - 'T'
             [newArgs addObject:obj];
         }
-        else if ( [obj isEqual:[NSValue oscFalse]] )
+        else if ( [obj isEqual:[F53OSCValue oscFalse]] )
         {
             [newTypes appendString:@"F"]; // OSC false - 'F'
             [newArgs addObject:obj];
         }
-        else if ( [obj isEqual:[NSValue oscNull]] )
+        else if ( [obj isEqual:[F53OSCValue oscNull]] )
         {
             [newTypes appendString:@"N"]; // OSC null - 'N'
             [newArgs addObject:obj];
         }
-        else if ( [obj isEqual:[NSValue oscImpulse]] )
+        else if ( [obj isEqual:[F53OSCValue oscImpulse]] )
         {
             [newTypes appendString:@"I"]; // OSC impulse - 'I'
             [newArgs addObject:obj];
@@ -443,7 +448,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                     continue;
             }
         }
-        else if ( [obj isKindOfClass:[NSValue class]] )
+        else if ( [obj isKindOfClass:[F53OSCValue class]] )
         {
             // no bytes are allocated for 'T', 'F', 'I', or 'N'
         }
@@ -496,19 +501,19 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         {
             [qscString appendFormat:@" #blob%@", [arg base64EncodedStringWithOptions:0]];
         }
-        else if ( [arg isEqual:[NSValue oscTrue]] ) // 'T'
+        else if ( [arg isEqual:[F53OSCValue oscTrue]] ) // 'T'
         {
             [qscString appendString:@" \\T"];
         }
-        else if ( [arg isEqual:[NSValue oscFalse]] ) // 'F'
+        else if ( [arg isEqual:[F53OSCValue oscFalse]] ) // 'F'
         {
             [qscString appendString:@" \\F"];
         }
-        else if ( [arg isEqual:[NSValue oscNull]] ) // 'N'
+        else if ( [arg isEqual:[F53OSCValue oscNull]] ) // 'N'
         {
             [qscString appendString:@" \\N"];
         }
-        else if ( [arg isEqual:[NSValue oscImpulse]] ) // 'I'
+        else if ( [arg isEqual:[F53OSCValue oscImpulse]] ) // 'I'
         {
             [qscString appendString:@" \\I"];
         }
