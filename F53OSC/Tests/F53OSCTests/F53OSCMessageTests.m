@@ -135,7 +135,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue( self.oscClient.isConnected );
 }
 
-- (void) testThat_01_F53OSCMessageCanSendAddressOnly
+- (void) testThat_F53OSCMessageCanSendAddressOnly
 {
     // given
     NSString *address = @"/thump";
@@ -164,7 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqual( messageReceived.arguments.count, 0 );
 }
 
-- (void) testThat_02_F53OSCMessageCanSendArgumentString
+- (void) testThat_F53OSCMessageCanSendArgumentString
 {
     // given
     NSString *address = @"/thump";
@@ -199,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_03_F53OSCMessageCanSendArgumentBlob
+- (void) testThat_F53OSCMessageCanSendArgumentBlob
 {
     // given
     NSString *address = @"/thump";
@@ -234,7 +234,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_04_F53OSCMessageCanSendArgumentInteger
+- (void) testThat_F53OSCMessageCanSendArgumentInteger
 {
     // given
     NSString *address = @"/thump";
@@ -269,7 +269,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_05_F53OSCMessageCanSendArgumentFloat
+- (void) testThat_F53OSCMessageCanSendArgumentFloat
 {
     // given
     NSString *address = @"/thump";
@@ -304,7 +304,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_06_F53OSCMessageCanSendArgumentTrue
+- (void) testThat_F53OSCMessageCanSendArgumentTrue
 {
     // given
     NSString *address = @"/thump";
@@ -339,7 +339,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_07_F53OSCMessageCanSendArgumentFalse
+- (void) testThat_F53OSCMessageCanSendArgumentFalse
 {
     // given
     NSString *address = @"/thump";
@@ -374,7 +374,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_08_F53OSCMessageCanSendArgumentNull
+- (void) testThat_F53OSCMessageCanSendArgumentNull
 {
     // given
     NSString *address = @"/thump";
@@ -409,7 +409,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_09_F53OSCMessageCanSendArgumentImpluse
+- (void) testThat_F53OSCMessageCanSendArgumentImpluse
 {
     // given
     NSString *address = @"/thump";
@@ -444,7 +444,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_10_F53OSCMessageCanSendQSCAddressOnly
+- (void) testThat_F53OSCMessageCanSendQSCAddressOnly
 {
     // given
     NSString *address = @"/thump";
@@ -473,7 +473,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqual( messageReceived.arguments.count, 0 );
 }
 
-- (void) testThat_11_F53OSCMessageCanSendQSCArgumentString
+- (void) testThat_F53OSCMessageCanSendQSCArgumentString
 {
     // given
     NSString *address = @"/thump";
@@ -516,7 +516,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_12_F53OSCMessageCanSendQSCArgumentBlob
+- (void) testThat_F53OSCMessageCanSendQSCArgumentBlob
 {
     // given
     NSString *address = @"/thump";
@@ -559,7 +559,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_13_F53OSCMessageCanSendQSCArgumentInteger
+- (void) testThat_F53OSCMessageCanSendQSCArgumentInteger
 {
     // given
     NSString *address = @"/thump";
@@ -602,7 +602,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_14_F53OSCMessageCanSendQSCArgumentFloat
+- (void) testThat_F53OSCMessageCanSendQSCArgumentFloat
 {
     // given
     NSString *address = @"/thump";
@@ -645,7 +645,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_15_F53OSCMessageCanSendQSCArgumentTrue
+- (void) testThat_F53OSCMessageCanSendQSCArgumentTrue
 {
     // given
     NSString *address = @"/thump";
@@ -688,7 +688,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_16_F53OSCMessageCanSendQSCArgumentFalse
+- (void) testThat_F53OSCMessageCanSendQSCArgumentFalse
 {
     // given
     NSString *address = @"/thump";
@@ -731,7 +731,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_17_F53OSCMessageCanSendQSCArgumentNull
+- (void) testThat_F53OSCMessageCanSendQSCArgumentNull
 {
     // given
     NSString *address = @"/thump";
@@ -774,7 +774,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_18_F53OSCMessageCanSendQSCArgumentImpluse
+- (void) testThat_F53OSCMessageCanSendQSCArgumentImpluse
 {
     // given
     NSString *address = @"/thump";
@@ -817,7 +817,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_19_F53OSCMessageCanSendMultipleArguments
+- (void) testThat_F53OSCMessageCanSendMultipleArguments
 {
     // given
     NSString *address = @"/thump";
@@ -860,7 +860,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_20_F53OSCMessageCanSendMultipleQSCArguments
+- (void) testThat_F53OSCMessageCanSendMultipleQSCArguments
 {
     // given
     NSString *address = @"/thump";
@@ -911,7 +911,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_21_F53OSCMessageCanSendMultipleStringArguments
+- (void) testThat_F53OSCMessageCanSendMultipleStringArguments
 {
     // given
     NSString *address = @"/thump";
@@ -962,7 +962,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_22_F53OSCMessageCanSendMultipleQSCStringArguments
+- (void) testThat_F53OSCMessageCanSendMultipleQSCStringArguments
 {
     // given
     NSString *address = @"/thump";
@@ -1021,7 +1021,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_23_F53OSCMessageCanSendMultipleBlobArguments
+- (void) testThat_F53OSCMessageCanSendMultipleBlobArguments
 {
     // given
     NSString *address = @"/thump";
@@ -1072,7 +1072,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_24_F53OSCMessageCanSendMultipleQSCBlobArguments
+- (void) testThat_F53OSCMessageCanSendMultipleQSCBlobArguments
 {
     // given
     NSString *address = @"/thump";
@@ -1136,7 +1136,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_25_F53OSCMessageCanSendOSCBundle
+- (void) testThat_F53OSCMessageCanSendOSCBundle
 {
     // given
     F53OSCTimeTag *timeTag = [F53OSCTimeTag immediateTimeTag];
@@ -1181,7 +1181,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_26_F53OSCMessageCanSendOSCBundleMultipleArguments
+- (void) testThat_F53OSCMessageCanSendOSCBundleMultipleArguments
 {
     // given
     F53OSCTimeTag *timeTag = [F53OSCTimeTag immediateTimeTag];
@@ -1250,7 +1250,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_27_F53OSCMessageCanSendOSCRecursiveBundles
+- (void) testThat_F53OSCMessageCanSendOSCRecursiveBundles
 {
     // given
     F53OSCTimeTag *timeTag = [F53OSCTimeTag immediateTimeTag];
@@ -1375,7 +1375,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) testThat_28_F53OSCValueIsValidSubclassOfNSValue
+- (void) testThat_F53OSCValueIsValidSubclassOfNSValue
 {
     // given
     F53OSCValue *oscTrue = [F53OSCValue oscTrue];
@@ -1620,7 +1620,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNotEqualObjects( oscImpulse, [NSNumber numberWithDouble:0.0] );
 }
 
-- (void) testThat_29_F53OSCValueImplementsNSSecureCoding
+- (void) testThat_F53OSCValueImplementsNSSecureCoding
 {
     // given
     F53OSCValue *oscTrue = [F53OSCValue oscTrue];
@@ -1683,7 +1683,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqualObjects( i, [F53OSCValue oscImpulse] );
 }
 
-- (void) testThat_30_F53OSCValueImplmementsNSCopying
+- (void) testThat_F53OSCValueImplmementsNSCopying
 {
     // given
     F53OSCValue *oscTrue = [F53OSCValue oscTrue];
