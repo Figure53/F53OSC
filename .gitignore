@@ -18,3 +18,8 @@ DerivedData
 *.ipa
 *.xcuserstate
 *.xcscmblueprint
+
+.build
+.swiftpm
+Packages
+

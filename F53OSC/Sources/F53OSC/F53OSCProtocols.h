@@ -24,6 +24,8 @@
 //  THE SOFTWARE.
 //
 
+#import <Foundation/Foundation.h>
+
 @protocol F53OSCPacketDestination;
 @class F53OSCMessage;
 

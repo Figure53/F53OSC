@@ -75,11 +75,11 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Unescape a minus sign separating two characters inside square brackets, which is special in OSC (matches a range of characters).
     // NOTE: the +? quantifier is needed to match multiple escaped minus signs in a complex pattern like {[1\-3],[1][1\-3]}
-    if ( [pattern containsString:@"["] )
+    if ( [pattern rangeOfString:@"["].location != NSNotFound )
         pattern = [pattern stringByReplacingOccurrencesOfString:@"\\[([^\\]]+?)\\\\-(\\S+?)\\]" withString:@"[$1-$2]" options:NSRegularExpressionSearch range:NSMakeRange( 0, pattern.length )];
     
     // Replace commas inside curly braces with equivalent in regex (ICU v3)
-    if ( [pattern containsString:@"{"] )
+    if ( [pattern rangeOfString:@"{"].location != NSNotFound )
     {
         NSUInteger open = NSNotFound;
         NSUInteger close = NSNotFound;
