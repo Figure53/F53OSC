@@ -74,6 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -108,6 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(  [predicate evaluateWithObject:@"2-13"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"10-1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"10-3"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"12-34"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1A"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"B2"] );
@@ -142,6 +144,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(  [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -176,6 +179,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"10-1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"10-3"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"12-34"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -210,6 +214,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -244,6 +249,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -278,6 +284,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1A"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"B2"] );
@@ -312,6 +319,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -346,6 +354,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -380,6 +389,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -414,6 +424,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -446,6 +457,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -469,6 +481,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -492,6 +505,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -515,6 +529,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -538,6 +553,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -561,6 +577,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -585,6 +602,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -610,6 +628,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -643,6 +662,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -668,6 +688,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -702,6 +723,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -736,6 +758,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -771,6 +794,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -808,6 +832,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
@@ -842,6 +867,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
@@ -875,6 +901,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"10-1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"10-3"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"12-34"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1A"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
