@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2013-2015 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2020 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal

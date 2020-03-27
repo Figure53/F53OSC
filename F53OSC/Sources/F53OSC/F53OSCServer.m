@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2018 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
