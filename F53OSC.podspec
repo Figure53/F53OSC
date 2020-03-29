@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
                    DESC
 
   s.author       = 'Figure 53, LLC'
-  s.homepage     = 'http://figure53.com/code/'
+  s.homepage     = 'https://figure53.com/studio/'
 
   s.license      = { :type => 'BSD-like', :file => 'LICENSE.txt' }
 
@@ -23,7 +23,8 @@ Pod::Spec.new do |s|
   
   s.requires_arc = true
   s.source_files = [
-    'F53OSC/Sources/F53OSC/*.{h,m}',
+    'Sources/F53OSC/*.{h,m}',
+    'Sources/Vendor/CocoaAsyncSocket/*.{h,m}',
   ]
   
   s.frameworks = 'Security', 'CFNetwork'
