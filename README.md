@@ -10,7 +10,7 @@ For convenience, we've included a few public domain source files from [CocoaAsyn
 
 - F53OSC must be compiled with ARC.
 - You must link against `Security.framework` and `CFNetwork.framework`.
-- F53OSC requires Xcode 10.3 or later and a deployment target of macOS 10.9+, iOS 8.4+, or tvOS 9.0+.
+- F53OSC requires Xcode 10.3 or later and a minimum deployment target of macOS 10.9, iOS 8.4, or tvOS 9.0.
 
 You can also use CocoaPods to include F53OSC into your project:
 

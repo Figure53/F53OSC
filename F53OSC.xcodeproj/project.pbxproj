@@ -201,6 +201,7 @@
 		3DA5A99F242FC4AB0068AF88 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		3DA5A9A0242FC4AB0068AF88 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		3DA5A9B02432674F0068AF88 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		66AFE43A1B79485100985C54 /* ActivityChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityChartView.h; sourceTree = "<group>"; };
 		66AFE43B1B79485100985C54 /* ActivityChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityChartView.m; sourceTree = "<group>"; };
 		66EE17521B729EA0008B6743 /* F53OSC Monitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "F53OSC Monitor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -364,6 +365,7 @@
 				66EE17531B729EA0008B6743 /* Products */,
 				3D1E07F8242A7D7200655E76 /* F53OSC.podspec */,
 				3D1E07F2242A7D5D00655E76 /* LICENSE.txt */,
+				3DA5A9B02432674F0068AF88 /* CHANGELOG.md */,
 				3D1E07F0242A7D5100655E76 /* README.md */,
 			);
 			sourceTree = "<group>";
