@@ -37,6 +37,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface F53OSCMessage ()
+
+@property (strong, nullable) NSArray *addressPartsCache;
+
+@end
+
 @implementation F53OSCMessage
 
 static NSCharacterSet *LEGAL_ADDRESS_CHARACTERS = nil;
@@ -247,6 +253,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     if ( self )
     {
         self.addressPattern = @"/";
+        self.addressPartsCache = nil;
         self.typeTagString = @",";
         self.arguments = [NSArray array];
         self.userData = nil;
@@ -328,6 +335,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     }
     
     _addressPattern = [newAddressPattern copy];
+    self.addressPartsCache = nil;
 }
 
 - (void) setArguments:(NSArray *)argArray
@@ -403,9 +411,13 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 
 - (NSArray *) addressParts
 {
-    NSMutableArray *parts = [NSMutableArray arrayWithArray:[self.addressPattern componentsSeparatedByString:@"/"]];
-    [parts removeObjectAtIndex:0];
-    return [NSArray arrayWithArray:parts];
+    if ( self.addressPartsCache == nil )
+    {
+        NSMutableArray *parts = [NSMutableArray arrayWithArray:[self.addressPattern componentsSeparatedByString:@"/"]];
+        [parts removeObjectAtIndex:0];
+        self.addressPartsCache = [NSArray arrayWithArray:parts];
+    }
+    return self.addressPartsCache;
 }
 
 - (NSData *) packetData
