@@ -200,7 +200,15 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         else
         {
             NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-            [formatter setLocale:[NSLocale currentLocale]];
+            NSLocale *locale = [NSLocale currentLocale];
+#ifdef TESTING
+            if ( [[NSUserDefaults standardUserDefaults] objectForKey:@"com.figure53.f53osc.testingLocaleIdentifier"] )
+            {
+                NSString *identifier = [[NSUserDefaults standardUserDefaults] objectForKey:@"com.figure53.f53osc.testingLocaleIdentifier"];
+                locale = [NSLocale localeWithLocaleIdentifier:identifier];
+            }
+#endif
+            [formatter setLocale:locale];
             [formatter setAllowsFloats:YES];
             
             NSNumber *number = [formatter numberFromString:arg];
