@@ -225,10 +225,25 @@ NS_ASSUME_NONNULL_BEGIN
     [newSocket readDataWithTimeout:-1 tag:self.activeIndex];
 
     self.activeIndex++;
+    
+    if ( [self.delegate respondsToSelector:@selector(serverDidConnect:toSocket:)] )
+    {
+        dispatch_block_t block = ^{
+            [self.delegate serverDidConnect:self toSocket:activeSocket];
+        };
+        
+        if ( [NSThread isMainThread] )
+            block();
+        else
+            dispatch_async( dispatch_get_main_queue(), block );
+    }
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
 {
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didConnectToHost %@:%u", sock, host, port );
+#endif
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
@@ -290,13 +305,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didDisconnect", sock );
+    NSLog( @"server socket %p didDisconnect withError: %@", sock, err );
 #endif
 
+    F53OSCSocket *socket = nil;
     NSNumber *keyOfDyingSocket = nil;
     for ( NSNumber *key in [self.activeTcpSockets allKeys] )
     {
-        F53OSCSocket *socket = [self.activeTcpSockets objectForKey:key];
+        socket = [self.activeTcpSockets objectForKey:key];
         if ( socket.tcpSocket == sock )
         {
             keyOfDyingSocket = key;
@@ -306,6 +322,18 @@ NS_ASSUME_NONNULL_BEGIN
 
     if ( keyOfDyingSocket != nil )
     {
+        if ( [self.delegate respondsToSelector:@selector(serverDidDisconnect:fromSocket:)] )
+        {
+            dispatch_block_t block = ^{
+                [self.delegate serverDidDisconnect:self fromSocket:socket];
+            };
+            
+            if ( [NSThread isMainThread] )
+                block();
+            else
+                dispatch_async( dispatch_get_main_queue(), block );
+        }
+        
         [self.activeTcpSockets removeObjectForKey:keyOfDyingSocket];
         [self.activeData removeObjectForKey:keyOfDyingSocket];
         [self.activeState removeObjectForKey:keyOfDyingSocket];

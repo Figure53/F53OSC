@@ -316,13 +316,13 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog( @"client socket %p didConnectToHost %@:%u", sock, host, port );
 #endif
     
-    if ( [self.delegate respondsToSelector:@selector( clientDidConnect: )] )
+    if ( [self.delegate respondsToSelector:@selector(clientDidConnect:)] )
     {
         dispatch_block_t block = ^{
             [self.delegate clientDidConnect:self];
         };
         
-        if ( [NSThread currentThread].isMainThread )
+        if ( [NSThread isMainThread] )
             block();
         else
             dispatch_async( dispatch_get_main_queue(), block );
@@ -383,7 +383,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.readState setObject:@NO forKey:@"dangling_ESC"];
     };
     
-    if ( [NSThread currentThread].isMainThread )
+    if ( [NSThread isMainThread] )
         block();
     else
         dispatch_async( dispatch_get_main_queue(), block );
@@ -399,11 +399,11 @@ NS_ASSUME_NONNULL_BEGIN
         [self.readData setData:[NSData data]];
         [self.readState setObject:@NO forKey:@"dangling_ESC"];
         
-        if ( [self.delegate respondsToSelector:@selector( clientDidDisconnect: )] )
+        if ( [self.delegate respondsToSelector:@selector(clientDidDisconnect:)] )
             [self.delegate clientDidDisconnect:self];
     };
     
-    if ( [NSThread currentThread].isMainThread )
+    if ( [NSThread isMainThread] )
         block();
     else
         dispatch_async( dispatch_get_main_queue(), block );
