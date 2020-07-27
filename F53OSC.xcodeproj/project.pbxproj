@@ -51,7 +51,7 @@
 		3D1E08B3242A84D500655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
 		3D1E08B4242A84D700655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
 		3D1E08BB242A861200655E76 /* F53OSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D1E0854242A815100655E76 /* F53OSC.framework */; };
-		3D1E08BD242A862D00655E76 /* F53OSC.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 3D1E0854242A815100655E76 /* F53OSC.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3D1E08BD242A862D00655E76 /* F53OSC.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 3D1E0854242A815100655E76 /* F53OSC.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3D1E08BE242A8C7400655E76 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0824242A7E1000655E76 /* F53OSCBundle.m */; };
 		3D1E08BF242A8C7500655E76 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0824242A7E1000655E76 /* F53OSCBundle.m */; };
 		3D1E08C0242A8C8000655E76 /* F53OSCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0819242A7E1000655E76 /* F53OSCClient.m */; };
@@ -587,7 +587,7 @@
 		66EE174A1B729EA0008B6743 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1030;
+				LastUpgradeCheck = 1160;
 				ORGANIZATIONNAME = "Figure 53";
 				TargetAttributes = {
 					3D1E0846242A7F5B00655E76 = {
@@ -1087,7 +1087,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -1269,6 +1268,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1280,7 +1280,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -1344,7 +1343,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -1400,6 +1398,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -1411,6 +1410,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
