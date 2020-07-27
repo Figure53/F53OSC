@@ -634,6 +634,104 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+
+    // NOTE: this pattern looks like "numbers 10-23", but it is not. (See below for the correct pattern.)
+    oscPattern = @"[10-23]"; // match single character '1', a character in range of '0' thru '2' inclusive, or single character '3'
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"0"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"4"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+
+    // NOTE: this pattern looks like "numbers 10-23", but it is not. (See below for the correct pattern.)
+    oscPattern = @"[(10)-(23)]"; // match any single character '(', '1', or '0'; or any character in range ')' thru '(' inclusive (which is an invalid range); or any single character '2', '3', or ')'. NOTE: the range portion ")-(" is invalid because in ASCII, the character ")" does not come before character "(", and `evaluateWithObject:` throws an exception with error: "Can't do regex matching, reason: Can't open pattern U_REGEX_INVALID_RANGE".
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertThrows( [predicate evaluateWithObject:@""] );
+    XCTAssertThrows(  [predicate evaluateWithObject:@"0"] );
+    XCTAssertThrows(  [predicate evaluateWithObject:@"1"] );
+    XCTAssertThrows(  [predicate evaluateWithObject:@"2"] );
+    XCTAssertThrows(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"4"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"12"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"13"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"1 3"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"6/1"] );
+
+    // "numbers 10 thru 23" (the correct way)
+    oscPattern = @"{1[0-9],2[0-3]}"; // match exact string '1' followed by a single character in the range of '0' thru '9' inclusive, or exact string '2' followed by a single character in the range of '0' thru '3' inclusive
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"0"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"4"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"5"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"7"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"8"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"9"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"10"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"11"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"12"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"13"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"14"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"15"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"16"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"17"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"18"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"19"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"20"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"21"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"22"] );
+    XCTAssertTrue(  [predicate evaluateWithObject:@"23"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"24"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
 }
 
 - (void) testThat_stringMatchesPredicateWithOSCWildcardStringList
