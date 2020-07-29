@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@protocol F53OSCPacketDestination  // ought to have called this F53OSCMessageDestination, alas
+@protocol F53OSCPacketDestination <NSObject> // ought to have called this F53OSCMessageDestination, alas
 
 - (void)takeMessage:(nullable F53OSCMessage *)message;
 

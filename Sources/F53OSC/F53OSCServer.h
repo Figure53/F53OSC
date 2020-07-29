@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSPredicate *) predicateForAttribute:(NSString *)attributeName 
                               matchingOSCPattern:(NSString *)pattern;
 
-@property (nonatomic, weak, nullable)   id <F53OSCServerDelegate> delegate;
+@property (nonatomic, weak)             id<F53OSCServerDelegate> delegate;
 @property (nonatomic, strong, readonly) F53OSCSocket *udpSocket;
 @property (nonatomic, strong, readonly) F53OSCSocket *tcpSocket;
 @property (nonatomic, assign)           UInt16 port;
@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@protocol F53OSCServerDelegate <NSObject, F53OSCPacketDestination>
+@protocol F53OSCServerDelegate <F53OSCPacketDestination>
 
 @optional
 - (void)serverDidConnect:(F53OSCServer *)server toSocket:(F53OSCSocket *)socket;

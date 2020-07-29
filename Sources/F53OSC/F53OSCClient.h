@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCClient : NSObject <NSSecureCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 
-@property (nonatomic, weak, nullable)           id <F53OSCClientDelegate> delegate;
+@property (nonatomic, weak)                     id<F53OSCClientDelegate> delegate;
 @property (nonatomic, strong, null_resettable)  dispatch_queue_t socketDelegateQueue; // defaults to main queue
 @property (nonatomic, copy, nullable)           NSString *interface;
 @property (nonatomic, copy, nullable)           NSString *host;
@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@protocol F53OSCClientDelegate <NSObject, F53OSCPacketDestination>
+@protocol F53OSCClientDelegate <F53OSCPacketDestination>
 
 @optional
 - (void) clientDidConnect:(F53OSCClient *)client;

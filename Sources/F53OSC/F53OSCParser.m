@@ -44,14 +44,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCParser (Private)
 
-+ (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
-+ (void) processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) processMessageData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) processBundleData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 
 @end
 
 @implementation F53OSCParser (Private)
 
-+ (void) processMessageData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
++ (void) processMessageData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
 {
     F53OSCMessage *inbound = [self parseOscMessageData:data];
     if ( inbound == nil )
@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
     [destination takeMessage:(F53OSCMessage * _Nonnull)inbound];
 }
 
-+ (void) processBundleData:(NSData *)data forDestination:(id <F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) processBundleData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
@@ -292,7 +292,7 @@ NS_ASSUME_NONNULL_BEGIN
     return [F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:nil];
 }
 
-+ (void) processOscData:(NSData *)data forDestination:(id <F53OSCPacketDestination, NSObject>)destination replyToSocket:(F53OSCSocket *)socket
++ (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
 {
     if ( data == nil || destination == nil )
         return;
@@ -320,7 +320,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void) translateSlipData:(NSData *)slipData
                     toData:(NSMutableData *)data
                  withState:(NSMutableDictionary *)state
-               destination:(id <F53OSCPacketDestination>)destination
+               destination:(id<F53OSCPacketDestination>)destination
 {
     // Incoming OSC messages are framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
     
