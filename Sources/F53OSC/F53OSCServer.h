@@ -28,18 +28,19 @@
 
 #import "F53OSC.h"
 
+@protocol F53OSCServerDelegate;
 
 NS_ASSUME_NONNULL_BEGIN
 
 #define F53_OSC_SERVER_DEBUG 0
 
-@interface F53OSCServer : NSObject <F53OSCServer, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
+@interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 
 + (NSString *) validCharsForOSCMethod;
 + (nullable NSPredicate *) predicateForAttribute:(NSString *)attributeName 
                               matchingOSCPattern:(NSString *)pattern;
 
-@property (nonatomic, weak, nullable)   id <F53OSCPacketDestination> delegate;
+@property (nonatomic, weak)             id<F53OSCServerDelegate> delegate;
 @property (nonatomic, strong, readonly) F53OSCSocket *udpSocket;
 @property (nonatomic, strong, readonly) F53OSCSocket *tcpSocket;
 @property (nonatomic, assign)           UInt16 port;
@@ -49,6 +50,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL) startListening;
 - (void) stopListening;
+
+@end
+
+@protocol F53OSCServerDelegate <F53OSCPacketDestination>
+
+@optional
+- (void)serverDidConnect:(F53OSCServer *)server toSocket:(F53OSCSocket *)socket;
+- (void)serverDidDisconnect:(F53OSCServer *)server fromSocket:(F53OSCSocket *)socket;
 
 @end
 
