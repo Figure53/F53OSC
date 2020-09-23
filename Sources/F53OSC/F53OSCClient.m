@@ -63,6 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.interface = nil;
         self.host = @"localhost";
         self.port = 53000;         // QLab is 53000, Stagetracker is 57115.
+        self.IPv6Enabled = NO;
         self.useTcp = NO;
         self.userData = nil;
         self.socket = nil;
@@ -89,6 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
     [coder encodeObject:self.interface forKey:@"interface"];
     [coder encodeObject:self.host forKey:@"host"];
     [coder encodeObject:[NSNumber numberWithUnsignedShort:self.port] forKey:@"port"];
+    [coder encodeObject:[NSNumber numberWithBool:self.isIPv6Enabled] forKey:@"IPv6Enabled"];
     [coder encodeObject:[NSNumber numberWithBool:self.useTcp] forKey:@"useTcp"];
     [coder encodeObject:self.userData forKey:@"userData"];
 }
@@ -103,6 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.interface = [coder decodeObjectOfClass:[NSString class] forKey:@"interface"];
         self.host = [coder decodeObjectOfClass:[NSString class] forKey:@"host"];
         self.port = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"port"] unsignedShortValue];
+        self.IPv6Enabled = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"IPv6Enabled"] boolValue];
         self.useTcp = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"useTcp"] boolValue];
         self.userData = [coder decodeObjectOfClass:[NSObject class] forKey:@"userData"];
         self.socket = nil;
@@ -153,6 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
         self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+        self.socket.IPv6Enabled = self.isIPv6Enabled;
         if ( self.socket )
             [self.readState setObject:self.socket forKey:@"socket"];
     }
@@ -160,6 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
         self.socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
+        self.socket.IPv6Enabled = self.isIPv6Enabled;
     }
     self.socket.interface = self.interface;
     self.socket.host = self.host;
@@ -200,6 +205,12 @@ NS_ASSUME_NONNULL_BEGIN
 {
     _port = port;
     self.socket.port = _port;
+}
+
+- (void) setIPv6Enabled:(BOOL)IPv6Enabled
+{
+    _IPv6Enabled = IPv6Enabled;
+    self.socket.IPv6Enabled = _IPv6Enabled;
 }
 
 - (void) setUseTcp:(BOOL)flag
