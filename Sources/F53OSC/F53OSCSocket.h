@@ -69,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *interface;
 @property (nonatomic, copy, nullable) NSString *host;
 @property (nonatomic, assign) UInt16 port;
+@property (nonatomic, getter=isIPv6Enabled) BOOL IPv6Enabled;
 
 @property (strong, readonly, nullable) F53OSCStats *stats;
 

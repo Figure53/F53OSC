@@ -161,6 +161,11 @@ NS_ASSUME_NONNULL_BEGIN
     self = [super init];
     if ( self )
     {
+        if ( !socket.isIPv6Enabled )
+            [socket setPreferIPv4]; // prevents socket from selecting an IPv6 resolved address after a DNS lookup
+        else
+            [socket setIPVersionNeutral];
+        
         self.tcpSocket = nil;
         self.udpSocket = socket;
         self.interface = nil;
@@ -202,6 +207,25 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) isUdpSocket
 {
     return ( self.udpSocket != nil );
+}
+
+- (BOOL) isIPv6Enabled
+{
+    if ( self.isTcpSocket )
+        return [self.tcpSocket isIPv6Enabled];
+    else // isUdpSocket
+        return [self.udpSocket isIPv6Enabled];
+}
+
+- (void) setIPv6Enabled:(BOOL)IPv6Enabled
+{
+    [self.tcpSocket setIPv6Enabled:IPv6Enabled];
+    
+    [self.udpSocket setIPv6Enabled:IPv6Enabled];
+    if ( !IPv6Enabled )
+        [self.udpSocket setPreferIPv4]; // prevents socket from selecting an IPv6 resolved address after a DNS lookup
+    else
+        [self.udpSocket setIPVersionNeutral];
 }
 
 - (BOOL) startListening

@@ -44,6 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable)           NSString *interface;
 @property (nonatomic, copy, nullable)           NSString *host;
 @property (nonatomic, assign)                   UInt16 port;
+@property (nonatomic, getter=isIPv6Enabled)     BOOL IPv6Enabled; // default NO
 @property (nonatomic, assign)                   BOOL useTcp;
 @property (nonatomic, strong, nullable)         id userData;
 @property (nonatomic, copy)                     NSDictionary *state;
