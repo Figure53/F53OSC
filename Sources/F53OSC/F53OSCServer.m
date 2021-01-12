@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2021 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -55,19 +55,19 @@ NS_ASSUME_NONNULL_BEGIN
     return @"\"$%&'()+-.0123456789:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\^_`abcdefghijklmnopqrstuvwxyz|~!";
 }
 
-+ (nullable NSPredicate *) predicateForAttribute:(NSString *)attributeName
-                              matchingOSCPattern:(NSString *)pattern
++ (NSPredicate *) predicateForAttribute:(NSString *)attributeName
+                     matchingOSCPattern:(NSString *)pattern
 {
     // the `pattern` string is presumed to be an OSC message address component, so we do not filter the pattern itself for valid OSC chars
     // - NOTE however that OSC wildcards in the pattern will only match with valid OSC characters
     
     //NSLog( @"pattern   : %@", pattern );
 
-    // Basic validity checks.
+    // Basic validity checks - failure returns a FALSE predicate
     if ( [[pattern componentsSeparatedByString:@"["] count] != [[pattern componentsSeparatedByString:@"]"] count] )
-        return nil;
+        return [NSPredicate predicateWithValue:NO];
     if ( [[pattern componentsSeparatedByString:@"{"] count] != [[pattern componentsSeparatedByString:@"}"] count] )
-        return nil;
+        return [NSPredicate predicateWithValue:NO];
 
     // Escape characters that are special in regex (ICU v3) but not special in OSC.
     pattern = [NSString stringWithSpecialRegexCharactersEscaped:pattern];

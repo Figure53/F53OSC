@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 2/24/20.
-//  Copyright (c) 2020 Figure 53, LLC. All rights reserved.
+//  Copyright (c) 2020-2021 Figure 53, LLC. All rights reserved.
 //
 
 #if !__has_feature(objc_arc)
@@ -58,6 +58,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
@@ -93,6 +96,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertTrue(  [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
@@ -128,6 +134,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
@@ -163,6 +172,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
@@ -198,6 +210,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
@@ -233,6 +248,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"3"] );
@@ -268,6 +286,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
@@ -303,6 +324,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
@@ -338,6 +362,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
@@ -373,6 +400,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
@@ -408,6 +438,9 @@ NS_ASSUME_NONNULL_BEGIN
     
     // then
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
@@ -443,6 +476,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"12"; // match exact string '12'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
@@ -467,6 +503,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"[12]"; // match either character '1' or character '2'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
@@ -491,6 +530,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"1-3"; // match exact string '1-3'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
@@ -515,6 +557,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"[1-3]"; // match any single character in range of '1' thru '3' inclusive
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
@@ -539,6 +584,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"[1][2]"; // match character '1', followed by character '2'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
@@ -563,6 +611,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"[!1]"; // match any single character except for '1'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"2"] );
@@ -587,6 +638,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{1,2,12}"; // match exact string '1', '2', or '12'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1,2,12"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
@@ -612,6 +666,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{1,2,3}-{1,2,3}"; // match characters '1', '2', or '3', followed by minus sign, followed by characters '1', '2', or '3'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"{1,2,3}-{1,2,3}"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
@@ -639,6 +696,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"[10-23]"; // match single character '1', a character in range of '0' thru '2' inclusive, or single character '3'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"0"] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
@@ -666,11 +726,14 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"[(10)-(23)]"; // match any single character '(', '1', or '0'; or any character in range ')' thru '(' inclusive (which is an invalid range); or any single character '2', '3', or ')'. NOTE: the range portion ")-(" is invalid because in ASCII, the character ")" does not come before character "(", and `evaluateWithObject:` throws an exception with error: "Can't do regex matching, reason: Can't open pattern U_REGEX_INVALID_RANGE".
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertNoThrow( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertThrows( [predicate evaluateWithObject:@""] );
-    XCTAssertThrows(  [predicate evaluateWithObject:@"0"] );
-    XCTAssertThrows(  [predicate evaluateWithObject:@"1"] );
-    XCTAssertThrows(  [predicate evaluateWithObject:@"2"] );
-    XCTAssertThrows(  [predicate evaluateWithObject:@"3"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"0"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"1"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"2"] );
+    XCTAssertThrows( [predicate evaluateWithObject:@"3"] );
     XCTAssertThrows( [predicate evaluateWithObject:@"4"] );
     XCTAssertThrows( [predicate evaluateWithObject:@"12"] );
     XCTAssertThrows( [predicate evaluateWithObject:@"13"] );
@@ -693,6 +756,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{1[0-9],2[0-3]}"; // match exact string '1' followed by a single character in the range of '0' thru '9' inclusive, or exact string '2' followed by a single character in the range of '0' thru '3' inclusive
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"0"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
@@ -745,6 +811,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{12}"; // match exact string '12'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"{12}"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
@@ -770,6 +839,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{12,13}"; // match exact string '12' or '13'
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"12,13"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"{12,13}"] );
@@ -796,6 +868,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{[1-3],[1][1-3]}"; // match (any single character in range of '1' thru '3' inclusive), or (character '1', followed by any single character in range of '1' thru '3' inclusive)
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
@@ -831,6 +906,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{[1-3],[1][2-3]}"; // match (any single character in range of '1' thru '3' inclusive), or (character '1', followed by any single character in range of '2' thru '3' inclusive)
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertTrue(  [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"2-3"] );
@@ -866,6 +944,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{[!1-3],[1][1-3]}"; // match (any single character NOT in range of '1' thru '3' inclusive), or (character '1', followed by any single character in range of '1' thru '3' inclusive)
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
@@ -902,6 +983,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{[!12],[1][A-C]}"; // match (any single character excluding '1' or '2'), or (character '1', followed by any single character in range of 'A' thru 'C' inclusive)
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"!12"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"[!12]"] );
@@ -939,6 +1023,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{2,?3}"; // match (character '2'), or (any single character, followed by '3')
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"2,?3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"{2,?3}"] );
@@ -975,6 +1062,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"{1*,3}"; // match (character '1', followed by any sequence of zero or more characters), or (character '3')
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"1*,3"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"{1*,3}"] );
@@ -1009,6 +1099,9 @@ NS_ASSUME_NONNULL_BEGIN
     oscPattern = @"[Q-c]"; // match any single character in range of 'Q' thru 'c' inclusive
     predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
     XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertThrows( [predicate evaluateWithObject:@NO] ); // can't do regex matching on an object
+    XCTAssertThrows( [predicate evaluateWithObject:@YES] ); // can't do regex matching on an object
     XCTAssertFalse( [predicate evaluateWithObject:@""] );
     XCTAssertFalse( [predicate evaluateWithObject:@"Q-c"] );
     XCTAssertFalse( [predicate evaluateWithObject:@"[Q-c]"] );
@@ -1039,14 +1132,262 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse( [predicate evaluateWithObject:@"abc"] );
 }
 
+- (void) testThat_stringDoesNotMatchPredicateWithMalformedOSCPattern
+{
+    NSString *oscPattern;
+    NSPredicate *predicate;
+    
+    // given
+    // when
+    // then
+    oscPattern = @"[12"; // malformed pattern, missing closing square bracket
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@NO] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@NO] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@YES] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@YES] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+    
+    oscPattern = @"[12["; // malformed pattern, two opening square brackets
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@NO] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@NO] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@YES] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@YES] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+    
+    oscPattern = @"1]2"; // malformed pattern, missing opening square bracket
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@NO] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@NO] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@YES] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@YES] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+    
+    oscPattern = @"]12]"; // malformed pattern, two closing square brackets
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@NO] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@NO] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@YES] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@YES] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+    
+    oscPattern = @"{1,2,12"; // malformed pattern, missing closing curly brace
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@NO] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@NO] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@YES] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@YES] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1,2,12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+    
+    oscPattern = @"{1,2,12{"; // malformed pattern, two opening curly braces
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@NO] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@NO] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@YES] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@YES] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1,2,12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+    
+    oscPattern = @"1,2,12}"; // malformed pattern, missing opening curly brace
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@NO] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@NO] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@YES] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@YES] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1,2,12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+    
+    oscPattern = @"}1,2,12}"; // malformed pattern, two closing curly braces
+    predicate = [self stringTestPredicateWithOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
+    XCTAssertFalse( [predicate evaluateWithObject:nil] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@NO] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@NO] );
+    XCTAssertNoThrow( [predicate evaluateWithObject:@YES] ); // can do matching on an object with FALSEPREDICATE
+    XCTAssertFalse( [predicate evaluateWithObject:@YES] );
+    XCTAssertFalse( [predicate evaluateWithObject:@""] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1,2,12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1 3"] ); // space invalid in OSC address
+    XCTAssertFalse( [predicate evaluateWithObject:@"1.2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1-12"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"2-13"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-1"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"10-3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"12-34"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"1A"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"B2"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"!3"] );
+    XCTAssertFalse( [predicate evaluateWithObject:@"6/1"] ); // slash invalid in OSC address
+}
+
 #pragma mark - helpers
 
 - (NSPredicate *) stringTestPredicateWithOSCPattern:(NSString *)oscPattern
 {
     NSPredicate *predicate = [F53OSCServer predicateForAttribute:@"SELF" matchingOSCPattern:oscPattern];
+    XCTAssertNotNil( predicate );
     
     // hack around passing reserved word to `predicateWithFormat:`
     predicate = [NSPredicate predicateWithFormat:[predicate.predicateFormat stringByReplacingOccurrencesOfString:@"#SELF" withString:@"SELF"]];
+    XCTAssertNotNil( predicate );
+    
     return predicate;
 }
 
