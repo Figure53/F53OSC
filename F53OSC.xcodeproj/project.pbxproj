@@ -14,7 +14,6 @@
 		3D083548242BF3C100E4A247 /* F53OSCValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D083543242BF3C000E4A247 /* F53OSCValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D083549242BF3C100E4A247 /* F53OSCValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D083543242BF3C000E4A247 /* F53OSCValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E07F3242A7D5D00655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
-		3D1E0869242A827700655E76 /* F53OSCProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E086A242A827700655E76 /* F53OSCFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E086B242A827700655E76 /* F53OSCBundle.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0813242A7E1000655E76 /* F53OSCBundle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E086D242A827700655E76 /* F53OSCClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080B242A7E1000655E76 /* F53OSCClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -28,7 +27,6 @@
 		3D1E0881242A827700655E76 /* NSDate+F53OSCTimeTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E0883242A827700655E76 /* NSNumber+F53OSCNumber.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081D242A7E1000655E76 /* NSNumber+F53OSCNumber.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E0885242A827700655E76 /* NSString+F53OSCString.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3D1E0889242A829300655E76 /* F53OSCProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E088A242A829300655E76 /* F53OSCFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E088B242A829300655E76 /* F53OSCBundle.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0813242A7E1000655E76 /* F53OSCBundle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E088D242A829300655E76 /* F53OSCClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080B242A7E1000655E76 /* F53OSCClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -78,7 +76,6 @@
 		3D1E08DA242A8C8000655E76 /* NSString+F53OSCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0815242A7E1000655E76 /* NSString+F53OSCString.m */; };
 		3D1E08DE242A8E7100655E76 /* F53OSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D1E0854242A815100655E76 /* F53OSC.framework */; };
 		3D1E08EC242A9F7C00655E76 /* F53OSC.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0822242A7E1000655E76 /* F53OSC.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3D1E08ED242A9F7C00655E76 /* F53OSCProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E08EE242A9F7C00655E76 /* F53OSCFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E08EF242A9F7C00655E76 /* F53OSCBundle.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0813242A7E1000655E76 /* F53OSCBundle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E08F0242A9F7C00655E76 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0824242A7E1000655E76 /* F53OSCBundle.m */; };
@@ -166,7 +163,6 @@
 		3D1E07FD242A7E1000655E76 /* F53OSCServerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCServerTests.m; sourceTree = "<group>"; };
 		3D1E07FE242A7E1000655E76 /* F53OSCMessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCMessageTests.m; sourceTree = "<group>"; };
 		3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NSNumberTests.m; sourceTree = "<group>"; };
-		3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCProtocols.h; sourceTree = "<group>"; };
 		3D1E0805242A7E1000655E76 /* F53OSCPacket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCPacket.m; sourceTree = "<group>"; };
 		3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+F53OSCString.h"; sourceTree = "<group>"; };
 		3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+F53OSCTimeTag.h"; sourceTree = "<group>"; };
@@ -287,7 +283,6 @@
 			isa = PBXGroup;
 			children = (
 				3D1E0822242A7E1000655E76 /* F53OSC.h */,
-				3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */,
 				3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */,
 				3D1E0813242A7E1000655E76 /* F53OSCBundle.h */,
 				3D1E0824242A7E1000655E76 /* F53OSCBundle.m */,
@@ -413,7 +408,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D1E0869242A827700655E76 /* F53OSCProtocols.h in Headers */,
 				3D1E086A242A827700655E76 /* F53OSCFoundationAdditions.h in Headers */,
 				3D1E086B242A827700655E76 /* F53OSCBundle.h in Headers */,
 				3D1E086D242A827700655E76 /* F53OSCClient.h in Headers */,
@@ -438,7 +432,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D1E0889242A829300655E76 /* F53OSCProtocols.h in Headers */,
 				3D1E088A242A829300655E76 /* F53OSCFoundationAdditions.h in Headers */,
 				3D1E088B242A829300655E76 /* F53OSCBundle.h in Headers */,
 				3D1E088D242A829300655E76 /* F53OSCClient.h in Headers */,
@@ -472,7 +465,6 @@
 				3D1E08FD242A9F7C00655E76 /* F53OSCTimeTag.h in Headers */,
 				3D1E08F1242A9F7C00655E76 /* F53OSCClient.h in Headers */,
 				3D1E08EE242A9F7C00655E76 /* F53OSCFoundationAdditions.h in Headers */,
-				3D1E08ED242A9F7C00655E76 /* F53OSCProtocols.h in Headers */,
 				3D1E08F9242A9F7C00655E76 /* F53OSCServer.h in Headers */,
 				3DA5A9AD242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */,
 				3DA5A9AA242FC4AB0068AF88 /* GCDAsyncUdpSocket.h in Headers */,
