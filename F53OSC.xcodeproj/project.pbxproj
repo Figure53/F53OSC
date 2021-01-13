@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D0333AD25AF602100E4EFDA /* F53OSCBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D0333AB25AF602100E4EFDA /* F53OSCBrowser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D0333AE25AF602100E4EFDA /* F53OSCBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D0333AB25AF602100E4EFDA /* F53OSCBrowser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D0333AF25AF602100E4EFDA /* F53OSCBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D0333AB25AF602100E4EFDA /* F53OSCBrowser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D0333B025AF602100E4EFDA /* F53OSCBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0333AC25AF602100E4EFDA /* F53OSCBrowser.m */; };
+		3D0333B125AF602100E4EFDA /* F53OSCBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0333AC25AF602100E4EFDA /* F53OSCBrowser.m */; };
+		3D0333B225AF602100E4EFDA /* F53OSCBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0333AC25AF602100E4EFDA /* F53OSCBrowser.m */; };
 		3D083544242BF3C100E4A247 /* F53OSCValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D083542242BF3C000E4A247 /* F53OSCValue.m */; };
 		3D083545242BF3C100E4A247 /* F53OSCValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D083542242BF3C000E4A247 /* F53OSCValue.m */; };
 		3D083546242BF3C100E4A247 /* F53OSCValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D083542242BF3C000E4A247 /* F53OSCValue.m */; };
@@ -154,6 +160,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3D0333AB25AF602100E4EFDA /* F53OSCBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCBrowser.h; sourceTree = "<group>"; };
+		3D0333AC25AF602100E4EFDA /* F53OSCBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCBrowser.m; sourceTree = "<group>"; };
 		3D083542242BF3C000E4A247 /* F53OSCValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCValue.m; sourceTree = "<group>"; };
 		3D083543242BF3C000E4A247 /* F53OSCValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCValue.h; sourceTree = "<group>"; };
 		3D1E07F0242A7D5100655E76 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -284,6 +292,8 @@
 			children = (
 				3D1E0822242A7E1000655E76 /* F53OSC.h */,
 				3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */,
+				3D0333AB25AF602100E4EFDA /* F53OSCBrowser.h */,
+				3D0333AC25AF602100E4EFDA /* F53OSCBrowser.m */,
 				3D1E0813242A7E1000655E76 /* F53OSCBundle.h */,
 				3D1E0824242A7E1000655E76 /* F53OSCBundle.m */,
 				3D1E080B242A7E1000655E76 /* F53OSCClient.h */,
@@ -412,6 +422,7 @@
 				3D1E086B242A827700655E76 /* F53OSCBundle.h in Headers */,
 				3D1E086D242A827700655E76 /* F53OSCClient.h in Headers */,
 				3D1E086F242A827700655E76 /* F53OSCMessage.h in Headers */,
+				3D0333AD25AF602100E4EFDA /* F53OSCBrowser.h in Headers */,
 				3D1E0871242A827700655E76 /* F53OSCPacket.h in Headers */,
 				3D1E0873242A827700655E76 /* F53OSCParser.h in Headers */,
 				3D083547242BF3C100E4A247 /* F53OSCValue.h in Headers */,
@@ -436,6 +447,7 @@
 				3D1E088B242A829300655E76 /* F53OSCBundle.h in Headers */,
 				3D1E088D242A829300655E76 /* F53OSCClient.h in Headers */,
 				3D1E088F242A829300655E76 /* F53OSCMessage.h in Headers */,
+				3D0333AE25AF602100E4EFDA /* F53OSCBrowser.h in Headers */,
 				3D1E0891242A829300655E76 /* F53OSCPacket.h in Headers */,
 				3D1E0893242A829300655E76 /* F53OSCParser.h in Headers */,
 				3D083548242BF3C100E4A247 /* F53OSCValue.h in Headers */,
@@ -460,6 +472,7 @@
 				3D1E08F7242A9F7C00655E76 /* F53OSCParser.h in Headers */,
 				3D1E08EC242A9F7C00655E76 /* F53OSC.h in Headers */,
 				3D1E0903242A9F7C00655E76 /* NSData+F53OSCBlob.h in Headers */,
+				3D0333AF25AF602100E4EFDA /* F53OSCBrowser.h in Headers */,
 				3D1E0905242A9F7C00655E76 /* NSDate+F53OSCTimeTag.h in Headers */,
 				3D083549242BF3C100E4A247 /* F53OSCValue.h in Headers */,
 				3D1E08FD242A9F7C00655E76 /* F53OSCTimeTag.h in Headers */,
@@ -579,7 +592,7 @@
 		66EE174A1B729EA0008B6743 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1160;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = "Figure 53";
 				TargetAttributes = {
 					3D1E0846242A7F5B00655E76 = {
@@ -743,6 +756,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D1E08D4242A8C8000655E76 /* F53OSCTimeTag.m in Sources */,
+				3D0333B025AF602100E4EFDA /* F53OSCBrowser.m in Sources */,
 				3D1E08D0242A8C8000655E76 /* F53OSCPacket.m in Sources */,
 				3D1E08D2242A8C8000655E76 /* F53OSCServer.m in Sources */,
 				3D1E08DA242A8C8000655E76 /* NSString+F53OSCString.m in Sources */,
@@ -765,6 +779,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D1E08C6242A8C8000655E76 /* F53OSCTimeTag.m in Sources */,
+				3D0333B125AF602100E4EFDA /* F53OSCBrowser.m in Sources */,
 				3D1E08C2242A8C8000655E76 /* F53OSCPacket.m in Sources */,
 				3D1E08C4242A8C8000655E76 /* F53OSCServer.m in Sources */,
 				3D1E08CC242A8C8000655E76 /* NSString+F53OSCString.m in Sources */,
@@ -787,6 +802,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D1E08FE242A9F7C00655E76 /* F53OSCTimeTag.m in Sources */,
+				3D0333B225AF602100E4EFDA /* F53OSCBrowser.m in Sources */,
 				3D1E08F6242A9F7C00655E76 /* F53OSCPacket.m in Sources */,
 				3D1E08FA242A9F7C00655E76 /* F53OSCServer.m in Sources */,
 				3D1E090A242A9F7C00655E76 /* NSString+F53OSCString.m in Sources */,
@@ -1097,6 +1113,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1290,6 +1307,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1353,6 +1371,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
