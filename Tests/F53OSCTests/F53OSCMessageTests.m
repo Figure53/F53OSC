@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifdef MAC_OS_X_VERSION_10_12
 
-@interface F53OSCMessageTests : XCTestCase <F53OSCPacketDestination, F53OSCClientDelegate>
+@interface F53OSCMessageTests : XCTestCase <F53OSCServerDelegate, F53OSCClientDelegate>
 
 @property (nonatomic, strong)           XCTestExpectation *clientConnectExpectation;
 @property (nonatomic, strong)           NSMutableArray<XCTestExpectation *> *messageExpectations;
