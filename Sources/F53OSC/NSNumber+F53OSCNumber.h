@@ -1,7 +1,7 @@
 //
 //  NSNumber+F53OSCNumber.h
 //
-//  Created by Sean Dougall on 3/23/11.
+//  Created by Siobhán Dougall on 3/23/11.
 //
 //  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
 //

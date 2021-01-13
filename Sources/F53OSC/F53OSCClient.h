@@ -1,7 +1,7 @@
 //
 //  F53OSCClient.h
 //
-//  Created by Sean Dougall on 1/20/11.
+//  Created by Siobhán Dougall on 1/20/11.
 //
 //  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
 //
