@@ -3,7 +3,7 @@
 //
 //  Created by Sean Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2021 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -37,8 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 
 + (NSString *) validCharsForOSCMethod;
-+ (nullable NSPredicate *) predicateForAttribute:(NSString *)attributeName 
-                              matchingOSCPattern:(NSString *)pattern;
++ (NSPredicate *) predicateForAttribute:(NSString *)attributeName
+                     matchingOSCPattern:(NSString *)pattern;
 
 @property (nonatomic, weak)             id<F53OSCServerDelegate> delegate;
 @property (nonatomic, strong, readonly) F53OSCSocket *udpSocket;
