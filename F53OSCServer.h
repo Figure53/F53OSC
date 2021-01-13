@@ -1,7 +1,7 @@
 //
 //  F53OSCServer.h
 //
-//  Created by Sean Dougall on 3/23/11.
+//  Created by Siobhán Dougall on 3/23/11.
 //
 //  Copyright (c) 2011-2019 Figure 53 LLC, http://figure53.com
 //
