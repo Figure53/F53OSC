@@ -1,0 +1,1487 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3D083544242BF3C100E4A247 /* F53OSCValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D083542242BF3C000E4A247 /* F53OSCValue.m */; };
+		3D083545242BF3C100E4A247 /* F53OSCValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D083542242BF3C000E4A247 /* F53OSCValue.m */; };
+		3D083546242BF3C100E4A247 /* F53OSCValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D083542242BF3C000E4A247 /* F53OSCValue.m */; };
+		3D083547242BF3C100E4A247 /* F53OSCValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D083543242BF3C000E4A247 /* F53OSCValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D083548242BF3C100E4A247 /* F53OSCValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D083543242BF3C000E4A247 /* F53OSCValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D083549242BF3C100E4A247 /* F53OSCValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D083543242BF3C000E4A247 /* F53OSCValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E07F3242A7D5D00655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
+		3D1E0869242A827700655E76 /* F53OSCProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E086A242A827700655E76 /* F53OSCFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E086B242A827700655E76 /* F53OSCBundle.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0813242A7E1000655E76 /* F53OSCBundle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E086D242A827700655E76 /* F53OSCClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080B242A7E1000655E76 /* F53OSCClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E086F242A827700655E76 /* F53OSCMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0812242A7E1000655E76 /* F53OSCMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0871242A827700655E76 /* F53OSCPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0817242A7E1000655E76 /* F53OSCPacket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0873242A827700655E76 /* F53OSCParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0814242A7E1000655E76 /* F53OSCParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0875242A827700655E76 /* F53OSCServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081E242A7E1000655E76 /* F53OSCServer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0877242A827700655E76 /* F53OSCSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081C242A7E1000655E76 /* F53OSCSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0879242A827700655E76 /* F53OSCTimeTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080E242A7E1000655E76 /* F53OSCTimeTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E087F242A827700655E76 /* NSData+F53OSCBlob.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080D242A7E1000655E76 /* NSData+F53OSCBlob.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0881242A827700655E76 /* NSDate+F53OSCTimeTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0883242A827700655E76 /* NSNumber+F53OSCNumber.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081D242A7E1000655E76 /* NSNumber+F53OSCNumber.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0885242A827700655E76 /* NSString+F53OSCString.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0889242A829300655E76 /* F53OSCProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E088A242A829300655E76 /* F53OSCFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E088B242A829300655E76 /* F53OSCBundle.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0813242A7E1000655E76 /* F53OSCBundle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E088D242A829300655E76 /* F53OSCClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080B242A7E1000655E76 /* F53OSCClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E088F242A829300655E76 /* F53OSCMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0812242A7E1000655E76 /* F53OSCMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0891242A829300655E76 /* F53OSCPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0817242A7E1000655E76 /* F53OSCPacket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0893242A829300655E76 /* F53OSCParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0814242A7E1000655E76 /* F53OSCParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0895242A829300655E76 /* F53OSCServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081E242A7E1000655E76 /* F53OSCServer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0897242A829300655E76 /* F53OSCSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081C242A7E1000655E76 /* F53OSCSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0899242A829300655E76 /* F53OSCTimeTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080E242A7E1000655E76 /* F53OSCTimeTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E089F242A829300655E76 /* NSData+F53OSCBlob.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080D242A7E1000655E76 /* NSData+F53OSCBlob.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08A1242A829300655E76 /* NSDate+F53OSCTimeTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08A3242A829300655E76 /* NSNumber+F53OSCNumber.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081D242A7E1000655E76 /* NSNumber+F53OSCNumber.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08A5242A829300655E76 /* NSString+F53OSCString.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08AB242A844E00655E76 /* F53OSC.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0822242A7E1000655E76 /* F53OSC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08AC242A844E00655E76 /* F53OSC.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0822242A7E1000655E76 /* F53OSC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08AD242A847A00655E76 /* F53OSCServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E07FD242A7E1000655E76 /* F53OSCServerTests.m */; };
+		3D1E08AE242A847C00655E76 /* F53OSCMessageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E07FE242A7E1000655E76 /* F53OSCMessageTests.m */; };
+		3D1E08AF242A847E00655E76 /* F53OSC_NSNumberTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */; };
+		3D1E08B2242A84D500655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
+		3D1E08B3242A84D500655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
+		3D1E08B4242A84D700655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
+		3D1E08BB242A861200655E76 /* F53OSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D1E0854242A815100655E76 /* F53OSC.framework */; };
+		3D1E08BD242A862D00655E76 /* F53OSC.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 3D1E0854242A815100655E76 /* F53OSC.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3D1E08BE242A8C7400655E76 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0824242A7E1000655E76 /* F53OSCBundle.m */; };
+		3D1E08BF242A8C7500655E76 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0824242A7E1000655E76 /* F53OSCBundle.m */; };
+		3D1E08C0242A8C8000655E76 /* F53OSCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0819242A7E1000655E76 /* F53OSCClient.m */; };
+		3D1E08C1242A8C8000655E76 /* F53OSCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0823242A7E1000655E76 /* F53OSCMessage.m */; };
+		3D1E08C2242A8C8000655E76 /* F53OSCPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0805242A7E1000655E76 /* F53OSCPacket.m */; };
+		3D1E08C3242A8C8000655E76 /* F53OSCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0821242A7E1000655E76 /* F53OSCParser.m */; };
+		3D1E08C4242A8C8000655E76 /* F53OSCServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E080F242A7E1000655E76 /* F53OSCServer.m */; };
+		3D1E08C5242A8C8000655E76 /* F53OSCSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0811242A7E1000655E76 /* F53OSCSocket.m */; };
+		3D1E08C6242A8C8000655E76 /* F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E081F242A7E1000655E76 /* F53OSCTimeTag.m */; };
+		3D1E08C9242A8C8000655E76 /* NSData+F53OSCBlob.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0820242A7E1000655E76 /* NSData+F53OSCBlob.m */; };
+		3D1E08CA242A8C8000655E76 /* NSDate+F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E081A242A7E1000655E76 /* NSDate+F53OSCTimeTag.m */; };
+		3D1E08CB242A8C8000655E76 /* NSNumber+F53OSCNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0810242A7E1000655E76 /* NSNumber+F53OSCNumber.m */; };
+		3D1E08CC242A8C8000655E76 /* NSString+F53OSCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0815242A7E1000655E76 /* NSString+F53OSCString.m */; };
+		3D1E08CE242A8C8000655E76 /* F53OSCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0819242A7E1000655E76 /* F53OSCClient.m */; };
+		3D1E08CF242A8C8000655E76 /* F53OSCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0823242A7E1000655E76 /* F53OSCMessage.m */; };
+		3D1E08D0242A8C8000655E76 /* F53OSCPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0805242A7E1000655E76 /* F53OSCPacket.m */; };
+		3D1E08D1242A8C8000655E76 /* F53OSCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0821242A7E1000655E76 /* F53OSCParser.m */; };
+		3D1E08D2242A8C8000655E76 /* F53OSCServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E080F242A7E1000655E76 /* F53OSCServer.m */; };
+		3D1E08D3242A8C8000655E76 /* F53OSCSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0811242A7E1000655E76 /* F53OSCSocket.m */; };
+		3D1E08D4242A8C8000655E76 /* F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E081F242A7E1000655E76 /* F53OSCTimeTag.m */; };
+		3D1E08D7242A8C8000655E76 /* NSData+F53OSCBlob.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0820242A7E1000655E76 /* NSData+F53OSCBlob.m */; };
+		3D1E08D8242A8C8000655E76 /* NSDate+F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E081A242A7E1000655E76 /* NSDate+F53OSCTimeTag.m */; };
+		3D1E08D9242A8C8000655E76 /* NSNumber+F53OSCNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0810242A7E1000655E76 /* NSNumber+F53OSCNumber.m */; };
+		3D1E08DA242A8C8000655E76 /* NSString+F53OSCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0815242A7E1000655E76 /* NSString+F53OSCString.m */; };
+		3D1E08DE242A8E7100655E76 /* F53OSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D1E0854242A815100655E76 /* F53OSC.framework */; };
+		3D1E08EC242A9F7C00655E76 /* F53OSC.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0822242A7E1000655E76 /* F53OSC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08ED242A9F7C00655E76 /* F53OSCProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08EE242A9F7C00655E76 /* F53OSCFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08EF242A9F7C00655E76 /* F53OSCBundle.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0813242A7E1000655E76 /* F53OSCBundle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08F0242A9F7C00655E76 /* F53OSCBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0824242A7E1000655E76 /* F53OSCBundle.m */; };
+		3D1E08F1242A9F7C00655E76 /* F53OSCClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080B242A7E1000655E76 /* F53OSCClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08F2242A9F7C00655E76 /* F53OSCClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0819242A7E1000655E76 /* F53OSCClient.m */; };
+		3D1E08F3242A9F7C00655E76 /* F53OSCMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0812242A7E1000655E76 /* F53OSCMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08F4242A9F7C00655E76 /* F53OSCMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0823242A7E1000655E76 /* F53OSCMessage.m */; };
+		3D1E08F5242A9F7C00655E76 /* F53OSCPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0817242A7E1000655E76 /* F53OSCPacket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08F6242A9F7C00655E76 /* F53OSCPacket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0805242A7E1000655E76 /* F53OSCPacket.m */; };
+		3D1E08F7242A9F7C00655E76 /* F53OSCParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0814242A7E1000655E76 /* F53OSCParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08F8242A9F7C00655E76 /* F53OSCParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0821242A7E1000655E76 /* F53OSCParser.m */; };
+		3D1E08F9242A9F7C00655E76 /* F53OSCServer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081E242A7E1000655E76 /* F53OSCServer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08FA242A9F7C00655E76 /* F53OSCServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E080F242A7E1000655E76 /* F53OSCServer.m */; };
+		3D1E08FB242A9F7C00655E76 /* F53OSCSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081C242A7E1000655E76 /* F53OSCSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08FC242A9F7C00655E76 /* F53OSCSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0811242A7E1000655E76 /* F53OSCSocket.m */; };
+		3D1E08FD242A9F7C00655E76 /* F53OSCTimeTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080E242A7E1000655E76 /* F53OSCTimeTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E08FE242A9F7C00655E76 /* F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E081F242A7E1000655E76 /* F53OSCTimeTag.m */; };
+		3D1E0903242A9F7C00655E76 /* NSData+F53OSCBlob.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E080D242A7E1000655E76 /* NSData+F53OSCBlob.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0904242A9F7C00655E76 /* NSData+F53OSCBlob.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0820242A7E1000655E76 /* NSData+F53OSCBlob.m */; };
+		3D1E0905242A9F7C00655E76 /* NSDate+F53OSCTimeTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0906242A9F7C00655E76 /* NSDate+F53OSCTimeTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E081A242A7E1000655E76 /* NSDate+F53OSCTimeTag.m */; };
+		3D1E0907242A9F7C00655E76 /* NSNumber+F53OSCNumber.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E081D242A7E1000655E76 /* NSNumber+F53OSCNumber.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E0908242A9F7C00655E76 /* NSNumber+F53OSCNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0810242A7E1000655E76 /* NSNumber+F53OSCNumber.m */; };
+		3D1E0909242A9F7C00655E76 /* NSString+F53OSCString.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D1E090A242A9F7C00655E76 /* NSString+F53OSCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0815242A7E1000655E76 /* NSString+F53OSCString.m */; };
+		3D1E090D242A9FAE00655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
+		3DA5A9A2242FC4AB0068AF88 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA5A99E242FC4AB0068AF88 /* GCDAsyncUdpSocket.m */; };
+		3DA5A9A3242FC4AB0068AF88 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA5A99E242FC4AB0068AF88 /* GCDAsyncUdpSocket.m */; };
+		3DA5A9A4242FC4AB0068AF88 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA5A99E242FC4AB0068AF88 /* GCDAsyncUdpSocket.m */; };
+		3DA5A9A5242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA5A99F242FC4AB0068AF88 /* GCDAsyncSocket.m */; };
+		3DA5A9A6242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA5A99F242FC4AB0068AF88 /* GCDAsyncSocket.m */; };
+		3DA5A9A7242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA5A99F242FC4AB0068AF88 /* GCDAsyncSocket.m */; };
+		3DA5A9A8242FC4AB0068AF88 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A0242FC4AB0068AF88 /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3DA5A9A9242FC4AB0068AF88 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A0242FC4AB0068AF88 /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3DA5A9AA242FC4AB0068AF88 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A0242FC4AB0068AF88 /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3DA5A9AB242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3DA5A9AC242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3DA5A9AD242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
+		66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17581B729EA0008B6743 /* AppDelegate.m */; };
+		66EE175B1B729EA0008B6743 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE175A1B729EA0008B6743 /* main.m */; };
+		66EE175D1B729EA0008B6743 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66EE175C1B729EA0008B6743 /* Images.xcassets */; };
+		66EE17601B729EA0008B6743 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66EE175E1B729EA0008B6743 /* MainMenu.xib */; };
+		66EE17A51B72AC59008B6743 /* DemoServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17A41B72AC59008B6743 /* DemoServer.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3D1E08B8242A85F100655E76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66EE174A1B729EA0008B6743 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3D1E0853242A815100655E76;
+			remoteInfo = "F53OSC-macOS";
+		};
+		3D1E08DC242A8E6300655E76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66EE174A1B729EA0008B6743 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3D1E0853242A815100655E76;
+			remoteInfo = "F53OSC-macOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3D1E08BC242A861E00655E76 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3D1E08BD242A862D00655E76 /* F53OSC.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		3D083542242BF3C000E4A247 /* F53OSCValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCValue.m; sourceTree = "<group>"; };
+		3D083543242BF3C000E4A247 /* F53OSCValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCValue.h; sourceTree = "<group>"; };
+		3D1E07F0242A7D5100655E76 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		3D1E07F2242A7D5D00655E76 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		3D1E07F5242A7D6900655E76 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3D1E07F8242A7D7200655E76 /* F53OSC.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = F53OSC.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		3D1E07FD242A7E1000655E76 /* F53OSCServerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCServerTests.m; sourceTree = "<group>"; };
+		3D1E07FE242A7E1000655E76 /* F53OSCMessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCMessageTests.m; sourceTree = "<group>"; };
+		3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NSNumberTests.m; sourceTree = "<group>"; };
+		3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCProtocols.h; sourceTree = "<group>"; };
+		3D1E0805242A7E1000655E76 /* F53OSCPacket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCPacket.m; sourceTree = "<group>"; };
+		3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+F53OSCString.h"; sourceTree = "<group>"; };
+		3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+F53OSCTimeTag.h"; sourceTree = "<group>"; };
+		3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCFoundationAdditions.h; sourceTree = "<group>"; };
+		3D1E080B242A7E1000655E76 /* F53OSCClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCClient.h; sourceTree = "<group>"; };
+		3D1E080D242A7E1000655E76 /* NSData+F53OSCBlob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+F53OSCBlob.h"; sourceTree = "<group>"; };
+		3D1E080E242A7E1000655E76 /* F53OSCTimeTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCTimeTag.h; sourceTree = "<group>"; };
+		3D1E080F242A7E1000655E76 /* F53OSCServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCServer.m; sourceTree = "<group>"; };
+		3D1E0810242A7E1000655E76 /* NSNumber+F53OSCNumber.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNumber+F53OSCNumber.m"; sourceTree = "<group>"; };
+		3D1E0811242A7E1000655E76 /* F53OSCSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCSocket.m; sourceTree = "<group>"; };
+		3D1E0812242A7E1000655E76 /* F53OSCMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCMessage.h; sourceTree = "<group>"; };
+		3D1E0813242A7E1000655E76 /* F53OSCBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCBundle.h; sourceTree = "<group>"; };
+		3D1E0814242A7E1000655E76 /* F53OSCParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCParser.h; sourceTree = "<group>"; };
+		3D1E0815242A7E1000655E76 /* NSString+F53OSCString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+F53OSCString.m"; sourceTree = "<group>"; };
+		3D1E0817242A7E1000655E76 /* F53OSCPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCPacket.h; sourceTree = "<group>"; };
+		3D1E0819242A7E1000655E76 /* F53OSCClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCClient.m; sourceTree = "<group>"; };
+		3D1E081A242A7E1000655E76 /* NSDate+F53OSCTimeTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+F53OSCTimeTag.m"; sourceTree = "<group>"; };
+		3D1E081C242A7E1000655E76 /* F53OSCSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCSocket.h; sourceTree = "<group>"; };
+		3D1E081D242A7E1000655E76 /* NSNumber+F53OSCNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNumber+F53OSCNumber.h"; sourceTree = "<group>"; };
+		3D1E081E242A7E1000655E76 /* F53OSCServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCServer.h; sourceTree = "<group>"; };
+		3D1E081F242A7E1000655E76 /* F53OSCTimeTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCTimeTag.m; sourceTree = "<group>"; };
+		3D1E0820242A7E1000655E76 /* NSData+F53OSCBlob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+F53OSCBlob.m"; sourceTree = "<group>"; };
+		3D1E0821242A7E1000655E76 /* F53OSCParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCParser.m; sourceTree = "<group>"; };
+		3D1E0822242A7E1000655E76 /* F53OSC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSC.h; sourceTree = "<group>"; };
+		3D1E0823242A7E1000655E76 /* F53OSCMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCMessage.m; sourceTree = "<group>"; };
+		3D1E0824242A7E1000655E76 /* F53OSCBundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCBundle.m; sourceTree = "<group>"; };
+		3D1E0847242A7F5B00655E76 /* F53OSCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = F53OSCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D1E0854242A815100655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D1E0861242A81F600655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D1E08E4242A8EC700655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DA5A99E242FC4AB0068AF88 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
+		3DA5A99F242FC4AB0068AF88 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		3DA5A9A0242FC4AB0068AF88 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
+		3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		3DA5A9B02432674F0068AF88 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		66AFE43A1B79485100985C54 /* ActivityChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityChartView.h; sourceTree = "<group>"; };
+		66AFE43B1B79485100985C54 /* ActivityChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityChartView.m; sourceTree = "<group>"; };
+		66EE17521B729EA0008B6743 /* F53OSC Monitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "F53OSC Monitor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		66EE17561B729EA0008B6743 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66EE17571B729EA0008B6743 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		66EE17581B729EA0008B6743 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		66EE175A1B729EA0008B6743 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		66EE175C1B729EA0008B6743 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		66EE175F1B729EA0008B6743 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		66EE17A31B72AC59008B6743 /* DemoServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoServer.h; sourceTree = "<group>"; };
+		66EE17A41B72AC59008B6743 /* DemoServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DemoServer.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3D1E0844242A7F5B00655E76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08DE242A8E7100655E76 /* F53OSC.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E0851242A815100655E76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E085E242A81F600655E76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E08E1242A8EC700655E76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66EE174F1B729EA0008B6743 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08BB242A861200655E76 /* F53OSC.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3D1E07FB242A7E1000655E76 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				3D1E07FC242A7E1000655E76 /* F53OSCTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		3D1E07FC242A7E1000655E76 /* F53OSCTests */ = {
+			isa = PBXGroup;
+			children = (
+				3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */,
+				3D1E07FE242A7E1000655E76 /* F53OSCMessageTests.m */,
+				3D1E07FD242A7E1000655E76 /* F53OSCServerTests.m */,
+			);
+			path = F53OSCTests;
+			sourceTree = "<group>";
+		};
+		3D1E0802242A7E1000655E76 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				3D1E0803242A7E1000655E76 /* F53OSC */,
+				3DA5A9AF242FC5BD0068AF88 /* Vendor */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		3D1E0803242A7E1000655E76 /* F53OSC */ = {
+			isa = PBXGroup;
+			children = (
+				3D1E0822242A7E1000655E76 /* F53OSC.h */,
+				3D1E0804242A7E1000655E76 /* F53OSCProtocols.h */,
+				3D1E080A242A7E1000655E76 /* F53OSCFoundationAdditions.h */,
+				3D1E0813242A7E1000655E76 /* F53OSCBundle.h */,
+				3D1E0824242A7E1000655E76 /* F53OSCBundle.m */,
+				3D1E080B242A7E1000655E76 /* F53OSCClient.h */,
+				3D1E0819242A7E1000655E76 /* F53OSCClient.m */,
+				3D1E0812242A7E1000655E76 /* F53OSCMessage.h */,
+				3D1E0823242A7E1000655E76 /* F53OSCMessage.m */,
+				3D1E0817242A7E1000655E76 /* F53OSCPacket.h */,
+				3D1E0805242A7E1000655E76 /* F53OSCPacket.m */,
+				3D1E0814242A7E1000655E76 /* F53OSCParser.h */,
+				3D1E0821242A7E1000655E76 /* F53OSCParser.m */,
+				3D1E081E242A7E1000655E76 /* F53OSCServer.h */,
+				3D1E080F242A7E1000655E76 /* F53OSCServer.m */,
+				3D1E081C242A7E1000655E76 /* F53OSCSocket.h */,
+				3D1E0811242A7E1000655E76 /* F53OSCSocket.m */,
+				3D1E080E242A7E1000655E76 /* F53OSCTimeTag.h */,
+				3D1E081F242A7E1000655E76 /* F53OSCTimeTag.m */,
+				3D083543242BF3C000E4A247 /* F53OSCValue.h */,
+				3D083542242BF3C000E4A247 /* F53OSCValue.m */,
+				3D1E080D242A7E1000655E76 /* NSData+F53OSCBlob.h */,
+				3D1E0820242A7E1000655E76 /* NSData+F53OSCBlob.m */,
+				3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */,
+				3D1E081A242A7E1000655E76 /* NSDate+F53OSCTimeTag.m */,
+				3D1E081D242A7E1000655E76 /* NSNumber+F53OSCNumber.h */,
+				3D1E0810242A7E1000655E76 /* NSNumber+F53OSCNumber.m */,
+				3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */,
+				3D1E0815242A7E1000655E76 /* NSString+F53OSCString.m */,
+			);
+			path = F53OSC;
+			sourceTree = "<group>";
+		};
+		3D1E0914242AAC9C00655E76 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				3D1E07F5242A7D6900655E76 /* Info.plist */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		3DA5A9AE242FC5B20068AF88 /* CocoaAsyncSocket */ = {
+			isa = PBXGroup;
+			children = (
+				3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */,
+				3DA5A99F242FC4AB0068AF88 /* GCDAsyncSocket.m */,
+				3DA5A9A0242FC4AB0068AF88 /* GCDAsyncUdpSocket.h */,
+				3DA5A99E242FC4AB0068AF88 /* GCDAsyncUdpSocket.m */,
+			);
+			path = CocoaAsyncSocket;
+			sourceTree = "<group>";
+		};
+		3DA5A9AF242FC5BD0068AF88 /* Vendor */ = {
+			isa = PBXGroup;
+			children = (
+				3DA5A9AE242FC5B20068AF88 /* CocoaAsyncSocket */,
+			);
+			path = Vendor;
+			sourceTree = "<group>";
+		};
+		66CAE3D71B754AA3001306FD /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				66EE175C1B729EA0008B6743 /* Images.xcassets */,
+				66EE175E1B729EA0008B6743 /* MainMenu.xib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		66EE17491B729EA0008B6743 = {
+			isa = PBXGroup;
+			children = (
+				3D1E0802242A7E1000655E76 /* Sources */,
+				3D1E07FB242A7E1000655E76 /* Tests */,
+				66EE17541B729EA0008B6743 /* F53OSC Monitor */,
+				3D1E0914242AAC9C00655E76 /* Supporting Files */,
+				66EE17531B729EA0008B6743 /* Products */,
+				3D1E07F8242A7D7200655E76 /* F53OSC.podspec */,
+				3D1E07F2242A7D5D00655E76 /* LICENSE.txt */,
+				3DA5A9B02432674F0068AF88 /* CHANGELOG.md */,
+				3D1E07F0242A7D5100655E76 /* README.md */,
+			);
+			sourceTree = "<group>";
+		};
+		66EE17531B729EA0008B6743 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				66EE17521B729EA0008B6743 /* F53OSC Monitor.app */,
+				3D1E0847242A7F5B00655E76 /* F53OSCTests.xctest */,
+				3D1E0854242A815100655E76 /* F53OSC.framework */,
+				3D1E0861242A81F600655E76 /* F53OSC.framework */,
+				3D1E08E4242A8EC700655E76 /* F53OSC.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		66EE17541B729EA0008B6743 /* F53OSC Monitor */ = {
+			isa = PBXGroup;
+			children = (
+				66EE17571B729EA0008B6743 /* AppDelegate.h */,
+				66EE17581B729EA0008B6743 /* AppDelegate.m */,
+				66EE17A31B72AC59008B6743 /* DemoServer.h */,
+				66EE17A41B72AC59008B6743 /* DemoServer.m */,
+				66AFE43A1B79485100985C54 /* ActivityChartView.h */,
+				66AFE43B1B79485100985C54 /* ActivityChartView.m */,
+				66CAE3D71B754AA3001306FD /* Resources */,
+				66EE17551B729EA0008B6743 /* Supporting Files */,
+			);
+			path = "F53OSC Monitor";
+			sourceTree = "<group>";
+		};
+		66EE17551B729EA0008B6743 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				66EE17561B729EA0008B6743 /* Info.plist */,
+				66EE175A1B729EA0008B6743 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		3D1E084F242A815100655E76 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E0869242A827700655E76 /* F53OSCProtocols.h in Headers */,
+				3D1E086A242A827700655E76 /* F53OSCFoundationAdditions.h in Headers */,
+				3D1E086B242A827700655E76 /* F53OSCBundle.h in Headers */,
+				3D1E086D242A827700655E76 /* F53OSCClient.h in Headers */,
+				3D1E086F242A827700655E76 /* F53OSCMessage.h in Headers */,
+				3D1E0871242A827700655E76 /* F53OSCPacket.h in Headers */,
+				3D1E0873242A827700655E76 /* F53OSCParser.h in Headers */,
+				3D083547242BF3C100E4A247 /* F53OSCValue.h in Headers */,
+				3D1E0875242A827700655E76 /* F53OSCServer.h in Headers */,
+				3D1E08AB242A844E00655E76 /* F53OSC.h in Headers */,
+				3D1E0877242A827700655E76 /* F53OSCSocket.h in Headers */,
+				3DA5A9AB242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */,
+				3DA5A9A8242FC4AB0068AF88 /* GCDAsyncUdpSocket.h in Headers */,
+				3D1E0879242A827700655E76 /* F53OSCTimeTag.h in Headers */,
+				3D1E087F242A827700655E76 /* NSData+F53OSCBlob.h in Headers */,
+				3D1E0881242A827700655E76 /* NSDate+F53OSCTimeTag.h in Headers */,
+				3D1E0883242A827700655E76 /* NSNumber+F53OSCNumber.h in Headers */,
+				3D1E0885242A827700655E76 /* NSString+F53OSCString.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E085C242A81F600655E76 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E0889242A829300655E76 /* F53OSCProtocols.h in Headers */,
+				3D1E088A242A829300655E76 /* F53OSCFoundationAdditions.h in Headers */,
+				3D1E088B242A829300655E76 /* F53OSCBundle.h in Headers */,
+				3D1E088D242A829300655E76 /* F53OSCClient.h in Headers */,
+				3D1E088F242A829300655E76 /* F53OSCMessage.h in Headers */,
+				3D1E0891242A829300655E76 /* F53OSCPacket.h in Headers */,
+				3D1E0893242A829300655E76 /* F53OSCParser.h in Headers */,
+				3D083548242BF3C100E4A247 /* F53OSCValue.h in Headers */,
+				3D1E0895242A829300655E76 /* F53OSCServer.h in Headers */,
+				3D1E08AC242A844E00655E76 /* F53OSC.h in Headers */,
+				3D1E0897242A829300655E76 /* F53OSCSocket.h in Headers */,
+				3DA5A9AC242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */,
+				3DA5A9A9242FC4AB0068AF88 /* GCDAsyncUdpSocket.h in Headers */,
+				3D1E0899242A829300655E76 /* F53OSCTimeTag.h in Headers */,
+				3D1E089F242A829300655E76 /* NSData+F53OSCBlob.h in Headers */,
+				3D1E08A1242A829300655E76 /* NSDate+F53OSCTimeTag.h in Headers */,
+				3D1E08A3242A829300655E76 /* NSNumber+F53OSCNumber.h in Headers */,
+				3D1E08A5242A829300655E76 /* NSString+F53OSCString.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E08DF242A8EC700655E76 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E0907242A9F7C00655E76 /* NSNumber+F53OSCNumber.h in Headers */,
+				3D1E08F7242A9F7C00655E76 /* F53OSCParser.h in Headers */,
+				3D1E08EC242A9F7C00655E76 /* F53OSC.h in Headers */,
+				3D1E0903242A9F7C00655E76 /* NSData+F53OSCBlob.h in Headers */,
+				3D1E0905242A9F7C00655E76 /* NSDate+F53OSCTimeTag.h in Headers */,
+				3D083549242BF3C100E4A247 /* F53OSCValue.h in Headers */,
+				3D1E08FD242A9F7C00655E76 /* F53OSCTimeTag.h in Headers */,
+				3D1E08F1242A9F7C00655E76 /* F53OSCClient.h in Headers */,
+				3D1E08EE242A9F7C00655E76 /* F53OSCFoundationAdditions.h in Headers */,
+				3D1E08ED242A9F7C00655E76 /* F53OSCProtocols.h in Headers */,
+				3D1E08F9242A9F7C00655E76 /* F53OSCServer.h in Headers */,
+				3DA5A9AD242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */,
+				3DA5A9AA242FC4AB0068AF88 /* GCDAsyncUdpSocket.h in Headers */,
+				3D1E08EF242A9F7C00655E76 /* F53OSCBundle.h in Headers */,
+				3D1E08F3242A9F7C00655E76 /* F53OSCMessage.h in Headers */,
+				3D1E08FB242A9F7C00655E76 /* F53OSCSocket.h in Headers */,
+				3D1E0909242A9F7C00655E76 /* NSString+F53OSCString.h in Headers */,
+				3D1E08F5242A9F7C00655E76 /* F53OSCPacket.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		3D1E0846242A7F5B00655E76 /* F53OSCTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3D1E084C242A7F5B00655E76 /* Build configuration list for PBXNativeTarget "F53OSCTests" */;
+			buildPhases = (
+				3D1E0845242A7F5B00655E76 /* Resources */,
+				3D1E0843242A7F5B00655E76 /* Sources */,
+				3D1E0844242A7F5B00655E76 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3D1E08DD242A8E6300655E76 /* PBXTargetDependency */,
+			);
+			name = F53OSCTests;
+			productName = F53OSCTests;
+			productReference = 3D1E0847242A7F5B00655E76 /* F53OSCTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		3D1E0853242A815100655E76 /* F53OSC-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3D1E0859242A815100655E76 /* Build configuration list for PBXNativeTarget "F53OSC-macOS" */;
+			buildPhases = (
+				3D1E084F242A815100655E76 /* Headers */,
+				3D1E0850242A815100655E76 /* Sources */,
+				3D1E0851242A815100655E76 /* Frameworks */,
+				3D1E0852242A815100655E76 /* Resources */,
+				3D1E08AA242A836600655E76 /* Copy Framework to Desktop */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "F53OSC-macOS";
+			productName = F53OSC;
+			productReference = 3D1E0854242A815100655E76 /* F53OSC.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		3D1E0860242A81F600655E76 /* F53OSC-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3D1E0866242A81F600655E76 /* Build configuration list for PBXNativeTarget "F53OSC-iOS" */;
+			buildPhases = (
+				3D1E085C242A81F600655E76 /* Headers */,
+				3D1E085D242A81F600655E76 /* Sources */,
+				3D1E085E242A81F600655E76 /* Frameworks */,
+				3D1E085F242A81F600655E76 /* Resources */,
+				3D1E08A9242A834A00655E76 /* Copy Framework to Desktop */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "F53OSC-iOS";
+			productName = F53OSC;
+			productReference = 3D1E0861242A81F600655E76 /* F53OSC.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		3D1E08E3242A8EC700655E76 /* F53OSC-tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3D1E08E9242A8EC700655E76 /* Build configuration list for PBXNativeTarget "F53OSC-tvOS" */;
+			buildPhases = (
+				3D1E08DF242A8EC700655E76 /* Headers */,
+				3D1E08E0242A8EC700655E76 /* Sources */,
+				3D1E08E1242A8EC700655E76 /* Frameworks */,
+				3D1E08E2242A8EC700655E76 /* Resources */,
+				3D1E090E242A9FB800655E76 /* Copy Framework to Desktop */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "F53OSC-tvOS";
+			productName = F53OSC;
+			productReference = 3D1E08E4242A8EC700655E76 /* F53OSC.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		66EE17511B729EA0008B6743 /* F53OSC Monitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 66EE176F1B729EA0008B6743 /* Build configuration list for PBXNativeTarget "F53OSC Monitor" */;
+			buildPhases = (
+				66EE17501B729EA0008B6743 /* Resources */,
+				66EE174E1B729EA0008B6743 /* Sources */,
+				66EE174F1B729EA0008B6743 /* Frameworks */,
+				3D1E08BC242A861E00655E76 /* Copy Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3D1E08B9242A85F100655E76 /* PBXTargetDependency */,
+			);
+			name = "F53OSC Monitor";
+			productName = "F53OSC Monitor";
+			productReference = 66EE17521B729EA0008B6743 /* F53OSC Monitor.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		66EE174A1B729EA0008B6743 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1030;
+				ORGANIZATIONNAME = "Figure 53";
+				TargetAttributes = {
+					3D1E0846242A7F5B00655E76 = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Manual;
+					};
+					3D1E0853242A815100655E76 = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Manual;
+					};
+					3D1E0860242A81F600655E76 = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Manual;
+					};
+					3D1E08E3242A8EC700655E76 = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Manual;
+					};
+					66EE17511B729EA0008B6743 = {
+						CreatedOnToolsVersion = 6.4;
+					};
+				};
+			};
+			buildConfigurationList = 66EE174D1B729EA0008B6743 /* Build configuration list for PBXProject "F53OSC" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 66EE17491B729EA0008B6743;
+			productRefGroup = 66EE17531B729EA0008B6743 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3D1E0853242A815100655E76 /* F53OSC-macOS */,
+				3D1E0860242A81F600655E76 /* F53OSC-iOS */,
+				3D1E08E3242A8EC700655E76 /* F53OSC-tvOS */,
+				3D1E0846242A7F5B00655E76 /* F53OSCTests */,
+				66EE17511B729EA0008B6743 /* F53OSC Monitor */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3D1E0845242A7F5B00655E76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08B4242A84D700655E76 /* LICENSE.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E0852242A815100655E76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08B2242A84D500655E76 /* LICENSE.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E085F242A81F600655E76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08B3242A84D500655E76 /* LICENSE.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E08E2242A8EC700655E76 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E090D242A9FAE00655E76 /* LICENSE.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66EE17501B729EA0008B6743 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E07F3242A7D5D00655E76 /* LICENSE.txt in Resources */,
+				66EE175D1B729EA0008B6743 /* Images.xcassets in Resources */,
+				66EE17601B729EA0008B6743 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3D1E08A9242A834A00655E76 /* Copy Framework to Desktop */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Framework to Desktop";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nif [ $CONFIGURATION != 'Release' ]; then exit 0; fi\n\n# If we're already inside this script then die\nif [ -n \"$F53_BUILD_IN_PROGRESS\" ]; then exit 0; fi\nexport F53_BUILD_IN_PROGRESS=1\n\nF53_FRAMEWORK_NAME=${PRODUCT_NAME}\nF53_FRAMEWORK_LOCATION=\"${BUILT_PRODUCTS_DIR}/${F53_FRAMEWORK_NAME}.framework\"\n\n# Copy the framework to the user's desktop\nditto \"${F53_FRAMEWORK_LOCATION}\" \"${HOME}/Desktop/${F53_FRAMEWORK_NAME}.framework\"\n";
+		};
+		3D1E08AA242A836600655E76 /* Copy Framework to Desktop */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Framework to Desktop";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nif [ $CONFIGURATION != 'Release' ]; then exit 0; fi\n\n# If we're already inside this script then die\nif [ -n \"$F53_BUILD_IN_PROGRESS\" ]; then exit 0; fi\nexport F53_BUILD_IN_PROGRESS=1\n\nF53_FRAMEWORK_NAME=${PRODUCT_NAME}\nF53_FRAMEWORK_LOCATION=\"${BUILT_PRODUCTS_DIR}/${F53_FRAMEWORK_NAME}.framework\"\n\n# Copy the framework to the user's desktop\nditto \"${F53_FRAMEWORK_LOCATION}\" \"${HOME}/Desktop/${F53_FRAMEWORK_NAME}.framework\"\n";
+		};
+		3D1E090E242A9FB800655E76 /* Copy Framework to Desktop */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Framework to Desktop";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nif [ $CONFIGURATION != 'Release' ]; then exit 0; fi\n\n# If we're already inside this script then die\nif [ -n \"$F53_BUILD_IN_PROGRESS\" ]; then exit 0; fi\nexport F53_BUILD_IN_PROGRESS=1\n\nF53_FRAMEWORK_NAME=${PRODUCT_NAME}\nF53_FRAMEWORK_LOCATION=\"${BUILT_PRODUCTS_DIR}/${F53_FRAMEWORK_NAME}.framework\"\n\n# Copy the framework to the user's desktop\nditto \"${F53_FRAMEWORK_LOCATION}\" \"${HOME}/Desktop/${F53_FRAMEWORK_NAME}.framework\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3D1E0843242A7F5B00655E76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08AF242A847E00655E76 /* F53OSC_NSNumberTests.m in Sources */,
+				3D1E08AE242A847C00655E76 /* F53OSCMessageTests.m in Sources */,
+				3D1E08AD242A847A00655E76 /* F53OSCServerTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E0850242A815100655E76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08D4242A8C8000655E76 /* F53OSCTimeTag.m in Sources */,
+				3D1E08D0242A8C8000655E76 /* F53OSCPacket.m in Sources */,
+				3D1E08D2242A8C8000655E76 /* F53OSCServer.m in Sources */,
+				3D1E08DA242A8C8000655E76 /* NSString+F53OSCString.m in Sources */,
+				3DA5A9A2242FC4AB0068AF88 /* GCDAsyncUdpSocket.m in Sources */,
+				3D1E08BF242A8C7500655E76 /* F53OSCBundle.m in Sources */,
+				3DA5A9A5242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */,
+				3D1E08D3242A8C8000655E76 /* F53OSCSocket.m in Sources */,
+				3D1E08D8242A8C8000655E76 /* NSDate+F53OSCTimeTag.m in Sources */,
+				3D083544242BF3C100E4A247 /* F53OSCValue.m in Sources */,
+				3D1E08CF242A8C8000655E76 /* F53OSCMessage.m in Sources */,
+				3D1E08D9242A8C8000655E76 /* NSNumber+F53OSCNumber.m in Sources */,
+				3D1E08CE242A8C8000655E76 /* F53OSCClient.m in Sources */,
+				3D1E08D1242A8C8000655E76 /* F53OSCParser.m in Sources */,
+				3D1E08D7242A8C8000655E76 /* NSData+F53OSCBlob.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E085D242A81F600655E76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08C6242A8C8000655E76 /* F53OSCTimeTag.m in Sources */,
+				3D1E08C2242A8C8000655E76 /* F53OSCPacket.m in Sources */,
+				3D1E08C4242A8C8000655E76 /* F53OSCServer.m in Sources */,
+				3D1E08CC242A8C8000655E76 /* NSString+F53OSCString.m in Sources */,
+				3DA5A9A3242FC4AB0068AF88 /* GCDAsyncUdpSocket.m in Sources */,
+				3D1E08BE242A8C7400655E76 /* F53OSCBundle.m in Sources */,
+				3DA5A9A6242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */,
+				3D1E08C5242A8C8000655E76 /* F53OSCSocket.m in Sources */,
+				3D1E08CA242A8C8000655E76 /* NSDate+F53OSCTimeTag.m in Sources */,
+				3D083545242BF3C100E4A247 /* F53OSCValue.m in Sources */,
+				3D1E08C1242A8C8000655E76 /* F53OSCMessage.m in Sources */,
+				3D1E08CB242A8C8000655E76 /* NSNumber+F53OSCNumber.m in Sources */,
+				3D1E08C0242A8C8000655E76 /* F53OSCClient.m in Sources */,
+				3D1E08C3242A8C8000655E76 /* F53OSCParser.m in Sources */,
+				3D1E08C9242A8C8000655E76 /* NSData+F53OSCBlob.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D1E08E0242A8EC700655E76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D1E08FE242A9F7C00655E76 /* F53OSCTimeTag.m in Sources */,
+				3D1E08F6242A9F7C00655E76 /* F53OSCPacket.m in Sources */,
+				3D1E08FA242A9F7C00655E76 /* F53OSCServer.m in Sources */,
+				3D1E090A242A9F7C00655E76 /* NSString+F53OSCString.m in Sources */,
+				3DA5A9A4242FC4AB0068AF88 /* GCDAsyncUdpSocket.m in Sources */,
+				3D1E08F0242A9F7C00655E76 /* F53OSCBundle.m in Sources */,
+				3DA5A9A7242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */,
+				3D1E08FC242A9F7C00655E76 /* F53OSCSocket.m in Sources */,
+				3D1E0906242A9F7C00655E76 /* NSDate+F53OSCTimeTag.m in Sources */,
+				3D083546242BF3C100E4A247 /* F53OSCValue.m in Sources */,
+				3D1E08F4242A9F7C00655E76 /* F53OSCMessage.m in Sources */,
+				3D1E0908242A9F7C00655E76 /* NSNumber+F53OSCNumber.m in Sources */,
+				3D1E08F2242A9F7C00655E76 /* F53OSCClient.m in Sources */,
+				3D1E08F8242A9F7C00655E76 /* F53OSCParser.m in Sources */,
+				3D1E0904242A9F7C00655E76 /* NSData+F53OSCBlob.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		66EE174E1B729EA0008B6743 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66EE175B1B729EA0008B6743 /* main.m in Sources */,
+				66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */,
+				66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */,
+				66EE17A51B72AC59008B6743 /* DemoServer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3D1E08B9242A85F100655E76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3D1E0853242A815100655E76 /* F53OSC-macOS */;
+			targetProxy = 3D1E08B8242A85F100655E76 /* PBXContainerItemProxy */;
+		};
+		3D1E08DD242A8E6300655E76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3D1E0853242A815100655E76 /* F53OSC-macOS */;
+			targetProxy = 3D1E08DC242A8E6300655E76 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		66EE175E1B729EA0008B6743 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				66EE175F1B729EA0008B6743 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3D1E084D242A7F5B00655E76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		3D1E084E242A7F5B00655E76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		3D1E085A242A815100655E76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		3D1E085B242A815100655E76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		3D1E0867242A81F600655E76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 x86_64";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		3D1E0868242A81F600655E76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 x86_64";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		3D1E08EA242A8EC700655E76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		3D1E08EB242A8EC700655E76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		3DD9A5CF242E4FC0008E62A0 /* Testing */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					$PROJECT_DIR/Sources/F53OSC/,
+				);
+				INFOPLIST_FILE = "$PROJECT_DIR/Supporting Files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.figure53.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = F53OSC;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Testing;
+		};
+		3DD9A5D0242E4FC0008E62A0 /* Testing */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Testing;
+		};
+		3DD9A5D1242E4FC0008E62A0 /* Testing */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 x86_64";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Testing;
+		};
+		3DD9A5D2242E4FC0008E62A0 /* Testing */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.figure53.F53OSC;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Testing;
+		};
+		3DD9A5D3242E4FC0008E62A0 /* Testing */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Testing;
+		};
+		3DD9A5D4242E4FC0008E62A0 /* Testing */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Testing;
+		};
+		66EE176D1B729EA0008B6743 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					$PROJECT_DIR/Sources/F53OSC/,
+				);
+				INFOPLIST_FILE = "$PROJECT_DIR/Supporting Files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.figure53.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = F53OSC;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		66EE176E1B729EA0008B6743 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					$PROJECT_DIR/Sources/F53OSC/,
+				);
+				INFOPLIST_FILE = "$PROJECT_DIR/Supporting Files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.figure53.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = F53OSC;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Release;
+		};
+		66EE17701B729EA0008B6743 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		66EE17711B729EA0008B6743 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3D1E084C242A7F5B00655E76 /* Build configuration list for PBXNativeTarget "F53OSCTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D1E084D242A7F5B00655E76 /* Debug */,
+				3DD9A5D3242E4FC0008E62A0 /* Testing */,
+				3D1E084E242A7F5B00655E76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3D1E0859242A815100655E76 /* Build configuration list for PBXNativeTarget "F53OSC-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D1E085A242A815100655E76 /* Debug */,
+				3DD9A5D0242E4FC0008E62A0 /* Testing */,
+				3D1E085B242A815100655E76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3D1E0866242A81F600655E76 /* Build configuration list for PBXNativeTarget "F53OSC-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D1E0867242A81F600655E76 /* Debug */,
+				3DD9A5D1242E4FC0008E62A0 /* Testing */,
+				3D1E0868242A81F600655E76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3D1E08E9242A8EC700655E76 /* Build configuration list for PBXNativeTarget "F53OSC-tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D1E08EA242A8EC700655E76 /* Debug */,
+				3DD9A5D2242E4FC0008E62A0 /* Testing */,
+				3D1E08EB242A8EC700655E76 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66EE174D1B729EA0008B6743 /* Build configuration list for PBXProject "F53OSC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66EE176D1B729EA0008B6743 /* Debug */,
+				3DD9A5CF242E4FC0008E62A0 /* Testing */,
+				66EE176E1B729EA0008B6743 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		66EE176F1B729EA0008B6743 /* Build configuration list for PBXNativeTarget "F53OSC Monitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66EE17701B729EA0008B6743 /* Debug */,
+				3DD9A5D4242E4FC0008E62A0 /* Testing */,
+				66EE17711B729EA0008B6743 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 66EE174A1B729EA0008B6743 /* Project object */;
+}
