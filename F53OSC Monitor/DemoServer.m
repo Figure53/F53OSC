@@ -3,7 +3,7 @@
 //  F53OSC Monitor
 //
 //  Created by Adam Bachman on 8/5/15.
-//  Copyright (c) 2015 Figure 53. All rights reserved.
+//  Copyright (c) 2015-2022 Figure 53. All rights reserved.
 //
 
 #import "AppDelegate.h"
@@ -77,7 +77,7 @@
     return @(self.server.udpSocket.stats.bytesPerSecond);
 }
 
-#pragma mark - Message Handling
+#pragma mark - F53OSCServerDelegate / F53OSCPacketDestination
 
 ///
 ///  Note: F53OSC reserves the right to send messages off the main thread.

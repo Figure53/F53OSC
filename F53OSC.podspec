@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'F53OSC'
-  s.version      = '1.1.0'
+  s.version      = '1.2.0'
   s.summary      = 'A nice open source OSC library for Objective-C.'
 
   s.description  = <<-DESC
