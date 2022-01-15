@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define F53_OSC_SERVER_DEBUG 0
 
-@interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
+@interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate, F53OSCControlHandler>
 
 + (NSString *) validCharsForOSCMethod;
 + (NSPredicate *) predicateForAttribute:(NSString *)attributeName
@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly) F53OSCSocket *tcpSocket;
 @property (nonatomic, assign)           UInt16 port;
 @property (nonatomic, assign)           UInt16 udpReplyPort;
+@property (strong)                      NSData *keyPair;
 
 - (instancetype) initWithDelegateQueue:(nullable dispatch_queue_t)queue;
 

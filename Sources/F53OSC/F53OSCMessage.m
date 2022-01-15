@@ -329,7 +329,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 {
     if ( newAddressPattern == nil ||
         [newAddressPattern length] == 0 ||
-        [newAddressPattern characterAtIndex:0] != '/' )
+        ![[NSCharacterSet characterSetWithCharactersInString:@"/!"] characterIsMember:[newAddressPattern characterAtIndex:0]] )
     {
         return;
     }

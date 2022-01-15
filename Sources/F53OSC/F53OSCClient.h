@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define F53_OSC_CLIENT_DEBUG 0
 
-@interface F53OSCClient : NSObject <NSSecureCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
+@interface F53OSCClient : NSObject <NSSecureCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate, F53OSCControlHandler>
 
 @property (nonatomic, weak)                     id<F53OSCClientDelegate> delegate;
 @property (nonatomic, strong, null_resettable)  dispatch_queue_t socketDelegateQueue; // defaults to main queue
@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly)                 BOOL isConnected;
 
 - (BOOL) connect;   // NOTE: returns NO if internal F53OSCSocket uses TCP and is already connected
+- (BOOL) connectEncryptedWithKeyPair:(NSData *)keyPair;
 - (void) disconnect;
 
 - (void) sendPacket:(F53OSCPacket *)packet;

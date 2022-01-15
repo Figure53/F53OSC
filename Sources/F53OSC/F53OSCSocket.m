@@ -308,6 +308,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     NSData *data = [packet packetData];
 
+    if ( self.isEncrypting )
+    {
+        NSData *encrypted = [self.encrypter encryptDataWithClearData:data];
+        char *beginning = "*";
+        NSMutableData *newData = [NSMutableData dataWithBytes:beginning length:1];
+        [newData appendData:encrypted];
+        data = newData;
+    }
+
     //NSLog( @"%@ sending message with native length: %li", self, [data length] );
 
     if ( self.tcpSocket )
@@ -361,6 +370,11 @@ NS_ASSUME_NONNULL_BEGIN
         
         [self.udpSocket closeAfterSending];
     }
+}
+
+- (void) setKeyPair:(NSData *)keyPair
+{
+    self.encrypter = [[F53OSCEncrypt alloc] initWithKeyPairData:keyPair];
 }
 
 @end

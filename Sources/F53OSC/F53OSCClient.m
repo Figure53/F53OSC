@@ -31,6 +31,7 @@
 #import "F53OSCClient.h"
 
 #import "F53OSCParser.h"
+#import "F53OSCEncryptHandshake.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -281,6 +282,16 @@ NS_ASSUME_NONNULL_BEGIN
     return NO;
 }
 
+- (BOOL) connectEncryptedWithKeyPair:(NSData *)keyPair
+{
+    if ( !self.socket )
+        [self createSocket];
+    [self.socket setKeyPair:keyPair];
+    if ( self.socket )
+        return [self.socket connect];
+    return NO;
+}
+
 - (void) disconnect
 {
     [self.socket disconnect];
@@ -309,6 +320,23 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
+- (void) handleF53OSCControlMessage:(F53OSCMessage *)message
+{
+    // TODO: check if the message is a handshake message
+    // TODO: Error checking
+    F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
+    if ( [handshake processHandshakeMessage:message] )
+    {
+        if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageAppprove )
+        {
+            F53OSCMessage *beginMessage = [handshake beginEncryptionMessage];
+            [self sendPacket:beginMessage];
+            self.socket.isEncrypting = YES;
+            [self tellDelegateDidConnect];
+        }
+    }
+}
+
 #pragma mark - GCDAsyncSocketDelegate
 
 - (nullable dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
@@ -326,7 +354,20 @@ NS_ASSUME_NONNULL_BEGIN
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didConnectToHost %@:%u", sock, host, port );
 #endif
-    
+    if ( self.socket.encrypter )
+    {
+        F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
+        F53OSCMessage *requestMessage = [handshake requestEncryptionMessage];
+        [self sendPacket:requestMessage];
+    }
+    else
+    {
+        [self tellDelegateDidConnect];
+    }
+}
+
+- (void) tellDelegateDidConnect
+{
     if ( [self.delegate respondsToSelector:@selector(clientDidConnect:)] )
     {
         dispatch_block_t block = ^{
@@ -346,7 +387,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog( @"client socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
     
-    [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate];
+    [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate controlHandler:self];
     [sock readDataWithTimeout:-1 tag:tag];
 }
 

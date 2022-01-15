@@ -73,6 +73,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, readonly, nullable) F53OSCStats *stats;
 
+@property (strong) F53OSCEncrypt *encrypter;
+@property (assign) BOOL isEncrypting;
+
 - (BOOL) startListening;
 - (void) stopListening;
 
@@ -81,6 +84,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) isConnected;
 
 - (void) sendPacket:(F53OSCPacket *)packet;
+
+- (void) setKeyPair:(NSData *)keyPair;
 
 @end
 
