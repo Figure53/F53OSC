@@ -12,6 +12,7 @@ import CryptoKit
 
 @objc class F53OSCEncrypt: NSObject {
     var keyPair: P521.KeyAgreement.PrivateKey?
+    @objc var peerKey: Data?
     var symmetricKey: SymmetricKey?
     @objc var salt: Data?
 
@@ -77,6 +78,7 @@ import CryptoKit
         {
             do
             {
+                self.peerKey = peerKey;
                 let peerPubKey = try P521.KeyAgreement.PublicKey(rawRepresentation: peerKey)
                 let sharedSecret = try keyPair?.sharedSecretFromKeyAgreement(with: peerPubKey)
                 self.symmetricKey = sharedSecret?.hkdfDerivedSymmetricKey(using: SHA512.self, salt: salt, sharedInfo: Data(), outputByteCount: 32)
