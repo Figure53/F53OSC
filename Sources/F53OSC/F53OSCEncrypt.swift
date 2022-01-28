@@ -9,12 +9,14 @@
 import Foundation
 import Cocoa
 import CryptoKit
+import OSLog
 
 @objc class F53OSCEncrypt: NSObject {
     var keyPair: P521.KeyAgreement.PrivateKey?
     @objc var peerKey: Data?
     var symmetricKey: SymmetricKey?
     @objc var salt: Data?
+    let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: Bundle.main.infoDictionary!["CFBundleName"] as! String)
 
     @objc override init()
     {
@@ -31,7 +33,7 @@ import CryptoKit
         }
         catch
         {
-            print("Error reading key pair data for F53OSC encryption")
+            logger.error("Error reading key pair data for F53OSC encryption")
         }
     }
 
@@ -40,6 +42,7 @@ import CryptoKit
     @objc func generateKeyPair() -> Data?
     {
         self.keyPair = P521.KeyAgreement.PrivateKey()
+        logger.notice("F53OSC generated new key pair")
         return keyPairData()
     }
 
@@ -82,15 +85,16 @@ import CryptoKit
                 let peerPubKey = try P521.KeyAgreement.PublicKey(rawRepresentation: peerKey)
                 let sharedSecret = try keyPair?.sharedSecretFromKeyAgreement(with: peerPubKey)
                 self.symmetricKey = sharedSecret?.hkdfDerivedSymmetricKey(using: SHA512.self, salt: salt, sharedInfo: Data(), outputByteCount: 32)
+                logger.notice("F53OSC encryption begun");
             }
             catch
             {
-                print("Error creating public key from peer key data")
+                logger.error("Error creating public key from peer key data")
             }
         }
         else
         {
-            print("Error, cannot begin encrypting without salt")
+            logger.error("Error, cannot begin encrypting without salt")
         }
     }
 
@@ -109,12 +113,12 @@ import CryptoKit
             }
             catch
             {
-                print("Error encrypting data")
+                logger.error("Error encrypting data")
             }
         }
         else
         {
-            print("Error: trying to encrypt data when no key is set")
+            logger.error("Error: trying to encrypt data when no key is set")
         }
         return nil
     }
@@ -135,12 +139,12 @@ import CryptoKit
             }
             catch
             {
-                print("Error decrypting data")
+                logger.error("Error decrypting data")
             }
         }
         else
         {
-            print("Error: trying to decrypt data when no key is set")
+            logger.error("Error: trying to decrypt data when no key is set")
         }
         return nil
     }
