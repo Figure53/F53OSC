@@ -307,22 +307,28 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if ( !socket.isEncrypting )
         {
-            NSLog(@"Error, received encrypted OSC on a non-encrypted connection");
+            NSLog(@"Error: received encrypted OSC on a non-encrypted connection");
             return;
         }
-        // TODO: validity and error checking
         if ( length > 1 )
         {
             NSData *encryptedData = [data subdataWithRange:NSMakeRange(1, length-1)];
             NSData *decryptedData = [socket.encrypter decryptDataWithEncryptedData:encryptedData];
-            [F53OSCParser processOscData:decryptedData forDestination:destination replyToSocket:socket controlHandler:controlHandler wasEncrypted:YES];
+            if ( decryptedData )
+                [F53OSCParser processOscData:decryptedData forDestination:destination replyToSocket:socket controlHandler:controlHandler wasEncrypted:YES];
+            else
+                NSLog(@"Error: failed to decrypt OSC data");
+        }
+        else
+        {
+            NSLog(@"Error: encrypted OSC data is too short: %ul bytes", (unsigned int)length);
         }
     }
     else
     {
         if ( socket.isEncrypting && !wasEncrypted )
         {
-            NSLog(@"Error, received unencrypted OSC on an encrypted connection");
+            NSLog(@"Error: received unencrypted OSC on an encrypted connection");
             return;
         }
         if ( buffer[0] == '/' ) // OSC message

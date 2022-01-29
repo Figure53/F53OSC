@@ -322,18 +322,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) handleF53OSCControlMessage:(F53OSCMessage *)message
 {
-    // TODO: check if the message is a handshake message
-    // TODO: Error checking
-    F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
-    if ( [handshake processHandshakeMessage:message] )
+    if ( [F53OSCEncryptHandshake isEncryptHandshakeMessage:message] )
     {
-        if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageAppprove )
+        F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
+        if ( [handshake processHandshakeMessage:message] )
         {
-            F53OSCMessage *beginMessage = [handshake beginEncryptionMessage];
-            [self sendPacket:beginMessage];
-            self.socket.isEncrypting = YES;
-            [self tellDelegateDidConnect];
+            if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageAppprove )
+            {
+                F53OSCMessage *beginMessage = [handshake beginEncryptionMessage];
+                [self sendPacket:beginMessage];
+                self.socket.isEncrypting = YES;
+                [self tellDelegateDidConnect];
+            }
+            else
+            {
+                NSLog(@"Error: received unexpected F53OSC encryption handshake message: %@", message);
+            }
         }
+    }
+    else
+    {
+        NSLog(@"Error: unknown F53OSC control message received: %@", message);
     }
 }
 
@@ -358,7 +367,8 @@ NS_ASSUME_NONNULL_BEGIN
     {
         F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
         F53OSCMessage *requestMessage = [handshake requestEncryptionMessage];
-        [self sendPacket:requestMessage];
+        if ( requestMessage )
+            [self sendPacket:requestMessage];
     }
     else
     {

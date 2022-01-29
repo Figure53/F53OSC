@@ -202,30 +202,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) handleF53OSCControlMessage:(F53OSCMessage *)message
 {
-    // TODO: check if the message is a handshake message
-    // TODO: Error checking
-    if ( self.keyPair )
+    if ( [F53OSCEncryptHandshake isEncryptHandshakeMessage:message] )
     {
-        if ( !message.replySocket.encrypter )
-            [message.replySocket setKeyPair:self.keyPair];
-        F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:message.replySocket.encrypter];
-        if ( [handshake processHandshakeMessage:message] )
+        if ( self.keyPair )
         {
-            if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageRequest )
+            if ( !message.replySocket.encrypter )
+                [message.replySocket setKeyPair:self.keyPair];
+            F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:message.replySocket.encrypter];
+            if ( [handshake processHandshakeMessage:message] )
             {
-                // TODO: Check peer key identity
-                F53OSCMessage *approveEncryptingMessage = [handshake approveEncryptionMessage];
-                [message.replySocket sendPacket:approveEncryptingMessage];
+                if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageRequest )
+                {
+                    F53OSCMessage *approveEncryptingMessage = [handshake approveEncryptionMessage];
+                    if ( approveEncryptingMessage )
+                        [message.replySocket sendPacket:approveEncryptingMessage];
+                }
+                else if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageBegin )
+                {
+                    message.replySocket.isEncrypting = YES;
+                }
+                else
+                {
+                    NSLog(@"Error: received unexpected F53OSC encryption handshake message: %@", message);
+                }
             }
-            else if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageBegin )
-            {
-                message.replySocket.isEncrypting = YES;
-            }
+        }
+        else
+        {
+            // TODO: Report error to client that encryption is not supported
         }
     }
     else
     {
-        // TODO: Report error to client that encryption is not supported
+        NSLog(@"Error: unknown F53OSC control message received: %@", message);
     }
 }
 

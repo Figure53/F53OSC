@@ -75,7 +75,7 @@ import OSLog
 
     /// Setup encryption.
     /// @param peerKey: public key data for the peer we are talking to
-    @objc func beginEncrypting(peerKey: Data)
+    @objc func beginEncrypting(peerKey: Data) -> Bool
     {
         if let salt = self.salt
         {
@@ -86,6 +86,7 @@ import OSLog
                 let sharedSecret = try keyPair?.sharedSecretFromKeyAgreement(with: peerPubKey)
                 self.symmetricKey = sharedSecret?.hkdfDerivedSymmetricKey(using: SHA512.self, salt: salt, sharedInfo: Data(), outputByteCount: 32)
                 logger.notice("F53OSC encryption begun");
+                return true
             }
             catch
             {
@@ -96,6 +97,7 @@ import OSLog
         {
             logger.error("Error, cannot begin encrypting without salt")
         }
+        return false
     }
 
     /// Encrypt some data.

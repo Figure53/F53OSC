@@ -25,8 +25,9 @@ typedef NS_ENUM(NSUInteger, EncryptionHandshakeMessage)
 @property (assign) EncryptionHandshakeMessage lastProcessedMessage; // Indicated which message was last processed
 
 + (instancetype) handshakeWithEncrypter:(F53OSCEncrypt *)encrypter;
-- (F53OSCMessage *) requestEncryptionMessage;
-- (F53OSCMessage *) approveEncryptionMessage;
++ (BOOL) isEncryptHandshakeMessage:(F53OSCMessage *)message;
+- (nullable F53OSCMessage *) requestEncryptionMessage;
+- (nullable F53OSCMessage *) approveEncryptionMessage;
 - (F53OSCMessage *) beginEncryptionMessage;
 - (BOOL) processHandshakeMessage:(F53OSCMessage *)message;
 
