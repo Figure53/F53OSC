@@ -1,3 +1,14 @@
+## [1.2.0 - Jan 13, 2022](https://github.com/Figure53/F53OSC/releases/tag/1.2.0)
+
+- Adds a new class `F53OSCBrowser` to facilitate Bonjour client discovery.
+- Adds support for optionally enabling IPv6 support for clients and sockets. NOTE: IPv6 support is experimental and is disabled by default.
+- Changes `+[F53OSCServer predicateForAttribute:matchingOSCPattern:]` to return a FALSE predicate when passed a malformed OSC pattern rather than returning `nil`.
+- Several changes to protocols and delegates, namely the protocol `F53OSCServer` is removed in favor of a new `F53OSCServerDelegate` protocol.
+- Adds tests to validate OSC wildcard patterns and predicates.
+- Adds support for testing arbitrary locales with the number formatter used in `+[F53OSCMessage messageWithString:]` via an optional NSUserDefaults key `com.figure53.f53osc.testingLocaleIdentifier`.
+- Updates header comments to reflect correct author name.
+- F53OSC.xcodeproj is updated for Xcode 12.
+
 ## [1.1.0 - Mar 30, 2020](https://github.com/Figure53/F53OSC/releases/tag/1.1.0)
 
 - Adds support for OSC 1.1 type tags `T`, `F`, `N`, and `I`. [#23](https://github.com/Figure53/F53OSC/issues/18)
