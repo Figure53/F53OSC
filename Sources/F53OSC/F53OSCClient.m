@@ -327,7 +327,7 @@ NS_ASSUME_NONNULL_BEGIN
         F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
         if ( [handshake processHandshakeMessage:message] )
         {
-            if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageAppprove )
+            if ( handshake.lastProcessedMessage == F53OSCEncryptionHandshakeMessageAppprove )
             {
                 F53OSCMessage *beginMessage = [handshake beginEncryptionMessage];
                 [self sendPacket:beginMessage];

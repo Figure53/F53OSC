@@ -11,18 +11,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, EncryptionHandshakeMessage)
+typedef NS_ENUM(NSUInteger, F53OSCEncryptionHandshakeMessage)
 {
-    EncryptionHandshakeMessageRequest = 0,
-    EncryptionHandshakeMessageAppprove,
-    EncryptionHandshakeMessageBegin,
+    F53OSCEncryptionHandshakeMessageRequest = 0,
+    F53OSCEncryptionHandshakeMessageAppprove,
+    F53OSCEncryptionHandshakeMessageBegin,
 };
 
 @interface F53OSCEncryptHandshake : NSObject
 
 @property (assign) BOOL handshakeComplete;
 @property (strong) NSData *peerKey; // Peer's public key
-@property (assign) EncryptionHandshakeMessage lastProcessedMessage; // Indicated which message was last processed
+@property (assign) F53OSCEncryptionHandshakeMessage lastProcessedMessage; // Indicated which message was last processed
 
 + (instancetype) handshakeWithEncrypter:(F53OSCEncrypt *)encrypter;
 + (BOOL) isEncryptHandshakeMessage:(F53OSCMessage *)message;

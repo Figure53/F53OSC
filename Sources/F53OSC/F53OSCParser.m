@@ -345,7 +345,10 @@ NS_ASSUME_NONNULL_BEGIN
             if ( inbound == nil )
                 return;
             inbound.replySocket = socket;
-            [controlHandler handleF53OSCControlMessage:inbound];
+            if ( controlHandler )
+                [controlHandler handleF53OSCControlMessage:inbound];
+            else
+                NSLog(@"Error: Received F53OSC control message without a control handler: %@", inbound.addressPattern);
         }
         else
         {

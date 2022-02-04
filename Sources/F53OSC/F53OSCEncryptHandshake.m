@@ -134,7 +134,7 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
         [self.encrypter generateSalt];
         if ( ![self.encrypter beginEncryptingWithPeerKey:self.peerKey] )
             return NO;
-        self.lastProcessedMessage = EncryptionHandshakeMessageRequest;
+        self.lastProcessedMessage = F53OSCEncryptionHandshakeMessageRequest;
         return YES;
     }
     else if ( [message.addressPattern isEqualToString:kApproveEncryptionAddress] )
@@ -160,13 +160,13 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
         self.encrypter.salt = salt;
         if ( ![self.encrypter beginEncryptingWithPeerKey:self.peerKey] )
             return NO;
-        self.lastProcessedMessage = EncryptionHandshakeMessageAppprove;
+        self.lastProcessedMessage = F53OSCEncryptionHandshakeMessageAppprove;
         return YES;
     }
     else if ( [message.addressPattern isEqualToString:kBeginEncryptionAddress] )
     {
         self.handshakeComplete = YES;
-        self.lastProcessedMessage = EncryptionHandshakeMessageBegin;
+        self.lastProcessedMessage = F53OSCEncryptionHandshakeMessageBegin;
         return YES;
     }
     NSLog(@"F53OSC received unknown encryption handshake message: %@", message.addressPattern);

@@ -211,13 +211,13 @@ NS_ASSUME_NONNULL_BEGIN
             F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:message.replySocket.encrypter];
             if ( [handshake processHandshakeMessage:message] )
             {
-                if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageRequest )
+                if ( handshake.lastProcessedMessage == F53OSCEncryptionHandshakeMessageRequest )
                 {
                     F53OSCMessage *approveEncryptingMessage = [handshake approveEncryptionMessage];
                     if ( approveEncryptingMessage )
                         [message.replySocket sendPacket:approveEncryptingMessage];
                 }
-                else if ( handshake.lastProcessedMessage == EncryptionHandshakeMessageBegin )
+                else if ( handshake.lastProcessedMessage == F53OSCEncryptionHandshakeMessageBegin )
                 {
                     message.replySocket.isEncrypting = YES;
                 }
