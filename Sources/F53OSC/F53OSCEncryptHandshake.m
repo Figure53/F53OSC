@@ -159,7 +159,7 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
         NSData *salt = message.arguments[2];
         self.encrypter.salt = salt;
         if ( ![self.encrypter beginEncryptingWithPeerKey:self.peerKey] )
-            return NO;;
+            return NO;
         self.lastProcessedMessage = EncryptionHandshakeMessageAppprove;
         return YES;
     }

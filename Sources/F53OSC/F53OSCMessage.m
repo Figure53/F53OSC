@@ -415,7 +415,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     {
         if ( self.addressPattern.length > 0 && [self.addressPattern characterAtIndex:0] == '!' )
         {
-            /* This methodcurrently only works on real OSC messages starting with /, not F53OSC Control messages starting with !
+            /* This method currently only works on real OSC messages starting with /, not F53OSC Control messages starting with !
                and would need to be updated if we want to parse parts of control message addresses. */
             NSLog(@"Error: trying to compute addressParts of an F53OSC control message is currently unsupported");
         }

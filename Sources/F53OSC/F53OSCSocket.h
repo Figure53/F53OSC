@@ -73,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, readonly, nullable) F53OSCStats *stats;
 
-@property (strong) F53OSCEncrypt *encrypter;
+@property (strong, nullable) F53OSCEncrypt *encrypter;
 @property (assign) BOOL isEncrypting;
 
 - (BOOL) startListening;
