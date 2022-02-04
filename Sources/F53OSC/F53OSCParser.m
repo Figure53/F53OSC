@@ -321,7 +321,7 @@ NS_ASSUME_NONNULL_BEGIN
         }
         else
         {
-            NSLog(@"Error: encrypted OSC data is too short: %ul bytes", (unsigned int)length);
+            NSLog(@"Error: encrypted OSC data is too short");
         }
     }
     else
