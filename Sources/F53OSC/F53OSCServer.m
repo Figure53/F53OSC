@@ -31,6 +31,7 @@
 #import "F53OSCServer.h"
 
 #import "F53OSCFoundationAdditions.h"
+#import "F53OSCEncryptHandshake.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -199,6 +200,44 @@ NS_ASSUME_NONNULL_BEGIN
     [self.udpSocket.udpSocket synchronouslySetDelegateQueue:nil];
 }
 
+- (void) handleF53OSCControlMessage:(F53OSCMessage *)message
+{
+    if ( [F53OSCEncryptHandshake isEncryptHandshakeMessage:message] )
+    {
+        if ( self.keyPair )
+        {
+            if ( !message.replySocket.encrypter )
+                [message.replySocket setKeyPair:self.keyPair];
+            F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:message.replySocket.encrypter];
+            if ( [handshake processHandshakeMessage:message] )
+            {
+                if ( handshake.lastProcessedMessage == F53OSCEncryptionHandshakeMessageRequest )
+                {
+                    F53OSCMessage *approveEncryptingMessage = [handshake approveEncryptionMessage];
+                    if ( approveEncryptingMessage )
+                        [message.replySocket sendPacket:approveEncryptingMessage];
+                }
+                else if ( handshake.lastProcessedMessage == F53OSCEncryptionHandshakeMessageBegin )
+                {
+                    message.replySocket.isEncrypting = YES;
+                }
+                else
+                {
+                    NSLog(@"Error: received unexpected F53OSC encryption handshake message: %@", message);
+                }
+            }
+        }
+        else
+        {
+            // TODO: Report error to client that encryption is not supported
+        }
+    }
+    else
+    {
+        NSLog(@"Error: unknown F53OSC control message received: %@", message);
+    }
+}
+
 #pragma mark - GCDAsyncSocketDelegate
 
 - (nullable dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
@@ -257,7 +296,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableDictionary *activeState = [self.activeState objectForKey:key];
     if ( activeData && activeState )
     {
-        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate];
+        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate controlHandler:self];
         [sock readDataWithTimeout:-1 tag:tag];
     }
 }
@@ -375,7 +414,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     [self.udpSocket.stats addBytes:[data length]];
 
-    [F53OSCParser processOscData:data forDestination:self.delegate replyToSocket:replySocket];
+    [F53OSCParser processOscData:data forDestination:self.delegate replyToSocket:replySocket controlHandler:nil wasEncrypted:NO];
 }
 
 - (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(nullable NSError *)error

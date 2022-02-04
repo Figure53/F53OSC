@@ -292,7 +292,7 @@ NS_ASSUME_NONNULL_BEGIN
     return [F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:nil];
 }
 
-+ (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket
++ (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket controlHandler:(nullable id<F53OSCControlHandler>)controlHandler wasEncrypted:(BOOL)wasEncrypted
 {
     if ( data == nil || destination == nil )
         return;
@@ -303,17 +303,57 @@ NS_ASSUME_NONNULL_BEGIN
     
     const char *buffer = [data bytes];
     
-    if ( buffer[0] == '/' ) // OSC message
+    if ( buffer[0] == '*' ) // Encrypted data
     {
-        [self processMessageData:data forDestination:destination replyToSocket:socket];
-    }
-    else if ( buffer[0] == '#' ) // OSC bundle
-    {
-        [self processBundleData:data forDestination:destination replyToSocket:socket];
+        if ( !socket.isEncrypting )
+        {
+            NSLog(@"Error: received encrypted OSC on a non-encrypted connection");
+            return;
+        }
+        if ( length > 1 )
+        {
+            NSData *encryptedData = [data subdataWithRange:NSMakeRange(1, length-1)];
+            NSData *decryptedData = [socket.encrypter decryptDataWithEncryptedData:encryptedData];
+            if ( decryptedData )
+                [F53OSCParser processOscData:decryptedData forDestination:destination replyToSocket:socket controlHandler:controlHandler wasEncrypted:YES];
+            else
+                NSLog(@"Error: failed to decrypt OSC data");
+        }
+        else
+        {
+            NSLog(@"Error: encrypted OSC data is too short");
+        }
     }
     else
     {
-        NSLog( @"Error: Unrecognized OSC message of length %lu.", (unsigned long)length );
+        if ( socket.isEncrypting && !wasEncrypted )
+        {
+            NSLog(@"Error: received unencrypted OSC on an encrypted connection");
+            return;
+        }
+        if ( buffer[0] == '/' ) // OSC message
+        {
+            [self processMessageData:data forDestination:destination replyToSocket:socket];
+        }
+        else if ( buffer[0] == '#' ) // OSC bundle
+        {
+            [self processBundleData:data forDestination:destination replyToSocket:socket];
+        }
+        else if ( buffer[0] == '!' ) // F53OSC control message
+        {
+            F53OSCMessage *inbound = [self parseOscMessageData:data];
+            if ( inbound == nil )
+                return;
+            inbound.replySocket = socket;
+            if ( controlHandler )
+                [controlHandler handleF53OSCControlMessage:inbound];
+            else
+                NSLog(@"Error: Received F53OSC control message without a control handler: %@", inbound.addressPattern);
+        }
+        else
+        {
+            NSLog( @"Error: Unrecognized OSC message of length %lu.", (unsigned long)length );
+        }
     }
 }
 
@@ -321,6 +361,7 @@ NS_ASSUME_NONNULL_BEGIN
                     toData:(NSMutableData *)data
                  withState:(NSMutableDictionary *)state
                destination:(id<F53OSCPacketDestination>)destination
+            controlHandler:(nullable id<F53OSCControlHandler>)controlHandler
 {
     // Incoming OSC messages are framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
     
@@ -355,7 +396,7 @@ NS_ASSUME_NONNULL_BEGIN
         {
             // The data is now a complete message.
             //NSLog( @"socket %p dispatching OSC data of length %lu", sock, [data length] );
-            [F53OSCParser processOscData:[NSData dataWithData:data] forDestination:destination replyToSocket:socket];
+            [F53OSCParser processOscData:[NSData dataWithData:data] forDestination:destination replyToSocket:socket controlHandler:controlHandler wasEncrypted:NO];
             [data setData:[NSData data]];
         }
         else if ( buffer[index] == ESC )

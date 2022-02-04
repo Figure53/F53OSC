@@ -74,4 +74,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@protocol F53OSCControlHandler <NSObject>
+
+- (void) handleF53OSCControlMessage:(F53OSCMessage *)message;
+
+@end
+
 NS_ASSUME_NONNULL_END
