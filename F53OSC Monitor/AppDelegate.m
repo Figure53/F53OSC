@@ -21,7 +21,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    self.server = [[DemoServer alloc] initWithPort:(UInt16)9999];
+    UInt16 port = 9999;
+    self.server = [[DemoServer alloc] initWithPort:port];
     self.server.app = self;
     [self.server start];
     
