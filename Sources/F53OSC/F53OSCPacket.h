@@ -26,7 +26,11 @@
 
 #import <Foundation/Foundation.h>
 
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSCSocket.h>
+#else
 #import "F53OSCSocket.h"
+#endif
 
 
 NS_ASSUME_NONNULL_BEGIN

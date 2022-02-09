@@ -7,7 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSCMessage.h>
+#else
 #import "F53OSCMessage.h"
+#endif
+
+@class F53OSCEncrypt;
 
 NS_ASSUME_NONNULL_BEGIN
 

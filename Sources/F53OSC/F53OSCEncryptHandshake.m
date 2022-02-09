@@ -8,6 +8,10 @@
 
 #import "F53OSCEncryptHandshake.h"
 
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSC-Swift.h>
+#endif
+
 #define F53OSCHandshakeProtocolVersion 1
 
 static NSString *const kRequestEncryptionAddress = @"!requestEncryption";

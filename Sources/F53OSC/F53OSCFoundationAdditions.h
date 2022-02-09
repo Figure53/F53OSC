@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,16 @@
 //  THE SOFTWARE.
 //
 
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/NSDate+F53OSCTimeTag.h>
+#import <F53OSC/NSString+F53OSCString.h>
+#import <F53OSC/NSData+F53OSCBlob.h>
+#import <F53OSC/NSNumber+F53OSCNumber.h>
+#import <F53OSC/F53OSCValue.h>
+#else
 #import "NSDate+F53OSCTimeTag.h"
 #import "NSString+F53OSCString.h"
 #import "NSData+F53OSCBlob.h"
 #import "NSNumber+F53OSCNumber.h"
 #import "F53OSCValue.h"
+#endif

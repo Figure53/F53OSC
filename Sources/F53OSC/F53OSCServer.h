@@ -26,7 +26,11 @@
 
 #import <Foundation/Foundation.h>
 
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSC.h>
+#else
 #import "F53OSC.h"
+#endif
 
 @protocol F53OSCServerDelegate;
 
