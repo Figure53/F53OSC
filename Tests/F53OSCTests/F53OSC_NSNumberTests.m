@@ -263,7 +263,7 @@ NS_ASSUME_NONNULL_BEGIN
       @"[NSNumber numberWithChar:INT8_MIN]"             : @{ [NSNumber numberWithChar:INT8_MIN] : @(kCFNumberSInt8Type) },
       @"[NSNumber numberWithChar:INT8_MAX]"             : @{ [NSNumber numberWithChar:INT8_MAX] : @(kCFNumberSInt8Type) },
       @"[NSNumber numberWithChar:'T']"                  : @{ [NSNumber numberWithChar:'T'] : @(kCFNumberSInt8Type) },
-      @"[NSNumber numberWithChar:'T']"                  : @{ [NSNumber numberWithChar:'F'] : @(kCFNumberSInt8Type) },
+      @"[NSNumber numberWithChar:'F']"                  : @{ [NSNumber numberWithChar:'F'] : @(kCFNumberSInt8Type) },
       @"[NSNumber numberWithChar:'t']"                  : @{ [NSNumber numberWithChar:'t'] : @(kCFNumberSInt8Type) },
       @"[NSNumber numberWithChar:'f']"                  : @{ [NSNumber numberWithChar:'f'] : @(kCFNumberSInt8Type) },
       @"[NSNumber numberWithChar:'1']"                  : @{ [NSNumber numberWithChar:'1'] : @(kCFNumberSInt8Type) },
