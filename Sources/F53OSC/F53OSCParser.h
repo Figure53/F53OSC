@@ -29,6 +29,7 @@
 @class F53OSCMessage;
 @class F53OSCSocket;
 @protocol F53OSCPacketDestination;
+@protocol F53OSCControlHandler;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -36,9 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable F53OSCMessage *) parseOscMessageData:(NSData *)data;
 
-+ (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
++ (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket controlHandler:(nullable id<F53OSCControlHandler>)controlHandler wasEncrypted:(BOOL)wasEncrypted;
 
-+ (void) translateSlipData:(NSData *)slipData toData:(NSMutableData *)data withState:(NSMutableDictionary *)state destination:(id<F53OSCPacketDestination>)destination;
++ (void) translateSlipData:(NSData *)slipData toData:(NSMutableData *)data withState:(NSMutableDictionary *)state destination:(id<F53OSCPacketDestination>)destination
+    controlHandler:(nullable id<F53OSCControlHandler>)controlHandler;
 
 @end
 

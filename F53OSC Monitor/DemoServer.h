@@ -3,7 +3,7 @@
 //  F53OSC Monitor
 //
 //  Created by Adam Bachman on 8/5/15.
-//  Copyright (c) 2015-2020 Figure 53. All rights reserved.
+//  Copyright (c) 2015-2022 Figure 53. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -11,7 +11,7 @@
 
 @class AppDelegate;
 
-@interface DemoServer : NSObject <F53OSCPacketDestination>
+@interface DemoServer : NSObject <F53OSCServerDelegate>
 
 @property (weak) AppDelegate *app;
 

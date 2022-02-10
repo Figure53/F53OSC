@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2013-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,9 @@
 
 #import "F53OSCSocket.h"
 
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSC-Swift.h>
+#endif
 #import "F53OSCPacket.h"
 
 
@@ -308,6 +311,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     NSData *data = [packet packetData];
 
+    if ( self.isEncrypting )
+    {
+        NSData *encrypted = [self.encrypter encryptDataWithClearData:data];
+        char *beginning = "*";
+        NSMutableData *newData = [NSMutableData dataWithBytes:beginning length:1];
+        [newData appendData:encrypted];
+        data = newData;
+    }
+
     //NSLog( @"%@ sending message with native length: %li", self, [data length] );
 
     if ( self.tcpSocket )
@@ -361,6 +373,11 @@ NS_ASSUME_NONNULL_BEGIN
         
         [self.udpSocket closeAfterSending];
     }
+}
+
+- (void) setKeyPair:(NSData *)keyPair
+{
+    self.encrypter = [[F53OSCEncrypt alloc] initWithKeyPairData:keyPair];
 }
 
 @end

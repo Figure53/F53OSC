@@ -26,8 +26,13 @@
 
 #import <Foundation/Foundation.h>
 
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSCPacket.h>
+#import <F53OSC/F53OSCFoundationAdditions.h>
+#else
 #import "F53OSCPacket.h"
 #import "F53OSCFoundationAdditions.h"
+#endif
 
 ///
 ///  Example usage:
@@ -71,6 +76,12 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol F53OSCPacketDestination <NSObject> // ought to have called this F53OSCMessageDestination, alas
 
 - (void)takeMessage:(nullable F53OSCMessage *)message;
+
+@end
+
+@protocol F53OSCControlHandler <NSObject>
+
+- (void) handleF53OSCControlMessage:(F53OSCMessage *)message;
 
 @end
 

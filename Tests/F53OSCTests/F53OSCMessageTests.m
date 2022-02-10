@@ -13,7 +13,7 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 
-#import <F53OSC/F53OSC.h>
+#import "F53OSC.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -1634,24 +1634,15 @@ NS_ASSUME_NONNULL_BEGIN
                             @"oscImpulse"   : oscImpulse };
     
     // when
-    NSData *data;
     id rootObject;
     
     NSError *encodeError = nil;
-    if ( @available( macOS 10.13, iOS 11.0, tvOS 11.0, *) ) {
-        data = [NSKeyedArchiver archivedDataWithRootObject:dict requiringSecureCoding:YES error:&encodeError];
-    } else {
-        data = [NSKeyedArchiver archivedDataWithRootObject:dict];
-    }
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:dict requiringSecureCoding:YES error:&encodeError];
     
     NSError *decodeError = nil;
-    if ( @available( macOS 10.13, iOS 11.0, tvOS 11.0, *) ) {
-        rootObject = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSDictionary class], [F53OSCValue class], nil]
+    rootObject = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSDictionary class], [F53OSCValue class], nil]
                                                          fromData:data
                                                             error:&decodeError];
-    } else {
-        rootObject = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    }
     
     id t = [rootObject objectForKey:@"oscTrue"];
     id f = [rootObject objectForKey:@"oscFalse"];

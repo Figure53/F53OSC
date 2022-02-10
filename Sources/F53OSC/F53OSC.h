@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,24 @@
 //  THE SOFTWARE.
 //
 
+// F53OSC-Swift.h only exists when building F53OSC as a framework.
+// If not building as a framework, the Swift compatibility header is not required.
+#define F53OSC_BUILT_AS_FRAMEWORK __has_include(<F53OSC/F53OSC-Swift.h>)
+
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSCBrowser.h>
+#import <F53OSC/F53OSCEncryptHandshake.h>
+#import <F53OSC/F53OSCParser.h>
+#import <F53OSC/F53OSCSocket.h>
+#import <F53OSC/F53OSCPacket.h>
+#import <F53OSC/F53OSCMessage.h>
+#import <F53OSC/F53OSCBundle.h>
+#import <F53OSC/F53OSCClient.h>
+#import <F53OSC/F53OSCServer.h>
+#import <F53OSC/F53OSCTimeTag.h>
+#else
+#import "F53OSCBrowser.h"
+#import "F53OSCEncryptHandshake.h"
 #import "F53OSCParser.h"
 #import "F53OSCSocket.h"
 #import "F53OSCPacket.h"
@@ -32,3 +50,4 @@
 #import "F53OSCClient.h"
 #import "F53OSCServer.h"
 #import "F53OSCTimeTag.h"
+#endif

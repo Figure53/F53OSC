@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2013-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,13 @@
 
 #import <Foundation/Foundation.h>
 
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/GCDAsyncSocket.h>
+#import <F53OSC/GCDAsyncUdpSocket.h>
+#else
 #import "GCDAsyncSocket.h"
 #import "GCDAsyncUdpSocket.h"
+#endif
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -35,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define F53_OSC_SOCKET_DEBUG 0
 
 @class F53OSCPacket;
+@class F53OSCEncrypt;
 
 ///
 ///  F53OSCStats tracks socket behavior over time.
@@ -73,6 +79,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, readonly, nullable) F53OSCStats *stats;
 
+@property (strong, nullable) F53OSCEncrypt *encrypter;
+@property (assign) BOOL isEncrypting;
+
 - (BOOL) startListening;
 - (void) stopListening;
 
@@ -81,6 +90,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) isConnected;
 
 - (void) sendPacket:(F53OSCPacket *)packet;
+
+- (void) setKeyPair:(NSData *)keyPair;
 
 @end
 
