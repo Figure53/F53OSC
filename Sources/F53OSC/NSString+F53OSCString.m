@@ -70,19 +70,17 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
     
-    //bool found = false;
-    NSUInteger strLength = 0;
+    NSUInteger bytesRead = 0;
     for ( NSUInteger index = 0; index < maxLength; index++ )
     {
         if ( buf[index] == 0 )
         {
-            strLength = index + 1;
+            // found a NULL character within the buffer
+            bytesRead = index + 1; // include length of null terminator character
             break;
         }
-        
-            //goto valid; // found a NULL character within the buffer
     }
-    if (strLength == 0)
+    if (bytesRead == 0)
     {
         // Buffer wasn't null terminated, so it's not a valid OSC string.
         if ( outBytesRead != NULL )
@@ -90,15 +88,10 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
     
-//valid:;
-    
     NSString *result = [NSString stringWithUTF8String:buf];
     
     if ( outBytesRead != NULL )
-    {
-        NSUInteger bytesRead = strLength; //result.length + 1; // include length of null terminator character
         *outBytesRead = 4 * ceil( bytesRead / 4.0 ); // round up to a multiple of 32 bits
-    }
     
     return result;
 }
