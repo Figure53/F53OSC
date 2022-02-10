@@ -129,6 +129,7 @@
 		3DA5A9AB242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3DA5A9AC242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3DA5A9AD242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3DD52F4427B2B80400F1DD6B /* F53OSC_NSStringTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DD52F4327B2B80400F1DD6B /* F53OSC_NSStringTests.m */; };
 		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
 		66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17581B729EA0008B6743 /* AppDelegate.m */; };
 		66EE175B1B729EA0008B6743 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE175A1B729EA0008B6743 /* main.m */; };
@@ -218,6 +219,7 @@
 		3DA5A9A0242FC4AB0068AF88 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		3DA5A9B02432674F0068AF88 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		3DD52F4327B2B80400F1DD6B /* F53OSC_NSStringTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NSStringTests.m; sourceTree = "<group>"; };
 		66AFE43A1B79485100985C54 /* ActivityChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityChartView.h; sourceTree = "<group>"; };
 		66AFE43B1B79485100985C54 /* ActivityChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityChartView.m; sourceTree = "<group>"; };
 		66EE17521B729EA0008B6743 /* F53OSC Monitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "F53OSC Monitor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -284,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */,
+				3DD52F4327B2B80400F1DD6B /* F53OSC_NSStringTests.m */,
 				3D1E07FE242A7E1000655E76 /* F53OSCMessageTests.m */,
 				3D1E07FD242A7E1000655E76 /* F53OSCServerTests.m */,
 			);
@@ -768,6 +771,7 @@
 			files = (
 				3D1E08AF242A847E00655E76 /* F53OSC_NSNumberTests.m in Sources */,
 				3D1E08AE242A847C00655E76 /* F53OSCMessageTests.m in Sources */,
+				3DD52F4427B2B80400F1DD6B /* F53OSC_NSStringTests.m in Sources */,
 				3D1E08AD242A847A00655E76 /* F53OSCServerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
