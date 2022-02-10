@@ -18,12 +18,13 @@ Pod::Spec.new do |s|
 
   s.social_media_url   = 'https://twitter.com/figure53'
   
-  s.platforms     = { :ios => '8.4', :tvos => '9.0', :osx => '10.9' }
+  s.platforms     = { :osx => '11.0', :ios => '14.0', :tvos => '14.0' }
+  s.swift_version = '5.0'
   s.source        = { :git => 'https://github.com/Figure53/F53OSC.git', :tag => "#{s.version}", }
   
   s.requires_arc = true
   s.source_files = [
-    'Sources/F53OSC/*.{h,m}',
+    'Sources/F53OSC/*.{h,m,swift}',
     'Sources/Vendor/CocoaAsyncSocket/*.{h,m}',
   ]
   
