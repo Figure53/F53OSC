@@ -133,19 +133,19 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     if ( [splitOnQuotes count] % 2 != 1 )
         return nil; // not matching quotes
 
-    NSString *QUOTE_STRING_TOKEN = @"⍂"; // not trying to be perfect here; we just use an unlikely character
-    NSMutableArray<NSString *> *allQuotedStrings = [NSMutableArray array];
+    NSString *QUOTED_STRING_TOKEN = @"⍂"; // not trying to be perfect here; we just use an unlikely character
+    NSMutableArray<NSString *> *quotedStrings = [NSMutableArray array];
     for ( NSUInteger i = 1; i < [splitOnQuotes count]; i += 2 )
     {
         // Pull out each quoted string, which will be at each odd index.
         NSString *quotedString = [splitOnQuotes objectAtIndex:i];
-        [allQuotedStrings addObject:quotedString];
+        [quotedStrings addObject:quotedString];
         
         // Place a token for the quote we just pulled.
         NSString *extractedQuote = [NSString stringWithFormat:@"\"%@\"", quotedString];
         NSRange rangeOfFirstOccurrence = [workingArguments rangeOfString:extractedQuote];
         workingArguments = [workingArguments stringByReplacingOccurrencesOfString:extractedQuote
-                                                                       withString:QUOTE_STRING_TOKEN
+                                                                       withString:QUOTED_STRING_TOKEN
                                                                           options:0
                                                                             range:rangeOfFirstOccurrence];
     }
@@ -154,18 +154,18 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     // Expand the tokens and store the final array of arguments.
     NSMutableArray<id> *finalArgs = [NSMutableArray array];
     NSArray<NSString *> *tokenArgs = [workingArguments componentsSeparatedByString:@" "];
-    NSUInteger token_index = 0;
+    NSUInteger quotedStringIndex = 0;
     for ( NSString *arg in tokenArgs )
     {
         if ( [arg isEqual:@""] ) // artifact of componentsSeparatedByString
             continue;
         
-        if ( [arg isEqual:QUOTE_STRING_TOKEN] )
+        if ( [arg isEqual:QUOTED_STRING_TOKEN] )
         {
-            NSString *detokenized = [[allQuotedStrings objectAtIndex:token_index]
-                                     stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""];
+            NSString *quotedString = [quotedStrings objectAtIndex:quotedStringIndex];
+            NSString *detokenized = [quotedString stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""];
             [finalArgs addObject:detokenized]; // quoted OSC string
-            token_index++;
+            quotedStringIndex++;
         }
         else if ( [arg isEqual:QUOTE_CHAR_TOKEN] )
         {
@@ -173,7 +173,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         }
         else if ( [arg hasPrefix:@"#blob"] )
         {
-            NSString *encodedBlob = [arg substringFromIndex:5]; // strip #blob
+            NSString *encodedBlob = [arg substringFromIndex:5]; // strip "#blob"
             if ( [encodedBlob isEqual:@""] )
                 continue;
             
@@ -218,15 +218,18 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
             [formatter setAllowsFloats:YES];
             
             NSNumber *number = [formatter numberFromString:arg];
-            if ( number == nil )
-                [finalArgs addObject:[arg stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""]]; // unquoted OSC string - 's'
-            else
+            if ( number != nil )
+            {
                 [finalArgs addObject:number];  // OSC int or float - 'i' or 'f'
+            }
+            else
+            {
+                [finalArgs addObject:[arg stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""]]; // unquoted OSC string - 's'
+            }
         }
     }
     
     NSArray<id> *arguments = [NSArray arrayWithArray:finalArgs];
-    
     return [F53OSCMessage messageWithAddressPattern:(NSString * _Nonnull)address arguments:arguments];
 }
 
