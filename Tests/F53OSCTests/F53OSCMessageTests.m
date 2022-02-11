@@ -1379,6 +1379,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // given
     NSDictionary<NSString *, NSArray<id> *> *stringsAndArgs = @{
+        // QUOTATION MARK (plain) U+0022
         @"/test/1a \"a\"" : @[ @"a" ],
         @"/test/1b \"a b\"" : @[ @"a b" ],
         @"/test/1c \"a\" \"b\"" : @[ @"a", @"b" ],
@@ -1391,6 +1392,23 @@ NS_ASSUME_NONNULL_BEGIN
         @"/test/1h \"a \" b \" c\"" : @[ @"a ", @"b", @" c" ],
         // interior escaped quotes, valid - single string arg includes quote characters
         @"/test/1j \"a \\\"b\\\" c\"" : @[ @"a \"b\" c" ],
+        @"/test/1k \\\"" : @[ @"\"" ],
+
+        // LEFT/RIGHT DOUBLE QUOTATION MARK (curly) U+201C U+201D
+        @"/test/2a “a”" : @[ @"a" ],
+        @"/test/2b \u201ca b\u201d" : @[ @"a b" ],
+        @"/test/2c “a” “b”" : @[ @"a", @"b" ],
+        @"/test/2d “a” 1 “b”" : @[ @"a", @1, @"b" ],
+        @"/test/2e “a b” 1 “c d”" : @[ @"a b", @1, @"c d" ],
+        @"/test/2f “a b” 1.2 “c d”" : @[ @"a b", @1.2, @"c d" ],
+        // interior quotes with improper spacing around arg 2, malformed - fails
+        @"/test/2g \"a “b” c\"" : @[],
+        // interior non-escaped quotes with proper spacing around arg 2, valid - A and C args include extra spaces
+        @"/test/2h \"a “ b ” c\"" : @[ @"a ", @"b", @" c" ],
+        // interior escaped quotes, valid - single string arg includes quote characters
+        @"/test/2j \"a \\“b\\” c\"" : @[ @"a “b” c" ],
+        @"/test/2k \\“" : @[ @"“" ],
+        @"/test/2l \\”" : @[ @"”" ],
     };
 
     for (NSString *string in stringsAndArgs)

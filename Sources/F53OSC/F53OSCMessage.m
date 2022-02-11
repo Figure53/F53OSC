@@ -37,6 +37,45 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// Not trying to be perfect here; we just use unlikely characters.
+NSString * const QUOTE_CHAR_TOKEN_PLAIN = @"⍁";        // QUOTATION MARK " (U+0022)
+NSString * const QUOTE_CHAR_TOKEN_LEFT_DOUBLE = @"⍃";  // LEFT DOUBLE QUOTATION MARK “ (U+201C)
+NSString * const QUOTE_CHAR_TOKEN_RIGHT_DOUBLE = @"⍄"; // RIGHT DOUBLE QUOTATION MARK ” (U+201D)
+
+#pragma mark - NSString category
+
+@interface NSString (F53OSCMessage)
+- (NSString *)escapedCharacterTokenizedString;
+- (NSString *)detokenizedUnescapedString;
+@end
+
+@implementation NSString (F53OSCMessage)
+
+- (NSString *)escapedCharacterTokenizedString
+{
+    NSString *string = self;
+
+    string = [string stringByReplacingOccurrencesOfString:@"\\\"" withString:QUOTE_CHAR_TOKEN_PLAIN];
+    string = [string stringByReplacingOccurrencesOfString:@"\\\u201C" withString:QUOTE_CHAR_TOKEN_LEFT_DOUBLE];
+    string = [string stringByReplacingOccurrencesOfString:@"\\\u201D" withString:QUOTE_CHAR_TOKEN_RIGHT_DOUBLE];
+
+    return string;
+}
+
+- (NSString *)detokenizedUnescapedString
+{
+    NSString *string = self;
+
+    string = [string stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN_PLAIN withString:@"\""];
+    string = [string stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN_LEFT_DOUBLE withString:@"\u201C"];
+    string = [string stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN_RIGHT_DOUBLE withString:@"\u201D"];
+
+    return string;
+}
+
+@end
+
+
 @interface F53OSCMessage ()
 
 @property (strong, nullable) NSArray<NSString *> *addressPartsCache;
@@ -47,6 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 static NSCharacterSet *LEGAL_ADDRESS_CHARACTERS = nil;
 static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
+static NSCharacterSet *QUOTATION_MARK_CHARACTERS = nil;
 static NSNumberFormatter *NUMBER_FORMATTER = nil;
 
 + (void) initialize
@@ -56,6 +96,10 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         NSString *legalAddressChars = [NSString stringWithFormat:@"%@/*?[]{,}", [F53OSCServer validCharsForOSCMethod]];
         LEGAL_ADDRESS_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:legalAddressChars];
         LEGAL_METHOD_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:[F53OSCServer validCharsForOSCMethod]];
+
+        // Unless escaped with a `\`, +messageWithString: interprets all characters in this set as plain " (U+0022) quotation marks:
+        // " plain (U+0022), “ curly left double (U+201C), ” curly right double (U+201D)
+        QUOTATION_MARK_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:@"\"\u201C\u201D"];
     }
     if ( !NUMBER_FORMATTER )
     {
@@ -130,11 +174,15 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     
     // Pull out arguments...
     
-    // Create a working copy and place a token for each escaped " character.
-    NSString *QUOTE_CHAR_TOKEN = @"⍁"; // not trying to be perfect here; we just use an unlikely character
+    // Create a working copy.
     NSString *workingArguments = [qscString substringFromIndex:[address length]];
-    workingArguments = [workingArguments stringByReplacingOccurrencesOfString:@"\\\"" withString:QUOTE_CHAR_TOKEN];
     
+    // Place a token for each escaped quotation mark character.
+    workingArguments = [workingArguments escapedCharacterTokenizedString];
+
+    // After all escaped quotation mark characters are tokenized, conform all allowed quotation mark characters to the plain " (U+0022) mark.
+    workingArguments = [[workingArguments componentsSeparatedByCharactersInSet:QUOTATION_MARK_CHARACTERS] componentsJoinedByString:@"\""];
+
     // The remaining " characters signify quoted string arguments; they should be paired up.
     NSArray<NSString *> *splitOnQuotes = [workingArguments componentsSeparatedByString:@"\""];
     if ( [splitOnQuotes count] % 2 != 1 )
@@ -151,6 +199,9 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         // Place a token for the quote we just pulled.
         NSString *extractedQuote = [NSString stringWithFormat:@"\"%@\"", quotedString];
         NSRange rangeOfFirstOccurrence = [workingArguments rangeOfString:extractedQuote];
+        if ( rangeOfFirstOccurrence.location == NSNotFound || rangeOfFirstOccurrence.length == 0 )
+            continue;
+
         workingArguments = [workingArguments stringByReplacingOccurrencesOfString:extractedQuote
                                                                        withString:QUOTED_STRING_TOKEN
                                                                           options:0
@@ -176,13 +227,15 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
                 return nil;
 
             NSString *quotedString = [quotedStrings objectAtIndex:quotedStringIndex];
-            NSString *detokenized = [quotedString stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""];
+            NSString *detokenized = [quotedString detokenizedUnescapedString];
             [finalArgs addObject:detokenized]; // quoted OSC string
             quotedStringIndex++;
         }
-        else if ( [arg isEqual:QUOTE_CHAR_TOKEN] )
+        else if ( [arg isEqual:QUOTE_CHAR_TOKEN_PLAIN] ||
+                 [arg isEqual:QUOTE_CHAR_TOKEN_LEFT_DOUBLE] ||
+                 [arg isEqual:QUOTE_CHAR_TOKEN_RIGHT_DOUBLE] )
         {
-            [finalArgs addObject:@"\""];       // single character OSC string - 's'
+            [finalArgs addObject:[arg detokenizedUnescapedString]]; // single character OSC string - 's'
         }
         else if ( [arg hasPrefix:@"#blob"] )
         {
@@ -228,11 +281,15 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
             NSNumber *number = [NUMBER_FORMATTER numberFromString:arg];
             if ( number != nil )
             {
+                // unquoted argument was successfully formatted as a number
                 [finalArgs addObject:number];  // OSC int or float - 'i' or 'f'
             }
             else
             {
-                [finalArgs addObject:[arg stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""]]; // unquoted OSC string - 's'
+                // If all other conditions above were not satisfied,
+                // handle unquoted argument as a string anyway.
+                NSString *detokenized = [arg detokenizedUnescapedString];
+                [finalArgs addObject:detokenized]; // unquoted OSC string - 's'
             }
         }
     }
