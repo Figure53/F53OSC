@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -34,16 +34,15 @@
 #import "F53OSCFoundationAdditions.h"
 #endif
 
-///
-///  Example usage:
-///
-///  F53OSCMessage *msg = [F53OSCMessage messageWithAddressPattern:@"/address/of/thing" 
-///                                                      arguments:[NSArray arrayWithObjects:
-///                                                                 [NSNumber numberWithInteger:x],
-///                                                                 [NSNumber numberWithFloat:y],
-///                                                                 @"z",
-///                                                                 nil]];
-///
+//
+//  Example usage:
+//  F53OSCMessage *msg = [F53OSCMessage messageWithAddressPattern:@"/address/of/thing"
+//                                                      arguments:@[@"x",
+//                                                                 [NSNumber numberWithFloat:y],
+//                                                                 [NSData dataWithData:z],
+//                                                                 [F53OSCValue oscImpulse],
+//                                                      ]];
+//
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,17 +54,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable F53OSCMessage *) messageWithString:(NSString *)qscString;
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
-                                    arguments:(NSArray *)arguments;
+                                    arguments:(NSArray<id> *)arguments;
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
-                                    arguments:(NSArray *)arguments
+                                    arguments:(NSArray<id> *)arguments
                                   replySocket:(nullable F53OSCSocket *)replySocket;
 
 @property (nonatomic, copy) NSString *addressPattern;
-@property (nonatomic, strong) NSString *typeTagString;   ///< This is normally constructed from the incoming arguments array.
-@property (nonatomic, strong) NSArray *arguments;        ///< May contain NSString, NSData, NSNumber, or F53OSCValue objects. This could be extended in the future, but this covers the required types for OSC 1.0 and OSC 1.1 (with the exception of "timetag").
+@property (nonatomic, strong) NSString *typeTagString; /// This is normally constructed from the incoming arguments array.
+@property (nonatomic, strong) NSArray<id> *arguments;  /// May contain NSString, NSData, NSNumber, or F53OSCValue objects. This could be extended in the future, but this covers the required types for OSC 1.0 and OSC 1.1 (with the exception of "timetag").
 @property (nonatomic, strong, nullable) id userData;
 
-- (NSArray *) addressParts;
+- (NSArray<NSString *> *) addressParts;
 
 // redeclare as nonnull for this subclass
 - (NSData *) packetData;

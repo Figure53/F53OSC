@@ -156,7 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
     buffer += bytesRead;
     lengthOfRemainingBuffer -= bytesRead;
     
-    NSMutableArray *args = [NSMutableArray array];
+    NSMutableArray<id> *args = [NSMutableArray array];
     BOOL hasArguments = (lengthOfRemainingBuffer > 0);
     if ( hasArguments && buffer[0] == ',' )
     {
@@ -362,7 +362,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void) translateSlipData:(NSData *)slipData
                     toData:(NSMutableData *)data
-                 withState:(NSMutableDictionary *)state
+                 withState:(NSMutableDictionary<NSString *, id> *)state
                destination:(id<F53OSCPacketDestination>)destination
             controlHandler:(nullable id<F53OSCControlHandler>)controlHandler
 {

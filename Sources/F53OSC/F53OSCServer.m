@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2021 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -293,7 +293,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     NSNumber *key = [NSNumber numberWithLong:tag];
     NSMutableData *activeData = [self.activeData objectForKey:key];
-    NSMutableDictionary *activeState = [self.activeState objectForKey:key];
+    NSMutableDictionary<NSString *, id> *activeState = [self.activeState objectForKey:key];
     if ( activeData && activeState )
     {
         [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate controlHandler:self];

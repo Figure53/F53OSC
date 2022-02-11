@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nullable)    F53OSCSocket *socket;
 @property (strong, nullable)    NSMutableData *readData;
-@property (strong, nullable)    NSMutableDictionary *readState;
+@property (strong, nullable)    NSMutableDictionary<NSString *, id> *readState;
 
 - (void) destroySocket;
 - (void) createSocket;
@@ -232,7 +232,7 @@ NS_ASSUME_NONNULL_BEGIN
     _userData = userData;
 }
 
-- (NSDictionary *) state
+- (NSDictionary<NSString *, id> *) state
 {
     return @{
              @"interface": self.interface ? self.interface : @"",
@@ -243,7 +243,7 @@ NS_ASSUME_NONNULL_BEGIN
              };
 }
 
-- (void) setState:(NSDictionary *)state
+- (void) setState:(NSDictionary<NSString *, id> *)state
 {
     self.interface = state[@"interface"];
     self.host = state[@"host"];

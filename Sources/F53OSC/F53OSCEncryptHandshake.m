@@ -51,9 +51,9 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
     NSData *pubKey = self.encrypter.publicKeyData;
     if ( pubKey )
     {
-        NSArray *args = @[@(F53OSCHandshakeProtocolVersion),
-                          pubKey
-                         ];
+        NSArray<id> *args = @[@(F53OSCHandshakeProtocolVersion),
+                              pubKey
+        ];
         F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:kRequestEncryptionAddress arguments:args];
         return message;
     }
@@ -74,10 +74,10 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
     NSData *salt = self.encrypter.salt;
     if ( pubKey && salt )
     {
-        NSArray *args = @[@(F53OSCHandshakeProtocolVersion),
-                          pubKey,
-                          salt
-                         ];
+        NSArray<id> *args = @[@(F53OSCHandshakeProtocolVersion),
+                              pubKey,
+                              salt
+        ];
         F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:kApproveEncryptionAddress arguments:args];
         return message;
     }
@@ -97,7 +97,7 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
 /// 1: Handshake protocol version
 - (F53OSCMessage *) beginEncryptionMessage
 {
-    NSArray *args = @[@(F53OSCHandshakeProtocolVersion)];
+    NSArray<id> *args = @[@(F53OSCHandshakeProtocolVersion)];
 
     F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:kBeginEncryptionAddress arguments:args];
     return message;

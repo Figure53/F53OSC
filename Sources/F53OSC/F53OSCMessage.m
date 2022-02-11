@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCMessage ()
 
-@property (strong, nullable) NSArray *addressPartsCache;
+@property (strong, nullable) NSArray<NSString *> *addressPartsCache;
 
 @end
 
@@ -129,12 +129,12 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     workingArguments = [workingArguments stringByReplacingOccurrencesOfString:@"\\\"" withString:QUOTE_CHAR_TOKEN];
     
     // The remaining " characters signify quoted string arguments; they should be paired up.
-    NSArray *splitOnQuotes = [workingArguments componentsSeparatedByString:@"\""];
+    NSArray<NSString *> *splitOnQuotes = [workingArguments componentsSeparatedByString:@"\""];
     if ( [splitOnQuotes count] % 2 != 1 )
         return nil; // not matching quotes
 
     NSString *QUOTE_STRING_TOKEN = @"⍂"; // not trying to be perfect here; we just use an unlikely character
-    NSMutableArray *allQuotedStrings = [NSMutableArray array];
+    NSMutableArray<NSString *> *allQuotedStrings = [NSMutableArray array];
     for ( NSUInteger i = 1; i < [splitOnQuotes count]; i += 2 )
     {
         // Pull out each quoted string, which will be at each odd index.
@@ -152,9 +152,9 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     
     // The working arguments have now been tokenized enough to process.
     // Expand the tokens and store the final array of arguments.
-    NSMutableArray *finalArgs = [NSMutableArray array];
-    NSArray *tokenArgs = [workingArguments componentsSeparatedByString:@" "];
-    int token_index = 0;
+    NSMutableArray<id> *finalArgs = [NSMutableArray array];
+    NSArray<NSString *> *tokenArgs = [workingArguments componentsSeparatedByString:@" "];
+    NSUInteger token_index = 0;
     for ( NSString *arg in tokenArgs )
     {
         if ( [arg isEqual:@""] ) // artifact of componentsSeparatedByString
@@ -225,19 +225,19 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         }
     }
     
-    NSArray *arguments = [NSArray arrayWithArray:finalArgs];
+    NSArray<id> *arguments = [NSArray arrayWithArray:finalArgs];
     
     return [F53OSCMessage messageWithAddressPattern:(NSString * _Nonnull)address arguments:arguments];
 }
 
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
-                                    arguments:(NSArray *)arguments
+                                    arguments:(NSArray<id> *)arguments
 {
     return [F53OSCMessage messageWithAddressPattern:addressPattern arguments:arguments replySocket:nil];
 }
 
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern 
-                                    arguments:(NSArray *)arguments
+                                    arguments:(NSArray<id> *)arguments
                                   replySocket:(nullable F53OSCSocket *)replySocket
 {
     F53OSCMessage *msg = [F53OSCMessage new];
@@ -246,6 +246,8 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     msg.replySocket = replySocket;
     return msg;
 }
+
+#pragma mark -
 
 - (instancetype) init
 {
@@ -311,7 +313,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     return [NSString stringWithString:description];
 }
 
-- (BOOL) isEqual:(id)object
+- (BOOL) isEqual:(nullable id)object
 {
     if ( [object isMemberOfClass:[self class]] )
     {
@@ -324,6 +326,8 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     }
     return NO;
 }
+
+#pragma mark -
 
 - (void) setAddressPattern:(NSString *)newAddressPattern
 {
@@ -338,9 +342,9 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     self.addressPartsCache = nil;
 }
 
-- (void) setArguments:(NSArray *)argArray
+- (void) setArguments:(NSArray<id> *)argArray
 {
-    NSMutableArray *newArgs = [NSMutableArray array];
+    NSMutableArray<id> *newArgs = [NSMutableArray array];
     NSMutableString *newTypes = [NSMutableString stringWithString:@","];
     for ( id obj in argArray )
     {
@@ -409,7 +413,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
     _arguments = [newArgs copy];
 }
 
-- (NSArray *) addressParts
+- (NSArray<NSString *> *) addressParts
 {
     if ( self.addressPartsCache == nil )
     {
@@ -419,7 +423,7 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
                and would need to be updated if we want to parse parts of control message addresses. */
             NSLog(@"Error: trying to compute addressParts of an F53OSC control message is currently unsupported");
         }
-        NSMutableArray *parts = [NSMutableArray arrayWithArray:[self.addressPattern componentsSeparatedByString:@"/"]];
+        NSMutableArray<NSString *> *parts = [NSMutableArray arrayWithArray:[self.addressPattern componentsSeparatedByString:@"/"]];
         [parts removeObjectAtIndex:0];
         self.addressPartsCache = [NSArray arrayWithArray:parts];
     }

@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, getter=isIPv6Enabled)     BOOL IPv6Enabled; // default NO
 @property (nonatomic, assign)                   BOOL useTcp;
 @property (nonatomic, strong, nullable)         id userData;
-@property (nonatomic, copy)                     NSDictionary *state;
+@property (nonatomic, copy)                     NSDictionary<NSString *, id> *state;
 @property (nonatomic, readonly)                 NSString *title;
 @property (nonatomic, readonly)                 BOOL isValid;
 @property (nonatomic, readonly)                 BOOL isConnected;

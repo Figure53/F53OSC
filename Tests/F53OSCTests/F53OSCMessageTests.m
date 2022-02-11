@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 2/14/20.
-//  Copyright (c) 2020 Figure 53, LLC. All rights reserved.
+//  Copyright (c) 2020-2022 Figure 53, LLC. All rights reserved.
 //
 
 #if !__has_feature(objc_arc)
@@ -1628,10 +1628,12 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCValue *oscNull = [F53OSCValue oscNull];
     F53OSCValue *oscImpulse = [F53OSCValue oscImpulse];
     
-    NSDictionary *dict = @{ @"oscTrue"      : oscTrue,
-                            @"oscFalse"     : oscFalse,
-                            @"oscNull"      : oscNull,
-                            @"oscImpulse"   : oscImpulse };
+    NSDictionary<NSString *, F53OSCValue *> *dict = @{
+        @"oscTrue"      : oscTrue,
+        @"oscFalse"     : oscFalse,
+        @"oscNull"      : oscNull,
+        @"oscImpulse"   : oscImpulse,
+    };
     
     // when
     id rootObject;
@@ -1640,7 +1642,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:dict requiringSecureCoding:YES error:&encodeError];
     
     NSError *decodeError = nil;
-    rootObject = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSDictionary class], [F53OSCValue class], nil]
+    rootObject = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSDictionary class], [NSString class], [F53OSCValue class], nil]
                                                          fromData:data
                                                             error:&decodeError];
     

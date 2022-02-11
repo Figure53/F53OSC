@@ -3,7 +3,7 @@
 //  F53OSC Monitor
 //
 //  Created by Adam Bachman on 8/5/15.
-//  Copyright (c) 2015 Figure 53. All rights reserved.
+//  Copyright (c) 2015-2022 Figure 53. All rights reserved.
 //
 
 #import "AppDelegate.h"
@@ -38,7 +38,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.logCount++;
         NSString *logString = [NSString stringWithFormat:@"[%@ %07ld] %@\n", [NSDate date], self.logCount, message];
-        NSDictionary *attrs = @{NSFontAttributeName:[NSFont fontWithName:@"Menlo" size:11]};
+        NSDictionary<NSAttributedStringKey, id> *attrs = @{NSFontAttributeName:[NSFont fontWithName:@"Menlo" size:11]};
         NSAttributedString* outString = [[NSAttributedString alloc] initWithString:logString attributes:attrs];
         [[self.logOutput textStorage] appendAttributedString:outString];
         [self.logOutput scrollRangeToVisible:NSMakeRange([[self.logOutput string] length], 0)];

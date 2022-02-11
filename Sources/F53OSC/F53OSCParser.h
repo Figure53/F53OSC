@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/30/13.
 //
-//  Copyright (c) 2013-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket controlHandler:(nullable id<F53OSCControlHandler>)controlHandler wasEncrypted:(BOOL)wasEncrypted;
 
-+ (void) translateSlipData:(NSData *)slipData toData:(NSMutableData *)data withState:(NSMutableDictionary *)state destination:(id<F53OSCPacketDestination>)destination
++ (void) translateSlipData:(NSData *)slipData toData:(NSMutableData *)data withState:(NSMutableDictionary<NSString *, id> *)state destination:(id<F53OSCPacketDestination>)destination
     controlHandler:(nullable id<F53OSCControlHandler>)controlHandler;
 
 @end
