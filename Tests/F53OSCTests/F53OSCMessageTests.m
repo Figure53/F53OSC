@@ -1375,6 +1375,32 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
+- (void) test_profile_F53OSCMessage_messageFromString_numericArgs
+{
+    XCTClockMetric *clockMetric = [[XCTClockMetric alloc] init];
+    XCTPerformanceMeasurementTimestamp *startTime = [XCTPerformanceMeasurementTimestamp new];
+
+    [self measureWithMetrics:@[clockMetric] block:^{
+        NSString *string;
+        F53OSCMessage *message;
+        for ( NSUInteger i = 0; i < 100000; i++ )
+        {
+            string = [NSString stringWithFormat:@"/test %ld", i];
+            message = [F53OSCMessage messageWithString:string];
+        }
+    }];
+
+    XCTPerformanceMeasurementTimestamp *endTime = [XCTPerformanceMeasurementTimestamp new];
+
+    NSError *error = nil;
+    NSArray<XCTPerformanceMeasurement *> *measurements = [clockMetric reportMeasurementsFromStartTime:startTime toEndTime:endTime error:&error];
+
+    XCTAssertNil( error );
+    XCTAssertNotNil( measurements );
+
+    NSLog( @"%@", measurements );
+}
+
 - (void) testThat_F53OSCValueIsValidSubclassOfNSValue
 {
     // given

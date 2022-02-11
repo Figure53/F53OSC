@@ -47,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 static NSCharacterSet *LEGAL_ADDRESS_CHARACTERS = nil;
 static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
+static NSNumberFormatter *NUMBER_FORMATTER = nil;
 
 + (void) initialize
 {
@@ -55,6 +56,12 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         NSString *legalAddressChars = [NSString stringWithFormat:@"%@/*?[]{,}", [F53OSCServer validCharsForOSCMethod]];
         LEGAL_ADDRESS_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:legalAddressChars];
         LEGAL_METHOD_CHARACTERS = [NSCharacterSet characterSetWithCharactersInString:[F53OSCServer validCharsForOSCMethod]];
+    }
+    if ( !NUMBER_FORMATTER )
+    {
+        NUMBER_FORMATTER = [[NSNumberFormatter alloc] init];
+        NUMBER_FORMATTER.allowsFloats = YES;
+        NUMBER_FORMATTER.locale = [NSLocale autoupdatingCurrentLocale];
     }
 }
 
@@ -205,19 +212,14 @@ static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
         }
         else
         {
-            NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-            NSLocale *locale = [NSLocale currentLocale];
 #ifdef TESTING
             if ( [[NSUserDefaults standardUserDefaults] objectForKey:@"com.figure53.f53osc.testingLocaleIdentifier"] )
             {
                 NSString *identifier = [[NSUserDefaults standardUserDefaults] objectForKey:@"com.figure53.f53osc.testingLocaleIdentifier"];
-                locale = [NSLocale localeWithLocaleIdentifier:identifier];
+                NUMBER_FORMATTER.locale = [NSLocale localeWithLocaleIdentifier:identifier];
             }
 #endif
-            [formatter setLocale:locale];
-            [formatter setAllowsFloats:YES];
-            
-            NSNumber *number = [formatter numberFromString:arg];
+            NSNumber *number = [NUMBER_FORMATTER numberFromString:arg];
             if ( number != nil )
             {
                 [finalArgs addObject:number];  // OSC int or float - 'i' or 'f'
