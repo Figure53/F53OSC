@@ -167,8 +167,14 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         if ( [arg isEqual:@""] ) // artifact of componentsSeparatedByString
             continue;
         
-        if ( [arg isEqual:QUOTED_STRING_TOKEN] )
+        if ( [arg containsString:QUOTED_STRING_TOKEN] )
         {
+            // Quoted string arguments should be separated by spaces, so we should only have QUOTED_STRING_TOKEN here.
+            // If `arg` has any additional characters either before or after QUOTED_STRING_TOKEN, parsing fails.
+            // i.e. if `workingArguments` has quoted strings that are not properly separated by spaces.
+            if ( [arg isEqual:QUOTED_STRING_TOKEN] == NO )
+                return nil;
+
             NSString *quotedString = [quotedStrings objectAtIndex:quotedStringIndex];
             NSString *detokenized = [quotedString stringByReplacingOccurrencesOfString:QUOTE_CHAR_TOKEN withString:@"\""];
             [finalArgs addObject:detokenized]; // quoted OSC string

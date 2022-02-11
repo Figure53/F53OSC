@@ -1375,6 +1375,44 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
+- (void) testThat_F53OSCMessageParsesQuotationMarks
+{
+    // given
+    NSDictionary<NSString *, NSArray<id> *> *stringsAndArgs = @{
+        @"/test/1a \"a\"" : @[ @"a" ],
+        @"/test/1b \"a b\"" : @[ @"a b" ],
+        @"/test/1c \"a\" \"b\"" : @[ @"a", @"b" ],
+        @"/test/1d \"a\" 1 \"b\"" : @[ @"a", @1, @"b" ],
+        @"/test/1e \"a b\" 1 \"c d\"" : @[ @"a b", @1, @"c d" ],
+        @"/test/1f \"a b\" 1.2 \"c d\"" : @[ @"a b", @1.2, @"c d" ],
+        // interior quotes with improper spacing around arg 2, malformed - fails
+        @"/test/1g \"a \"b\" c\"" : @[],
+        // interior non-escaped quotes with proper spacing around arg 2, valid - A and C args include extra spaces
+        @"/test/1h \"a \" b \" c\"" : @[ @"a ", @"b", @" c" ],
+        // interior escaped quotes, valid - single string arg includes quote characters
+        @"/test/1j \"a \\\"b\\\" c\"" : @[ @"a \"b\" c" ],
+    };
+
+    for (NSString *string in stringsAndArgs)
+    {
+        // when
+        F53OSCMessage *message = [F53OSCMessage messageWithString:string];
+
+        // then
+        NSArray<NSString *> *expectedArgs = stringsAndArgs[string];
+        if (expectedArgs.count == 0) // signals expected error condition
+        {
+            XCTAssertNil( message, @"%@", string );
+        }
+        else
+        {
+            XCTAssertNotNil( message, @"%@", string );
+            XCTAssertEqual( message.arguments.count, expectedArgs.count, @"%@", string );
+            XCTAssertEqualObjects( message.arguments, expectedArgs, @"%@", string );
+        }
+    }
+}
+
 - (void) test_profile_F53OSCMessage_messageFromString_numericArgs
 {
     XCTClockMetric *clockMetric = [[XCTClockMetric alloc] init];
