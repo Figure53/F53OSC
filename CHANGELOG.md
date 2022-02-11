@@ -8,8 +8,13 @@
 - Servers wishing to support encryption must first generate a key pair using the `generateKeyPair` method of `F53OSCEncrypt` and then call `setKeyPair:` on their `F53OSCServer`. 
 - Additionally, both servers and clients can check the `encrypter.publicKey` property of an `F53OSCSocket` to verify the identity of a peer if they wish to do so.
 
+### F53OSCMessage
+- Fixes `+messageWithString:` to handle quotation mark characters `“` (U+201C) and `”` (U+201D) as plain quotation marks `"` (U+0022) for better compatibility with certain text editors that automatically format with "smart" quotation marks. [#37](https://github.com/Figure53/F53OSC/issues/37)
+- Fixes `+messageWithString:` to fail parsing and return `nil` if quoted string arguments are not separated by spaces.
+
 ### More
 - F53OSC.xcodeproj is updated for Xcode 13.
+- Requires Swift 5.
 - Requires minimum deployment target of macOS 11, iOS 14, or tvOS 14.
 
 ## [1.2.0 - Jan 13, 2022](https://github.com/Figure53/F53OSC/releases/tag/1.2.0)
@@ -25,7 +30,7 @@
 
 ## [1.1.0 - Mar 30, 2020](https://github.com/Figure53/F53OSC/releases/tag/1.1.0)
 
-- Adds support for OSC 1.1 type tags `T`, `F`, `N`, and `I`. [#23](https://github.com/Figure53/F53OSC/issues/18)
+- Adds support for OSC 1.1 type tags `T`, `F`, `N`, and `I`. [#23](https://github.com/Figure53/F53OSC/issues/23)
 - Fixes a bug that prevented OSC range patterns from being handled correctly, e.g. `[A-Z]`.
 - Fixes a bug that caused the OSC wildcard `?` to incorrectly match on a two-character string ending in "1".
 - Fixes a bug when handing an incoming `F53OSCMessage` that caused incorrect parsing of arguments that follow a "Blob" type argument.
