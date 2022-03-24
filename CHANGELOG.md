@@ -12,6 +12,9 @@
 - Fixes `+messageWithString:` to handle quotation mark characters `“` (U+201C) and `”` (U+201D) as plain quotation marks `"` (U+0022) for better compatibility with certain text editors that automatically format with "smart" quotation marks. [#37](https://github.com/Figure53/F53OSC/issues/37)
 - Fixes `+messageWithString:` to fail parsing and return `nil` if quoted string arguments are not separated by spaces.
 
+### F53OSCSocket
+- Adds `tcpDataFraming` to allow optionally disabling SLIP framing when sending non-OSC data over TCP.
+
 ### More
 - F53OSC.xcodeproj is updated for Xcode 13.
 - Requires Swift 5.

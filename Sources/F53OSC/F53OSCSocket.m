@@ -155,6 +155,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.interface = nil;
         self.host = @"localhost";
         self.port = 0;
+        self.tcpDataFraming = F53TCPDataFramingSLIP;
     }
     return self;
 }
@@ -174,6 +175,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.interface = nil;
         self.host = @"localhost";
         self.port = 0;
+        self.tcpDataFraming = F53TCPDataFramingSLIP;
         self.stats = nil;
     }
     return self;
@@ -324,28 +326,40 @@ NS_ASSUME_NONNULL_BEGIN
 
     if ( self.tcpSocket )
     {
-        // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
-
-        NSMutableData *slipData = [NSMutableData data];
-        Byte esc_end[2] = {ESC, ESC_END};
-        Byte esc_esc[2] = {ESC, ESC_ESC};
-        Byte end[1] = {END};
-
-        [slipData appendBytes:end length:1];
-        NSUInteger length = [data length];
-        const Byte *buffer = [data bytes];
-        for ( NSUInteger index = 0; index < length; index++ )
+        switch (self.tcpDataFraming)
         {
-            if ( buffer[index] == END )
-                [slipData appendBytes:esc_end length:2];
-            else if ( buffer[index] == ESC )
-                [slipData appendBytes:esc_esc length:2];
-            else
-                [slipData appendBytes:&(buffer[index]) length:1];
-        }
-        [slipData appendBytes:end length:1];
+            case F53TCPDataFramingNone:
+                break;
 
-        [self.tcpSocket writeData:slipData withTimeout:TIMEOUT tag:[slipData length]];
+            case F53TCPDataFramingSLIP: {
+
+                // Outgoing OSC messages are framed using the double END SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
+
+                NSMutableData *slipData = [NSMutableData data];
+                Byte esc_end[2] = {ESC, ESC_END};
+                Byte esc_esc[2] = {ESC, ESC_ESC};
+                Byte end[1] = {END};
+
+                [slipData appendBytes:end length:1];
+                NSUInteger length = [data length];
+                const Byte *buffer = [data bytes];
+                for ( NSUInteger index = 0; index < length; index++ )
+                {
+                    if ( buffer[index] == END )
+                        [slipData appendBytes:esc_end length:2];
+                    else if ( buffer[index] == ESC )
+                        [slipData appendBytes:esc_esc length:2];
+                    else
+                        [slipData appendBytes:&(buffer[index]) length:1];
+                }
+                [slipData appendBytes:end length:1];
+
+                data = slipData;
+
+            } break;
+        }
+
+        [self.tcpSocket writeData:data withTimeout:TIMEOUT tag:[data length]];
     }
     else if ( self.udpSocket )
     {

@@ -42,6 +42,11 @@ NS_ASSUME_NONNULL_BEGIN
 @class F53OSCPacket;
 @class F53OSCEncrypt;
 
+typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
+    F53TCPDataFramingNone = -1,
+    F53TCPDataFramingSLIP = 0, // Default, OSC 1.1
+};
+
 ///
 ///  F53OSCStats tracks socket behavior over time.
 ///
@@ -71,6 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, readonly, nullable) GCDAsyncUdpSocket *udpSocket;
 @property (nonatomic, readonly) BOOL isTcpSocket;
 @property (nonatomic, readonly) BOOL isUdpSocket;
+@property (nonatomic, assign) F53TCPDataFraming tcpDataFraming; // Default SLIP
 
 @property (nonatomic, copy, nullable) NSString *interface;
 @property (nonatomic, copy, nullable) NSString *host;
