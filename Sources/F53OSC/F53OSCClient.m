@@ -66,6 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.port = 53000;         // QLab is 53000, Stagetracker is 57115.
         self.IPv6Enabled = NO;
         self.useTcp = NO;
+        self.tcpTimeout = -1; // no timeout
         self.userData = nil;
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -93,6 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
     [coder encodeObject:[NSNumber numberWithUnsignedShort:self.port] forKey:@"port"];
     [coder encodeObject:[NSNumber numberWithBool:self.isIPv6Enabled] forKey:@"IPv6Enabled"];
     [coder encodeObject:[NSNumber numberWithBool:self.useTcp] forKey:@"useTcp"];
+    [coder encodeObject:[NSNumber numberWithDouble:self.tcpTimeout] forKey:@"tcpTimeout"];
     [coder encodeObject:self.userData forKey:@"userData"];
 }
 
@@ -108,6 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.port = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"port"] unsignedShortValue];
         self.IPv6Enabled = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"IPv6Enabled"] boolValue];
         self.useTcp = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"useTcp"] boolValue];
+        self.tcpTimeout = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"tcpTimeout"] doubleValue];
         self.userData = [coder decodeObjectOfClass:[NSObject class] forKey:@"userData"];
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -224,6 +227,14 @@ NS_ASSUME_NONNULL_BEGIN
     [self destroySocket];
 }
 
+- (void) setTcpTimeout:(NSTimeInterval)tcpTimeout
+{
+    if ( tcpTimeout <= 0.0 )
+        tcpTimeout = -1.0;
+
+    _tcpTimeout = tcpTimeout;
+}
+
 - (void) setUserData:(nullable id)userData
 {
     if ( userData == [NSNull null] )
@@ -239,6 +250,7 @@ NS_ASSUME_NONNULL_BEGIN
              @"host": self.host ? self.host : @"",
              @"port": @( self.port ),
              @"useTcp": @( self.useTcp ),
+             @"tcpTimeout": @( self.tcpTimeout ),
              @"userData": ( self.userData ? self.userData : [NSNull null] )
              };
 }
@@ -249,6 +261,7 @@ NS_ASSUME_NONNULL_BEGIN
     self.host = state[@"host"];
     self.port = [state[@"port"] unsignedIntValue];
     self.useTcp = [state[@"useTcp"] boolValue];
+    self.tcpTimeout = [state[@"tcpTimeout"] doubleValue];
     self.userData = state[@"userData"];
 }
 
@@ -310,7 +323,7 @@ NS_ASSUME_NONNULL_BEGIN
     if ( self.socket )
     {
         if ( self.socket.isTcpSocket )
-            [self.socket.tcpSocket readDataWithTimeout:-1 tag:0]; // Listen for a potential response.
+            [self.socket.tcpSocket readDataWithTimeout:self.tcpTimeout tag:0]; // Listen for a potential response.
         [self.socket sendPacket:packet];
     }
     else
@@ -397,7 +410,7 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
     
     [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate controlHandler:self];
-    [sock readDataWithTimeout:-1 tag:tag];
+    [sock readDataWithTimeout:self.tcpTimeout tag:tag];
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag

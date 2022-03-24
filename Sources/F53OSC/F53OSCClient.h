@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign)                   UInt16 port;
 @property (nonatomic, getter=isIPv6Enabled)     BOOL IPv6Enabled; // default NO
 @property (nonatomic, assign)                   BOOL useTcp;
+@property (nonatomic, assign)                   NSTimeInterval tcpTimeout; // default -1 (no timeout)
 @property (nonatomic, strong, nullable)         id userData;
 @property (nonatomic, copy)                     NSDictionary<NSString *, id> *state;
 @property (nonatomic, readonly)                 NSString *title;
