@@ -281,7 +281,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didConnectToHost %@:%u", sock, host, port );
+    NSLog( @"server socket %p didConnectToHost %@:%hu", sock, host, port );
 #endif
 }
 

@@ -44,12 +44,12 @@
 
     if ( ![self.server startListening] )
     {
-        NSLog( @"Error: F53OSC Monitor was unable to start listening on port %u.", self.server.port );
-        errorString = [NSString stringWithFormat:@"F53OSC Monitor was unable to start listening for OSC messages on port %u.", self.server.port ];
+        NSLog( @"Error: F53OSC Monitor was unable to start listening on port %hu.", self.server.port );
+        errorString = [NSString stringWithFormat:@"F53OSC Monitor was unable to start listening for OSC messages on port %hu.", self.server.port ];
     }
     else
     {
-        [self.app log:[NSString stringWithFormat:@"F53OSC Monitor is listening for OSC messages on port %u", self.server.port]];
+        [self.app log:[NSString stringWithFormat:@"F53OSC Monitor is listening for OSC messages on port %hu", self.server.port]];
         self.isActive = YES;
     }
 

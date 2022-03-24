@@ -197,9 +197,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *) description
 {
     if ( self.isTcpSocket )
-        return [NSString stringWithFormat:@"<F53OSCSocket TCP %@:%u isConnected = %i>", self.host, self.port, self.isConnected ];
+        return [NSString stringWithFormat:@"<F53OSCSocket TCP %@:%hu isConnected = %i>", self.host, self.port, self.isConnected ];
     else
-        return [NSString stringWithFormat:@"<F53OSCSocket UDP %@:%u>", self.host, self.port ];
+        return [NSString stringWithFormat:@"<F53OSCSocket UDP %@:%hu>", self.host, self.port ];
 }
 
 - (BOOL) isTcpSocket

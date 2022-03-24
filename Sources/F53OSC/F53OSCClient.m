@@ -118,7 +118,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"<F53OSCClient %@:%u>", self.host, self.port ];
+    return [NSString stringWithFormat:@"<F53OSCClient %@:%hu>", self.host, self.port ];
 }
 
 - (void) setSocketDelegateQueue:(nullable dispatch_queue_t)queue
@@ -255,7 +255,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *) title
 {
     if ( self.isValid )
-        return [NSString stringWithFormat:@"%@ : %u", self.host, self.port ];
+        return [NSString stringWithFormat:@"%@ : %hu", self.host, self.port ];
     else
         return [NSString stringWithFormat:@"<invalid>" ];
 }
@@ -361,7 +361,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
 {
 #if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didConnectToHost %@:%u", sock, host, port );
+    NSLog( @"client socket %p didConnectToHost %@:%hu", sock, host, port );
 #endif
     if ( self.socket.encrypter )
     {
