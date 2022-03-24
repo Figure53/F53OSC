@@ -301,8 +301,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) sendPacket:(F53OSCPacket *)packet
 {
-    if ( !self.socket )
-        [self connect];
+    [self connect];
     
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"%@ sending packet: %@", self, packet );
