@@ -495,7 +495,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(nullable NSError *)error
 {
 #if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didSendDataWithTag: %ld dueToError: %@", sock, tag, [error localizedDescription] );
+    NSLog( @"client socket %p didNotSendDataWithTag: %ld dueToError: %@", sock, tag, [error localizedDescription] );
 #endif
 }
 
