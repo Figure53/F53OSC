@@ -354,6 +354,7 @@ NS_ASSUME_NONNULL_BEGIN
         socket = [self.activeTcpSockets objectForKey:key];
         if ( socket.tcpSocket == sock )
         {
+            socket.isEncrypting = NO;
             keyOfDyingSocket = key;
             break;
         }

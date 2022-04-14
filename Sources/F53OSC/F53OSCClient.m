@@ -468,6 +468,8 @@ NS_ASSUME_NONNULL_BEGIN
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didDisconnect", sock );
 #endif
+
+    self.socket.isEncrypting = NO;
     
     dispatch_block_t block = ^{
         [self.readData setData:[NSData data]];
