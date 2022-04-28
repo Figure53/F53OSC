@@ -173,10 +173,17 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     }
     
     // Pull out arguments...
-    
+    NSString *qscArgString = [qscString substringFromIndex:[address length]];
+    NSArray<id> *arguments = [self argumentsWithString:qscArgString];
+
+    return [F53OSCMessage messageWithAddressPattern:(NSString * _Nonnull)address arguments:arguments];
+}
+
++ (NSArray<id> *)argumentsWithString:(NSString *)argString
+{
     // Create a working copy.
-    NSString *workingArguments = [qscString substringFromIndex:[address length]];
-    
+    NSString *workingArguments = argString;
+
     // Place a token for each escaped quotation mark character.
     workingArguments = [workingArguments escapedCharacterTokenizedString];
 
@@ -293,9 +300,8 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
             }
         }
     }
-    
-    NSArray<id> *arguments = [NSArray arrayWithArray:finalArgs];
-    return [F53OSCMessage messageWithAddressPattern:(NSString * _Nonnull)address arguments:arguments];
+
+    return [NSArray arrayWithArray:finalArgs];
 }
 
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
