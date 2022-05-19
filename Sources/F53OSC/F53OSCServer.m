@@ -324,13 +324,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
 {
-    NSLog( @"Warning: F53OSCServer timed out when reading TCP data." );
+    NSLog( @"Warning: F53OSCServer timed out after %0.2f seconds when reading TCP data.", elapsed );
     return 0;
 }
 
 - (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutWriteWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
 {
-    NSLog( @"Warning: F53OSCServer timed out when writing TCP data." );
+    NSLog( @"Warning: F53OSCServer timed out after %0.2f seconds when writing TCP data.", elapsed );
     return 0;
 }
 
