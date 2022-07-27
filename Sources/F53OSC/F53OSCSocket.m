@@ -38,8 +38,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define TIMEOUT         3
-
 #define END             0300    /* indicates end of packet */
 #define ESC             0333    /* indicates byte stuffing */
 #define ESC_END         0334    /* ESC ESC_END means END data byte */
@@ -359,7 +357,7 @@ NS_ASSUME_NONNULL_BEGIN
             } break;
         }
 
-        [self.tcpSocket writeData:data withTimeout:TIMEOUT tag:[data length]];
+        [self.tcpSocket writeData:data withTimeout:-1 tag:[data length]];
     }
     else if ( self.udpSocket )
     {
@@ -383,7 +381,7 @@ NS_ASSUME_NONNULL_BEGIN
         }
         
         if ( self.host )
-            [self.udpSocket sendData:data toHost:(NSString * _Nonnull)self.host port:self.port withTimeout:TIMEOUT tag:0];
+            [self.udpSocket sendData:data toHost:(NSString * _Nonnull)self.host port:self.port withTimeout:-1 tag:0];
         
         [self.udpSocket closeAfterSending];
     }
