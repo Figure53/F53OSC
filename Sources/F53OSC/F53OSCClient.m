@@ -420,21 +420,27 @@ NS_ASSUME_NONNULL_BEGIN
 
     if ( self.readChunkSize )
     {
-        NSUInteger lengthOfCurrentRead = self.readData.length;
-        dispatch_block_t block = ^{
-            if ( [self.delegate respondsToSelector:@selector(client:didReadData:)] )
-                [self.delegate client:self didReadData:lengthOfCurrentRead];
-        };
-        if ( [NSThread isMainThread] )
-            block();
-        else
-            dispatch_async( dispatch_get_main_queue(), block );
-
+        [self tellDelegateDidRead];
         [sock readDataWithTimeout:self.tcpTimeout buffer:nil bufferOffset:0 maxLength:self.readChunkSize tag:tag];
     }
     else
     {
         [sock readDataWithTimeout:self.tcpTimeout tag:tag];
+    }
+}
+
+- (void) tellDelegateDidRead
+{
+    if ( [self.delegate respondsToSelector:@selector(client:didReadData:)] )
+    {
+        NSUInteger lengthOfCurrentRead = self.readData.length;
+        dispatch_block_t block = ^{
+            [self.delegate client:self didReadData:lengthOfCurrentRead];
+        };
+        if ( [NSThread isMainThread] )
+            block();
+        else
+            dispatch_sync( dispatch_get_main_queue(), block ); // synchronous so GUI updates don't lag reality
     }
 }
 

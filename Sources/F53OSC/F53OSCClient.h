@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol F53OSCClientDelegate <F53OSCPacketDestination>
 
-@optional
+@optional // All called on the main thread.
 - (void) clientDidConnect:(F53OSCClient *)client;
 - (void) clientDidDisconnect:(F53OSCClient *)client;
 - (void) client:(F53OSCClient *)client didReadData:(NSUInteger)lengthOfCurrentRead;
