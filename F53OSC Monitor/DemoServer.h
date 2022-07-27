@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <F53OSC/F53OSC.h>
+#import "F53OSC.h"
 
 @class AppDelegate;
 

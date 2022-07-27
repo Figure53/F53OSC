@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		3D608AF623F6C987000D1C3A /* F53OSCMessageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D608AF523F6C987000D1C3A /* F53OSCMessageTests.m */; };
 		3D9235412891B396009BBF39 /* F53OSC_NSStringTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D9235402891B396009BBF39 /* F53OSC_NSStringTests.m */; };
+		3D9235482891B54C009BBF39 /* F53OSCEncryptHandshake.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D9235462891B54C009BBF39 /* F53OSCEncryptHandshake.m */; };
+		3D9235492891B54C009BBF39 /* F53OSCEncrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D9235472891B54C009BBF39 /* F53OSCEncrypt.swift */; };
 		3DA1FD7A24045D3300DBDAD4 /* F53OSCServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA1FD7924045D3300DBDAD4 /* F53OSCServerTests.m */; };
 		3DD2E36F240AEEA400AF8C1F /* F53OSCValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DD2E36D240AEEA400AF8C1F /* F53OSCValue.m */; };
 		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
@@ -47,6 +49,11 @@
 /* Begin PBXFileReference section */
 		3D608AF523F6C987000D1C3A /* F53OSCMessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCMessageTests.m; sourceTree = "<group>"; };
 		3D9235402891B396009BBF39 /* F53OSC_NSStringTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NSStringTests.m; sourceTree = "<group>"; };
+		3D9235442891B54C009BBF39 /* F53OSC Monitor-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "F53OSC Monitor-Bridging-Header.h"; sourceTree = "<group>"; };
+		3D9235452891B54C009BBF39 /* F53OSCEncryptHandshake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCEncryptHandshake.h; sourceTree = "<group>"; };
+		3D9235462891B54C009BBF39 /* F53OSCEncryptHandshake.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCEncryptHandshake.m; sourceTree = "<group>"; };
+		3D9235472891B54C009BBF39 /* F53OSCEncrypt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = F53OSCEncrypt.swift; sourceTree = "<group>"; };
+		3D92354A2891B6CD009BBF39 /* F53OSC Monitor Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "F53OSC Monitor Prefix.pch"; sourceTree = "<group>"; };
 		3DA1FD7924045D3300DBDAD4 /* F53OSCServerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCServerTests.m; sourceTree = "<group>"; };
 		3DD2E36D240AEEA400AF8C1F /* F53OSCValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCValue.m; sourceTree = "<group>"; };
 		3DD2E36E240AEEA400AF8C1F /* F53OSCValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCValue.h; sourceTree = "<group>"; };
@@ -182,6 +189,7 @@
 			children = (
 				66EE17561B729EA0008B6743 /* Info.plist */,
 				66EE175A1B729EA0008B6743 /* main.m */,
+				3D92354A2891B6CD009BBF39 /* F53OSC Monitor Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -215,6 +223,9 @@
 				66EE17781B729EFB008B6743 /* F53OSCBundle.m */,
 				66EE17791B729EFB008B6743 /* F53OSCClient.h */,
 				66EE177A1B729EFB008B6743 /* F53OSCClient.m */,
+				3D9235472891B54C009BBF39 /* F53OSCEncrypt.swift */,
+				3D9235452891B54C009BBF39 /* F53OSCEncryptHandshake.h */,
+				3D9235462891B54C009BBF39 /* F53OSCEncryptHandshake.m */,
 				66EE177B1B729EFB008B6743 /* F53OSCFoundationAdditions.h */,
 				66EE177C1B729EFB008B6743 /* F53OSCMessage.h */,
 				66EE177D1B729EFB008B6743 /* F53OSCMessage.m */,
@@ -238,6 +249,7 @@
 				66EE17921B729EFB008B6743 /* NSNumber+F53OSCNumber.m */,
 				66EE17931B729EFB008B6743 /* NSString+F53OSCString.h */,
 				66EE17941B729EFB008B6743 /* NSString+F53OSCString.m */,
+				3D9235442891B54C009BBF39 /* F53OSC Monitor-Bridging-Header.h */,
 			);
 			name = F53OSC;
 			path = ../Sources/F53OSC;
@@ -292,6 +304,7 @@
 				TargetAttributes = {
 					66EE17511B729EA0008B6743 = {
 						CreatedOnToolsVersion = 6.4;
+						LastSwiftMigration = 1340;
 					};
 					66EE17641B729EA0008B6743 = {
 						CreatedOnToolsVersion = 6.4;
@@ -353,6 +366,7 @@
 				66EE17951B729EFB008B6743 /* F53OSCBundle.m in Sources */,
 				66EE17A01B729EFB008B6743 /* NSDate+F53OSCTimeTag.m in Sources */,
 				66EE17981B729EFB008B6743 /* F53OSCPacket.m in Sources */,
+				3D9235482891B54C009BBF39 /* F53OSCEncryptHandshake.m in Sources */,
 				66EE17A11B729EFB008B6743 /* NSNumber+F53OSCNumber.m in Sources */,
 				66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */,
 				66EE17961B729EFB008B6743 /* F53OSCClient.m in Sources */,
@@ -360,6 +374,7 @@
 				66EE179C1B729EFB008B6743 /* F53OSCTimeTag.m in Sources */,
 				66EE17A51B72AC59008B6743 /* DemoServer.m in Sources */,
 				66EE179D1B729EFB008B6743 /* GCDAsyncSocket.m in Sources */,
+				3D9235492891B54C009BBF39 /* F53OSCEncrypt.swift in Sources */,
 				66EE17991B729EFB008B6743 /* F53OSCParser.m in Sources */,
 				66EE17A21B729EFB008B6743 /* NSString+F53OSCString.m in Sources */,
 			);
@@ -402,27 +417,41 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = "F53OSC Monitor Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -434,7 +463,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -445,17 +474,29 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -465,15 +506,17 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "F53OSC Monitor Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
@@ -481,10 +524,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "../Sources/F53OSC/F53OSC Monitor-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -492,16 +540,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "../Sources/F53OSC/F53OSC Monitor-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
 		66EE17731B729EA0008B6743 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -522,6 +575,7 @@
 		66EE17741B729EA0008B6743 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
