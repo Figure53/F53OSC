@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 3/23/11.
 //
-//  Copyright (c) 2011-2021 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -44,12 +44,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSPredicate *) predicateForAttribute:(NSString *)attributeName
                      matchingOSCPattern:(NSString *)pattern;
 
-@property (nonatomic, weak)             id<F53OSCServerDelegate> delegate;
-@property (nonatomic, strong, readonly) F53OSCSocket *udpSocket;
-@property (nonatomic, strong, readonly) F53OSCSocket *tcpSocket;
-@property (nonatomic, assign)           UInt16 port;
-@property (nonatomic, assign)           UInt16 udpReplyPort;
-@property (strong)                      NSData *keyPair;
+@property (nonatomic, weak)                 id<F53OSCServerDelegate> delegate;
+@property (nonatomic, strong, readonly)     F53OSCSocket *udpSocket;
+@property (nonatomic, strong, readonly)     F53OSCSocket *tcpSocket;
+@property (nonatomic, assign)               UInt16 port;
+@property (nonatomic, assign)               UInt16 udpReplyPort;
+@property (nonatomic, getter=isIPv6Enabled) BOOL IPv6Enabled; // default NO
+@property (strong)                          NSData *keyPair;
 
 - (instancetype) initWithDelegateQueue:(nullable dispatch_queue_t)queue;
 

@@ -138,18 +138,22 @@ NS_ASSUME_NONNULL_BEGIN
     self = [super init];
     if ( self )
     {
+        self.delegate = nil;
+        self.port = 0;
+        self.udpReplyPort = 0;
+        self.IPv6Enabled = NO;
+
         if ( !queue )
             queue = dispatch_get_main_queue();
         self.queue = queue;
         
         GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:queue];
-        GCDAsyncUdpSocket *rawUdpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:queue];
-        
-        self.delegate = nil;
-        self.port = 0;
-        self.udpReplyPort = 0;
         self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket];
+        self.tcpSocket.IPv6Enabled = self.isIPv6Enabled;
+
+        GCDAsyncUdpSocket *rawUdpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:queue];
         self.udpSocket = [F53OSCSocket socketWithUdpSocket:rawUdpSocket];
+        self.udpSocket.IPv6Enabled = self.isIPv6Enabled;
         
         // NOTE: after init, only read/write to these on the delegate queue
         self.activeTcpSockets = [NSMutableDictionary dictionaryWithCapacity:1];
@@ -173,6 +177,13 @@ NS_ASSUME_NONNULL_BEGIN
     [self.udpSocket stopListening];
     self.tcpSocket.port = _port;
     self.udpSocket.port = _port;
+}
+
+- (void) setIPv6Enabled:(BOOL)IPv6Enabled
+{
+    _IPv6Enabled = IPv6Enabled;
+    self.tcpSocket.IPv6Enabled = _IPv6Enabled;
+    self.udpSocket.IPv6Enabled = _IPv6Enabled;
 }
 
 - (BOOL) startListening
@@ -412,6 +423,7 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
     replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
     replySocket.port = self.udpReplyPort;
+    replySocket.IPv6Enabled = self.isIPv6Enabled;
 
     [self.udpSocket.stats addBytes:[data length]];
 
