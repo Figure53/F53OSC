@@ -8,8 +8,12 @@
 - Servers wishing to support encryption must first generate a key pair using the `generateKeyPair` method of `F53OSCEncrypt` and then call `setKeyPair:` on their `F53OSCServer`. 
 - Additionally, both servers and clients can check the `encrypter.publicKey` property of an `F53OSCSocket` to verify the identity of a peer if they wish to do so.
 
+### F53OSCServer
+- Adds support for optionally enabling IPv6 support for sockets. NOTE: IPv6 support is experimental and is now disabled by default on both of the internal sockets.
+
 ### F53OSCClient
 - Adds a `tcpTimeout` property to configure an optional timeout for waiting to receive TCP data to read. Any negative value means "no timeout". The default is `-1`.
+- Adds an optional delegate method `client:didReadData:` to notify about the progression of how much data has been read for the current incoming message.
 
 ### F53OSCMessage
 - Fixes `+messageWithString:` to handle quotation mark characters `“` (U+201C) and `”` (U+201D) as plain quotation marks `"` (U+0022) for better compatibility with certain text editors that automatically format with "smart" quotation marks. [#37](https://github.com/Figure53/F53OSC/issues/37)
@@ -17,6 +21,7 @@
 
 ### F53OSCSocket
 - Adds a `tcpDataFraming` property to allow optionally disabling SLIP framing when sending non-OSC data over TCP.
+- Fixes the inability to send large packets by removing the timeout when writing data.
 
 ### More
 - F53OSC.xcodeproj is updated for Xcode 13.
