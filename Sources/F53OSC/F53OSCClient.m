@@ -66,7 +66,8 @@ NS_ASSUME_NONNULL_BEGIN
         self.port = 53000;         // QLab is 53000, Stagetracker is 57115.
         self.IPv6Enabled = NO;
         self.useTcp = NO;
-        self.tcpTimeout = -1; // no timeout
+        self.tcpTimeout = -1;   // no timeout
+        self.readChunkSize = 0; // no partial reads
         self.userData = nil;
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -95,6 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
     [coder encodeObject:[NSNumber numberWithBool:self.isIPv6Enabled] forKey:@"IPv6Enabled"];
     [coder encodeObject:[NSNumber numberWithBool:self.useTcp] forKey:@"useTcp"];
     [coder encodeObject:[NSNumber numberWithDouble:self.tcpTimeout] forKey:@"tcpTimeout"];
+    [coder encodeObject:[NSNumber numberWithUnsignedInteger:self.readChunkSize] forKey:@"readChunkSize"];
     [coder encodeObject:self.userData forKey:@"userData"];
 }
 
@@ -111,6 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.IPv6Enabled = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"IPv6Enabled"] boolValue];
         self.useTcp = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"useTcp"] boolValue];
         self.tcpTimeout = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"tcpTimeout"] doubleValue];
+        self.readChunkSize = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"readChunkSize"] unsignedIntegerValue];
         self.userData = [coder decodeObjectOfClass:[NSObject class] forKey:@"userData"];
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -322,8 +325,6 @@ NS_ASSUME_NONNULL_BEGIN
     
     if ( self.socket )
     {
-        if ( self.socket.isTcpSocket )
-            [self.socket.tcpSocket readDataWithTimeout:self.tcpTimeout tag:0]; // Listen for a potential response.
         [self.socket sendPacket:packet];
     }
     else
@@ -375,6 +376,12 @@ NS_ASSUME_NONNULL_BEGIN
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didConnectToHost %@:%hu", sock, host, port );
 #endif
+
+    if ( self.readChunkSize )
+        [sock readDataWithTimeout:self.tcpTimeout buffer:nil bufferOffset:0 maxLength:self.readChunkSize tag:0];
+    else
+        [sock readDataWithTimeout:self.tcpTimeout tag:0];
+
     if ( self.socket.encrypter )
     {
         F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
@@ -408,9 +415,33 @@ NS_ASSUME_NONNULL_BEGIN
 #if F53_OSC_CLIENT_DEBUG
     NSLog( @"client socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
-    
+
     [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate controlHandler:self];
-    [sock readDataWithTimeout:self.tcpTimeout tag:tag];
+
+    if ( self.readChunkSize )
+    {
+        [self tellDelegateDidRead];
+        [sock readDataWithTimeout:self.tcpTimeout buffer:nil bufferOffset:0 maxLength:self.readChunkSize tag:tag];
+    }
+    else
+    {
+        [sock readDataWithTimeout:self.tcpTimeout tag:tag];
+    }
+}
+
+- (void) tellDelegateDidRead
+{
+    if ( [self.delegate respondsToSelector:@selector(client:didReadData:)] )
+    {
+        NSUInteger lengthOfCurrentRead = self.readData.length;
+        dispatch_block_t block = ^{
+            [self.delegate client:self didReadData:lengthOfCurrentRead];
+        };
+        if ( [NSThread isMainThread] )
+            block();
+        else
+            dispatch_sync( dispatch_get_main_queue(), block ); // synchronous so GUI updates don't lag reality
+    }
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag

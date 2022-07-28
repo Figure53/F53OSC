@@ -54,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, getter=isIPv6Enabled)     BOOL IPv6Enabled; // default NO
 @property (nonatomic, assign)                   BOOL useTcp;
 @property (nonatomic, assign)                   NSTimeInterval tcpTimeout; // default -1 (no timeout)
+@property (nonatomic, assign)                   NSUInteger readChunkSize;  // default 0 (no partial reads)
 @property (nonatomic, strong, nullable)         id userData;
 @property (nonatomic, copy)                     NSDictionary<NSString *, id> *state;
 @property (nonatomic, readonly)                 NSString *title;
@@ -70,9 +71,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol F53OSCClientDelegate <F53OSCPacketDestination>
 
-@optional
+@optional // All called on the main thread.
 - (void) clientDidConnect:(F53OSCClient *)client;
 - (void) clientDidDisconnect:(F53OSCClient *)client;
+- (void) client:(F53OSCClient *)client didReadData:(NSUInteger)lengthOfCurrentRead;
 
 @end
 
