@@ -193,7 +193,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     // The remaining " characters signify quoted string arguments; they should be paired up.
     NSArray<NSString *> *splitOnQuotes = [workingArguments componentsSeparatedByString:@"\""];
     if ( [splitOnQuotes count] % 2 != 1 )
-        return nil; // not matching quotes
+        return @[]; // not matching quotes
 
     NSString *QUOTED_STRING_TOKEN = @"⍂"; // not trying to be perfect here; we just use an unlikely character
     NSMutableArray<NSString *> *quotedStrings = [NSMutableArray array];
@@ -231,7 +231,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
             // If `arg` has any additional characters either before or after QUOTED_STRING_TOKEN, parsing fails.
             // i.e. if `workingArguments` has quoted strings that are not properly separated by spaces.
             if ( [arg isEqual:QUOTED_STRING_TOKEN] == NO )
-                return nil;
+                return @[];
 
             NSString *quotedString = [quotedStrings objectAtIndex:quotedStringIndex];
             NSString *detokenized = [quotedString detokenizedUnescapedString];
