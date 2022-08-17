@@ -164,6 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
         GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
         self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
         self.socket.IPv6Enabled = self.isIPv6Enabled;
+        self.socket.delegate = self;
         if ( self.socket )
             [self.readState setObject:self.socket forKey:@"socket"];
     }
@@ -172,6 +173,7 @@ NS_ASSUME_NONNULL_BEGIN
         GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
         self.socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
         self.socket.IPv6Enabled = self.isIPv6Enabled;
+        self.socket.delegate = self;
     }
     self.socket.interface = self.interface;
     self.socket.host = self.host;
@@ -549,6 +551,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(nullable NSError *)error
+{
+}
+
+#pragma mark - F53OSCSocketDelegate
+
+- (void)socket:(F53OSCSocket *)socket willSendPacket:(F53OSCPacket *)packet withTag:(long)tag viaTCP:(BOOL)viaTCP
 {
 }
 

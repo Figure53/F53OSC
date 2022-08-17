@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define F53_OSC_CLIENT_DEBUG 0
 
-@interface F53OSCClient : NSObject <NSSecureCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate, F53OSCControlHandler>
+@interface F53OSCClient : NSObject <NSSecureCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate, F53OSCSocketDelegate, F53OSCControlHandler>
 
 @property (nonatomic, weak)                     id<F53OSCClientDelegate> delegate;
 @property (nonatomic, strong, null_resettable)  dispatch_queue_t socketDelegateQueue; // defaults to main queue

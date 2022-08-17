@@ -29,6 +29,7 @@
 #endif
 
 #import "F53OSCSocket.h"
+#import <stdatomic.h>
 
 #if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSC-Swift.h>
@@ -124,6 +125,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - F53OSCSocket
 
 @interface F53OSCSocket ()
+{
+    atomic_ulong _packetIndex;
+}
 
 @property (strong, readwrite, nullable) GCDAsyncSocket *tcpSocket;
 @property (strong, readwrite, nullable) GCDAsyncUdpSocket *udpSocket;
@@ -148,6 +152,7 @@ NS_ASSUME_NONNULL_BEGIN
     self = [super init];
     if ( self )
     {
+        _packetIndex = 1;
         self.tcpSocket = socket;
         self.udpSocket = nil;
         self.interface = nil;
@@ -167,7 +172,8 @@ NS_ASSUME_NONNULL_BEGIN
             [socket setPreferIPv4]; // prevents socket from selecting an IPv6 resolved address after a DNS lookup
         else
             [socket setIPVersionNeutral];
-        
+
+        _packetIndex = 1;
         self.tcpSocket = nil;
         self.udpSocket = socket;
         self.interface = nil;
@@ -320,7 +326,9 @@ NS_ASSUME_NONNULL_BEGIN
         data = newData;
     }
 
-    //NSLog( @"%@ sending message with native length: %li", self, [data length] );
+    NSUInteger packetIndex = atomic_fetch_add_explicit(&_packetIndex, 1, memory_order_relaxed);
+
+    //NSLog( @"[%p] %@ sending message %li with native length: %li", self, self, packetIndex, data.length );
 
     if ( self.tcpSocket )
     {
@@ -357,7 +365,9 @@ NS_ASSUME_NONNULL_BEGIN
             } break;
         }
 
-        [self.tcpSocket writeData:data withTimeout:-1 tag:[data length]];
+        if ([self.delegate respondsToSelector:@selector(socket:willSendPacket:withTag:viaTCP:)])
+            [self.delegate socket:self willSendPacket:packet withTag:packetIndex viaTCP:YES];
+        [self.tcpSocket writeData:data withTimeout:-1 tag:packetIndex];
     }
     else if ( self.udpSocket )
     {
@@ -381,7 +391,11 @@ NS_ASSUME_NONNULL_BEGIN
         }
         
         if ( self.host )
-            [self.udpSocket sendData:data toHost:(NSString * _Nonnull)self.host port:self.port withTimeout:-1 tag:0];
+        {
+            if ([self.delegate respondsToSelector:@selector(socket:willSendPacket:withTag:viaTCP:)])
+                [self.delegate socket:self willSendPacket:packet withTag:packetIndex viaTCP:NO];
+            [self.udpSocket sendData:data toHost:(NSString * _Nonnull)self.host port:self.port withTimeout:-1 tag:packetIndex];
+        }
         
         [self.udpSocket closeAfterSending];
     }

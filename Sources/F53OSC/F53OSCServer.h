@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define F53_OSC_SERVER_DEBUG 0
 
-@interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate, F53OSCControlHandler>
+@interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate, F53OSCSocketDelegate, F53OSCControlHandler>
 
 + (NSString *) validCharsForOSCMethod;
 + (NSPredicate *) predicateForAttribute:(NSString *)attributeName
@@ -56,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL) startListening;
 - (void) stopListening;
+
+- (NSUInteger) maximumPendingTcpPackets; // The number of pending packets waiting to be sent on the busiest active tcpSocket.
 
 @end
 

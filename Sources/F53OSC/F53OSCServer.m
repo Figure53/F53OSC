@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong) NSMutableDictionary<NSNumber *, NSMutableData *> *activeData;        // NSMutableData keyed by index; buffers the incoming data.
 @property (strong) NSMutableDictionary<NSNumber *, NSMutableDictionary *> *activeState; // NSMutableDictionary keyed by index; stores state of incoming data.
 @property (assign) long activeIndex;
+@property (strong) NSMutableDictionary<NSNumber *, NSMutableDictionary *> *activePendingPackets; // NSMutableDictionary keyed by index; stores outgoing packets.
 
 @end
 
@@ -150,16 +151,20 @@ NS_ASSUME_NONNULL_BEGIN
         GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:queue];
         self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket];
         self.tcpSocket.IPv6Enabled = self.isIPv6Enabled;
+        self.tcpSocket.delegate = self;
 
         GCDAsyncUdpSocket *rawUdpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:queue];
         self.udpSocket = [F53OSCSocket socketWithUdpSocket:rawUdpSocket];
         self.udpSocket.IPv6Enabled = self.isIPv6Enabled;
+        self.udpSocket.delegate = self;
         
         // NOTE: after init, only read/write to these on the delegate queue
         self.activeTcpSockets = [NSMutableDictionary dictionaryWithCapacity:1];
         self.activeData = [NSMutableDictionary dictionaryWithCapacity:1];
         self.activeState = [NSMutableDictionary dictionaryWithCapacity:1];
         self.activeIndex = 0;
+
+        self.activePendingPackets = [NSMutableDictionary dictionaryWithCapacity:1];
     }
     return self;
 }
@@ -211,6 +216,21 @@ NS_ASSUME_NONNULL_BEGIN
     [self.udpSocket.udpSocket synchronouslySetDelegateQueue:nil];
 }
 
+- (NSUInteger) maximumPendingTcpPackets
+{
+    NSUInteger maxPackets = 0;
+    @synchronized (self.activePendingPackets)
+    {
+        for (NSDictionary *pendingPackets in self.activePendingPackets.allValues)
+        {
+            NSUInteger countOfPendingPackets = pendingPackets.count;
+            if (countOfPendingPackets > maxPackets)
+                maxPackets = countOfPendingPackets;
+        }
+    }
+    return maxPackets;
+}
+
 - (void) handleF53OSCControlMessage:(F53OSCMessage *)message
 {
     if ( [F53OSCEncryptHandshake isEncryptHandshakeMessage:message] )
@@ -259,12 +279,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didAcceptNewSocket %p", sock, newSocket );
+    NSLog( @"server socket [%p] didAcceptNewSocket %p", sock, newSocket );
 #endif
+
+    newSocket.userData = @{@"activeIndex": @(self.activeIndex)};
 
     F53OSCSocket *activeSocket = [F53OSCSocket socketWithTcpSocket:newSocket];
     activeSocket.host = newSocket.connectedHost;
     activeSocket.port = newSocket.connectedPort;
+    activeSocket.delegate = self;
 
     NSNumber *key = [NSNumber numberWithLong:self.activeIndex];
     [self.activeTcpSockets setObject:activeSocket forKey:key];
@@ -272,10 +295,15 @@ NS_ASSUME_NONNULL_BEGIN
     [self.activeState setObject:[NSMutableDictionary dictionaryWithDictionary:@{ @"socket" : activeSocket,
                                                                                  @"dangling_ESC" : @NO }] forKey:key];
 
+    @synchronized (self.activePendingPackets)
+    {
+        [self.activePendingPackets setObject:[NSMutableDictionary dictionary] forKey:key];
+    }
+
     [newSocket readDataWithTimeout:-1 tag:self.activeIndex];
 
     self.activeIndex++;
-    
+
     if ( [self.delegate respondsToSelector:@selector(serverDidConnect:toSocket:)] )
     {
         dispatch_block_t block = ^{
@@ -292,17 +320,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didConnectToHost %@:%hu", sock, host, port );
+    NSLog( @"server socket [%p] didConnectToHost %@:%hu", sock, host, port );
 #endif
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
+    NSLog( @"server socket %@ [%p] didReadData of length %lu. tag : %lu", sock.userData[@"activeIndex"], sock, [data length], tag );
 #endif
     
-    NSNumber *key = [NSNumber numberWithLong:tag];
+    NSNumber *key = [NSNumber numberWithLong:tag]; // tag is the index of this active socket
     NSMutableData *activeData = [self.activeData objectForKey:key];
     NSMutableDictionary<NSString *, id> *activeState = [self.activeState objectForKey:key];
     if ( activeData && activeState )
@@ -315,21 +343,31 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didReadPartialDataOfLength %lu. tag: %li", sock, partialLength, tag );
+    NSLog( @"server socket %@ [%p] didReadPartialDataOfLength %lu. tag: %li", sock.userData[@"activeIndex"], sock, partialLength, tag );
 #endif
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didWriteDataWithTag: %li", sock, tag );
+    NSLog( @"server socket %@ [%p] didWriteDataWithTag: %li", sock.userData[@"activeIndex"], sock, tag );
 #endif
+
+    NSNumber *activeSocketIndex = sock.userData[@"activeIndex"];
+    if (activeSocketIndex)
+    {
+        @synchronized (self.activePendingPackets)
+        {
+            NSMutableDictionary<NSNumber *, id> *activePendingPackets = [self.activePendingPackets objectForKey:activeSocketIndex];
+            [activePendingPackets removeObjectForKey:@(tag)];
+        }
+    }
 }
 
 - (void) socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didWritePartialDataOfLength %lu", sock, partialLength );
+    NSLog( @"server socket %@ [%p] didWritePartialDataOfLength %lu", sock.userData[@"activeIndex"], sock, partialLength );
 #endif
 }
 
@@ -348,14 +386,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didCloseReadStream", sock );
+    NSLog( @"server socket %@ [%p] didCloseReadStream", sock.userData[@"activeIndex"], sock );
 #endif
 }
 
 - (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didDisconnect withError: %@", sock, err );
+    NSLog( @"server socket %@ [%p] didDisconnect withError: %@", sock.userData[@"activeIndex"], sock, err );
 #endif
 
     F53OSCSocket *socket = nil;
@@ -388,6 +426,11 @@ NS_ASSUME_NONNULL_BEGIN
         [self.activeTcpSockets removeObjectForKey:keyOfDyingSocket];
         [self.activeData removeObjectForKey:keyOfDyingSocket];
         [self.activeState removeObjectForKey:keyOfDyingSocket];
+
+        @synchronized (self.activePendingPackets)
+        {
+            [self.activePendingPackets removeObjectForKey:keyOfDyingSocket];
+        }
     }
     else
     {
@@ -432,6 +475,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(nullable NSError *)error
 {
+}
+
+#pragma mark - F53OSCSocketDelegate
+
+- (void)socket:(F53OSCSocket *)socket willSendPacket:(F53OSCPacket *)packet withTag:(long)tag viaTCP:(BOOL)viaTCP
+{
+    if (viaTCP)
+    {
+        NSNumber *activeSocketIndex = socket.tcpSocket.userData[@"activeIndex"];
+#if F53_OSC_SERVER_DEBUG
+        NSLog( @"%@ [%p] will send TCP packet with tag %@", activeSocketIndex, socket.tcpSocket, @(tag) );
+#endif
+
+        if (activeSocketIndex)
+        {
+            @synchronized (self.activePendingPackets)
+            {
+                NSMutableDictionary<NSNumber *, id> *activePendingPackets = [self.activePendingPackets objectForKey:activeSocketIndex];
+                [activePendingPackets setObject:packet forKey:@(tag)];
+            }
+        }
+    }
+    else // UDP
+    {
+    }
 }
 
 @end

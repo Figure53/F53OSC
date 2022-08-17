@@ -41,11 +41,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class F53OSCPacket;
 @class F53OSCEncrypt;
+@class F53OSCSocket;
 
 typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
     F53TCPDataFramingNone = -1,
     F53TCPDataFramingSLIP = 0, // Default, OSC 1.1
 };
+
+
+#pragma mark - F53OSCStats
 
 ///
 ///  F53OSCStats tracks socket behavior over time.
@@ -60,6 +64,18 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 @end
 
 
+#pragma mark - F53OSCSocketDelegate
+
+@protocol F53OSCSocketDelegate <NSObject>
+
+@optional
+- (void)socket:(F53OSCSocket *)socket willSendPacket:(F53OSCPacket *)packet withTag:(long)tag viaTCP:(BOOL)viaTCP;
+
+@end
+
+
+#pragma mark - F53OSCSocket
+
 ///
 ///  An F53OSCSocket object represents either a TCP socket or UDP socket, but never both at the same time.
 ///
@@ -72,6 +88,7 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 - (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket;
 - (instancetype) initWithUdpSocket:(GCDAsyncUdpSocket *)socket;
 
+@property (weak, nullable) id<F53OSCSocketDelegate> delegate;
 @property (strong, readonly, nullable) GCDAsyncSocket *tcpSocket;
 @property (strong, readonly, nullable) GCDAsyncUdpSocket *udpSocket;
 @property (nonatomic, readonly) BOOL isTcpSocket;
