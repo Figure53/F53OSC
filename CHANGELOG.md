@@ -1,4 +1,4 @@
-## [1.3.0 - ?? ??, 2022](https://github.com/Figure53/F53OSC/releases/tag/1.3.0)
+## [1.3.0 - August 30, 2022](https://github.com/Figure53/F53OSC/releases/tag/1.3.0)
 
 ### F53OSCEncrypt
 - Adds the ability to transmit OSC messages using encryption. (NOTE: this is F53OSC-specific, not based on the OSC spec.) The core of the encryption is written in Swift using CryptoKit, including P521 public/private keys, HKDF derived symmetric keys, and ChaChaPoly symmetric encryption.
