@@ -83,6 +83,8 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 @property (nonatomic, assign) UInt16 port;
 @property (nonatomic, getter=isIPv6Enabled) BOOL IPv6Enabled;
 
+@property (nonatomic, readonly) BOOL hostIsLocal;
+
 @property (strong, readonly, nullable) F53OSCStats *stats;
 
 @property (strong, nullable) F53OSCEncrypt *encrypter;

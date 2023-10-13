@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2023 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -206,6 +206,10 @@ NS_ASSUME_NONNULL_BEGIN
     
     _host = [host copy];
     self.socket.host = self.host;
+
+    _hostIsLocal = ( !_host.length ||
+                    [_host isEqualToString:@"localhost"] ||
+                    [_host isEqualToString:@"127.0.0.1"] );
 }
 
 - (void) setPort:(UInt16)port

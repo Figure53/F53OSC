@@ -3,7 +3,7 @@
 //
 //  Created by Christopher Ashworth on 1/28/13.
 //
-//  Copyright (c) 2013-2022 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2023 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -210,6 +210,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) isUdpSocket
 {
     return ( self.udpSocket != nil );
+}
+
+- (void) setHost:(nullable NSString *)host
+{
+    if ( _host != host )
+    {
+        _host = host.copy;
+        
+        _hostIsLocal = ( !_host.length ||
+                        [_host isEqualToString:@"localhost"] ||
+                        [_host isEqualToString:@"127.0.0.1"] );
+    }
 }
 
 - (BOOL) isIPv6Enabled

@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 1/20/11.
 //
-//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2023 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -60,6 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly)                 NSString *title;
 @property (nonatomic, readonly)                 BOOL isValid;
 @property (nonatomic, readonly)                 BOOL isConnected;
+@property (nonatomic, readonly)                 BOOL hostIsLocal;
 
 - (BOOL) connect;   // NOTE: returns NO if internal F53OSCSocket uses TCP and is already connected
 - (BOOL) connectEncryptedWithKeyPair:(NSData *)keyPair;
