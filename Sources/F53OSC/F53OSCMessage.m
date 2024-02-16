@@ -3,7 +3,7 @@
 //
 //  Created by Siobhán Dougall on 1/17/11.
 //
-//  Copyright (c) 2011-2022 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2024 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -175,11 +175,13 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     // Pull out arguments...
     NSString *qscArgString = [qscString substringFromIndex:[address length]];
     NSArray<id> *arguments = [self argumentsWithString:qscArgString];
+    if (!arguments)
+        return nil;
 
     return [F53OSCMessage messageWithAddressPattern:(NSString * _Nonnull)address arguments:arguments];
 }
 
-+ (NSArray<id> *)argumentsWithString:(NSString *)argString
++ (nullable NSArray<id> *)argumentsWithString:(NSString *)argString
 {
     // Create a working copy.
     NSString *workingArguments = argString;
@@ -193,7 +195,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     // The remaining " characters signify quoted string arguments; they should be paired up.
     NSArray<NSString *> *splitOnQuotes = [workingArguments componentsSeparatedByString:@"\""];
     if ( [splitOnQuotes count] % 2 != 1 )
-        return @[]; // not matching quotes
+        return nil; // not matching quotes
 
     NSString *QUOTED_STRING_TOKEN = @"⍂"; // not trying to be perfect here; we just use an unlikely character
     NSMutableArray<NSString *> *quotedStrings = [NSMutableArray array];
@@ -231,7 +233,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
             // If `arg` has any additional characters either before or after QUOTED_STRING_TOKEN, parsing fails.
             // i.e. if `workingArguments` has quoted strings that are not properly separated by spaces.
             if ( [arg isEqual:QUOTED_STRING_TOKEN] == NO )
-                return @[];
+                return nil;
 
             NSString *quotedString = [quotedStrings objectAtIndex:quotedStringIndex];
             NSString *detokenized = [quotedString detokenizedUnescapedString];
