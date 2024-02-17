@@ -106,6 +106,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         NUMBER_FORMATTER = [[NSNumberFormatter alloc] init];
         NUMBER_FORMATTER.allowsFloats = YES;
         NUMBER_FORMATTER.locale = [NSLocale autoupdatingCurrentLocale];
+        NUMBER_FORMATTER.roundingMode = NSNumberFormatterRoundHalfUp;
     }
 }
 

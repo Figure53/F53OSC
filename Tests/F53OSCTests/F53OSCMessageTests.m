@@ -101,6 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
         [formatter setLocale:[NSLocale currentLocale]];
         [formatter setAllowsFloats:YES];
+        [formatter setRoundingMode:NSNumberFormatterRoundHalfUp];
         
         arg = [formatter numberFromString:qsc]; // 'i' or 'f'
     }
