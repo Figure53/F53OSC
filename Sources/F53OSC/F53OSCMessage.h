@@ -59,6 +59,8 @@ NS_ASSUME_NONNULL_BEGIN
                                     arguments:(NSArray<id> *)arguments
                                   replySocket:(nullable F53OSCSocket *)replySocket;
 
++ (nullable NSString *) tagForArgument:(id)arg;
+
 @property (nonatomic, copy) NSString *addressPattern;
 @property (nonatomic, strong) NSString *typeTagString; /// This is normally constructed from the incoming arguments array.
 @property (nonatomic, strong) NSArray<id> *arguments;  /// May contain NSString, NSData, NSNumber, or F53OSCValue objects. This could be extended in the future, but this covers the required types for OSC 1.0 and OSC 1.1 (with the exception of "timetag").

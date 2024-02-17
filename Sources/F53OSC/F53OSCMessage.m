@@ -418,72 +418,73 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     self.addressPartsCache = nil;
 }
 
++ (nullable NSString *) tagForArgument:(id)arg
+{
+    if ( [arg isKindOfClass:[NSString class]] )
+        return @"s"; // OSC string - 's'
+
+    if ( [arg isKindOfClass:[NSNumber class]] )
+    {
+        CFNumberType numberType = CFNumberGetType( (CFNumberRef)arg );
+        switch ( numberType )
+        {
+            case kCFNumberSInt8Type:
+            case kCFNumberSInt16Type:
+            case kCFNumberSInt32Type:
+            case kCFNumberSInt64Type:
+            case kCFNumberCharType:
+            case kCFNumberShortType:
+            case kCFNumberIntType:
+            case kCFNumberLongType:
+            case kCFNumberLongLongType:
+            case kCFNumberCFIndexType: // aka signed long
+            case kCFNumberNSIntegerType:
+                return @"i"; // OSC integer - 'i'
+
+            case kCFNumberFloat32Type:
+            case kCFNumberFloat64Type:
+            case kCFNumberFloatType:
+            case kCFNumberDoubleType:
+            case kCFNumberCGFloatType:
+                return @"f"; // OSC float - 'f'
+
+            default:
+                NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, arg );
+                return nil;
+        }
+    }
+
+    if ( [arg isKindOfClass:[NSData class]] )
+        return @"b"; // OSC blob - 'b'
+
+    if ( [arg isEqual:[F53OSCValue oscTrue]] )
+        return @"T"; // OSC true - 'T'
+
+    if ( [arg isEqual:[F53OSCValue oscFalse]] )
+        return @"F"; // OSC false - 'F'
+
+    if ( [arg isEqual:[F53OSCValue oscNull]] )
+        return @"N"; // OSC null - 'N'
+
+    if ( [arg isEqual:[F53OSCValue oscImpulse]] )
+        return @"I"; // OSC impulse - 'I'
+
+    // else - unknown
+    return nil;
+}
+
 - (void) setArguments:(NSArray<id> *)argArray
 {
     NSMutableArray<id> *newArgs = [NSMutableArray array];
     NSMutableString *newTypes = [NSMutableString stringWithString:@","];
     for ( id obj in argArray )
     {
-        if ( [obj isKindOfClass:[NSString class]] )
-        {
-            [newTypes appendString:@"s"]; // OSC string - 's'
-            [newArgs addObject:obj];
-        }
-        else if ( [obj isKindOfClass:[NSData class]] )
-        {
-            [newTypes appendString:@"b"]; // OSC blob - 'b'
-            [newArgs addObject:obj];
-        }
-        else if ( [obj isKindOfClass:[NSNumber class]] )
-        {
-            CFNumberType numberType = CFNumberGetType( (CFNumberRef)obj );
-            switch ( numberType )
-            {
-                case kCFNumberSInt8Type:
-                case kCFNumberSInt16Type:
-                case kCFNumberSInt32Type:
-                case kCFNumberSInt64Type:
-                case kCFNumberCharType:
-                case kCFNumberShortType:
-                case kCFNumberIntType:
-                case kCFNumberLongType:
-                case kCFNumberLongLongType:
-                case kCFNumberNSIntegerType:
-                    [newTypes appendString:@"i"]; // OSC integer - 'i'
-                    break;
-                case kCFNumberFloat32Type:
-                case kCFNumberFloat64Type:
-                case kCFNumberFloatType:
-                case kCFNumberDoubleType:
-                case kCFNumberCGFloatType:
-                    [newTypes appendString:@"f"]; // OSC float - 'f'
-                    break;
-                default:
-                    NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, obj );
-                    continue;
-            }
-            [newArgs addObject:obj];
-        }
-        else if ( [obj isEqual:[F53OSCValue oscTrue]] )
-        {
-            [newTypes appendString:@"T"]; // OSC true - 'T'
-            [newArgs addObject:obj];
-        }
-        else if ( [obj isEqual:[F53OSCValue oscFalse]] )
-        {
-            [newTypes appendString:@"F"]; // OSC false - 'F'
-            [newArgs addObject:obj];
-        }
-        else if ( [obj isEqual:[F53OSCValue oscNull]] )
-        {
-            [newTypes appendString:@"N"]; // OSC null - 'N'
-            [newArgs addObject:obj];
-        }
-        else if ( [obj isEqual:[F53OSCValue oscImpulse]] )
-        {
-            [newTypes appendString:@"I"]; // OSC impulse - 'I'
-            [newArgs addObject:obj];
-        }
+        NSString *tag = [F53OSCMessage tagForArgument:obj];
+        if ( !tag )
+            continue;
+
+        [newTypes appendString:tag];
+        [newArgs addObject:obj];
     }
     self.typeTagString = [newTypes copy];
     _arguments = [newArgs copy];
