@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ActivityChartView ()
 
-@property (strong) NSMutableArray *dataPoints;
+@property (strong) NSMutableArray<NSNumber *> *dataPoints;
 
 @end
 
@@ -47,10 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)awakeFromNib
 {
     self.dataPoints = [NSMutableArray array];
-    for (int i=0; i < DATA_POINTS; i++)
-    {
+    for (int i = 0; i < DATA_POINTS; i++)
         [self.dataPoints addObject:@0];
-    }
 }
 
 - (void)addDataPoint:(NSNumber *)point
@@ -64,27 +62,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
     CGContextRef ctx = [[NSGraphicsContext currentContext] CGContext];
     
-    NSNumber *max = @0;
-    NSNumber *n;
-    
-    for (int i=0; i < DATA_POINTS; i++)
+    CGFloat max = 0.0;
+    CGFloat n = 0.0;
+
+    for (int i = 0; i < DATA_POINTS; i++)
     {
-        n = [self.dataPoints objectAtIndex:i];
-        if ([max doubleValue] < [n doubleValue]) {
+        n = [[self.dataPoints objectAtIndex:i] doubleValue];
+        if (max < n)
             max = n;
-        }
     }
     
-    if ( [max isLessThanOrEqualTo:@0] ) {
-        max = @50;
-    }
-    
-    double slope = 1.0 * CHART_HEIGHT / [max doubleValue];
-    double barWidth = 1.0 * CHART_WIDTH / DATA_POINTS;
-    
+    if (max <= 0)
+        max = 50.0;
+
+    CGFloat slope = 1.0 * CHART_HEIGHT / max;
+    CGFloat barWidth = 1.0 * CHART_WIDTH / DATA_POINTS;
+
     // redraw background
     CGContextSetRGBFillColor (ctx, 0, 0, 0, 1);
-    CGContextFillRect (ctx, CGRectMake (0, 0, CHART_WIDTH, CHART_HEIGHT ));
+    CGContextFillRect (ctx, CGRectMake (0, 0, CHART_WIDTH, CHART_HEIGHT));
     
     // path
     CGMutablePathRef path = CGPathCreateMutable();
@@ -93,9 +89,9 @@ NS_ASSUME_NONNULL_BEGIN
     CGPathMoveToPoint(path, NULL, CHART_WIDTH, 0);
     CGPathAddLineToPoint(path, NULL, CHART_WIDTH, 0);
     
-    for (int i=0; i < DATA_POINTS; i++)
+    for (int i = 0; i < DATA_POINTS; i++)
     {
-        double normalizedValue = slope * [[self.dataPoints objectAtIndex:i] doubleValue] + 0.5;
+        CGFloat normalizedValue = slope * [[self.dataPoints objectAtIndex:i] doubleValue] + 0.5;
         if (i == 0)
             CGPathAddLineToPoint(path, NULL, CHART_WIDTH, normalizedValue);
         

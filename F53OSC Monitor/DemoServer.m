@@ -35,13 +35,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong) NSByteCountFormatter *formatter;
 @property (strong) F53OSCServer *server;
 @property (assign) UInt16 listeningPort;
-@property (assign) bool isActive;
+@property (readwrite, getter=isActive) BOOL active;
 
 @end
 
 @implementation DemoServer
 
-- (id)initWithPort:(UInt16)port
+- (instancetype)initWithPort:(UInt16)port
 {
     self = [super init];
     if ( self )
@@ -71,19 +71,17 @@ NS_ASSUME_NONNULL_BEGIN
     else
     {
         [self.app log:[NSString stringWithFormat:@"F53OSC Monitor is listening for OSC messages on port %hu", self.server.port]];
-        self.isActive = YES;
+        self.active = YES;
     }
 
-    if ( errorString )
-    {
+    if (errorString)
         [self.app log:errorString];
-    }
 }
 
 - (void)stop
 {
     [self.server stopListening];
-    self.isActive = NO;
+    self.active = NO;
 }
 
 - (NSString *)stats

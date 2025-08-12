@@ -37,11 +37,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak) AppDelegate *app;
 
-- (id) initWithPort:(UInt16)port;
+- (instancetype) initWithPort:(UInt16)port;
 
 - (void) start;
 - (void) stop;
-- (bool) isActive;
+@property (readonly, getter=isActive) BOOL active;
 
 - (NSString *)stats;
 - (NSNumber *)bytesPerSecond;
