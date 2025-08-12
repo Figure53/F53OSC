@@ -1,9 +1,9 @@
 //
 //  F53OSCPacket.h
+//  F53OSC
 //
 //  Created by Siobhán Dougall on 1/17/11.
-//
-//  Copyright (c) 2011-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2025 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal

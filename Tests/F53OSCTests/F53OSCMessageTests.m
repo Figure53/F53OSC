@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 2/14/20.
-//  Copyright (c) 2020-2022 Figure 53, LLC. All rights reserved.
+//  Copyright (c) 2020-2025 Figure 53, LLC. All rights reserved.
 //
 
 #if !__has_feature(objc_arc)

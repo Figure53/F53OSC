@@ -4,8 +4,7 @@
 //
 //  Created by Brent Lord on 8/27/20.
 //  Adapted from QLKBrowser by Zach Waugh.
-//
-//  Copyright (c) 2013-2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2025 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal

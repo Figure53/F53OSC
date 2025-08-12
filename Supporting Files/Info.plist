@@ -19,6 +19,6 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2015-2020 Figure 53. All rights reserved.</string>
+	<string>Copyright © 2015-2025 Figure 53. All rights reserved.</string>
 </dict>
 </plist>

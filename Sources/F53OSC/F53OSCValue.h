@@ -1,9 +1,9 @@
 //
 //  F53OSCValue.h
+//  F53OSC
 //
 //  Created by Brent Lord on 2/19/20.
-//
-//  Copyright (c) 2020 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2020-2025 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
