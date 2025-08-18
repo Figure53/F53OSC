@@ -103,4 +103,9 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 
 @end
 
+
+@interface F53OSCSocket (DisallowedInits)
+- (instancetype)init __attribute__((unavailable("Use -initWithTcpSocket: or -initWithUdpSocket: instead.")));
+@end
+
 NS_ASSUME_NONNULL_END
