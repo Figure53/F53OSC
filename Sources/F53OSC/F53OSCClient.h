@@ -49,10 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak)                     id<F53OSCClientDelegate> delegate;
 @property (nonatomic, strong, null_resettable)  dispatch_queue_t socketDelegateQueue; // defaults to main queue
 @property (nonatomic, copy, nullable)           NSString *interface;
-@property (nonatomic, copy, nullable)           NSString *host;
-@property (nonatomic, assign)                   UInt16 port;
-@property (nonatomic, getter=isIPv6Enabled)     BOOL IPv6Enabled; // default NO
-@property (nonatomic, assign)                   BOOL useTcp;
+@property (nonatomic, copy, nullable)           NSString *host;     // default "localhost"
+@property (nonatomic, assign)                   UInt16 port;        // default 53000
+@property (nonatomic, getter=isIPv6Enabled)     BOOL IPv6Enabled;   // default NO
+@property (nonatomic, assign)                   BOOL useTcp;        // default NO
 @property (nonatomic, assign)                   NSTimeInterval tcpTimeout; // default -1 (no timeout)
 @property (nonatomic, assign)                   NSUInteger readChunkSize;  // default 0 (no partial reads)
 @property (nonatomic, strong, nullable)         id userData;

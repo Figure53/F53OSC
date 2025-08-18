@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface F53OSCPacket : NSObject <NSCopying>
 
-@property (strong, nullable) F53OSCSocket *replySocket; ///< If this message was received from a client, this is the socket to use to reply.
+@property (strong, nullable) F53OSCSocket *replySocket; // If this message was received from a client, this is the socket to use to reply.
 
 - (nullable NSData *) packetData;
 - (nullable NSString *) asQSC;

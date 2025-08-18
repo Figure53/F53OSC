@@ -78,9 +78,9 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 @property (nonatomic, readonly) BOOL isUdpSocket;
 @property (nonatomic, assign) F53TCPDataFraming tcpDataFraming; // Default SLIP
 
-@property (nonatomic, copy, nullable) NSString *interface;
-@property (nonatomic, copy, nullable) NSString *host;
-@property (nonatomic, assign) UInt16 port;
+@property (nonatomic, copy, nullable) NSString *interface;      // Default nil, aka default interface
+@property (nonatomic, copy, nullable) NSString *host;           // Default "localhost"
+@property (nonatomic, assign) UInt16 port;                      // Default 0
 @property (nonatomic, getter=isIPv6Enabled) BOOL IPv6Enabled;
 
 @property (nonatomic, readonly) BOOL hostIsLocal;

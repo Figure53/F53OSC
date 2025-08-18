@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.delegate = nil;
         self.interface = nil;
         self.host = @"localhost";
-        self.port = 53000;         // QLab is 53000, Stagetracker is 57115.
+        self.port = 53000; // QLab default listening port
         self.IPv6Enabled = NO;
         self.useTcp = NO;
         self.tcpTimeout = -1;   // no timeout
@@ -253,13 +253,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSDictionary<NSString *, id> *) state
 {
     return @{
-             @"interface": self.interface ? self.interface : @"",
-             @"host": self.host ? self.host : @"",
-             @"port": @( self.port ),
-             @"useTcp": @( self.useTcp ),
-             @"tcpTimeout": @( self.tcpTimeout ),
-             @"userData": ( self.userData ? self.userData : [NSNull null] )
-             };
+        @"interface": self.interface ? self.interface : @"",
+        @"host": self.host ? self.host : @"",
+        @"port": @( self.port ),
+        @"useTcp": @( self.useTcp ),
+        @"tcpTimeout": @( self.tcpTimeout ),
+        @"userData": ( self.userData ? self.userData : [NSNull null] )
+    };
 }
 
 - (void) setState:(NSDictionary<NSString *, id> *)state

@@ -52,7 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL) legalAddress:(nullable NSString *)address;
 + (BOOL) legalMethod:(nullable NSString *)method;
 
+// Arguments should be space-delimited following the address.
+// Arguments enclosed in quotes are parsed as string arguments.
+// Numeric, non-string arguments are formatted using the current machine locale.
 + (nullable F53OSCMessage *) messageWithString:(NSString *)qscString;
+
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
                                     arguments:(NSArray<id> *)arguments;
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
@@ -61,16 +65,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable NSString *) tagForArgument:(id)arg;
 
-@property (nonatomic, copy) NSString *addressPattern;
-@property (nonatomic, strong) NSString *typeTagString; /// This is normally constructed from the incoming arguments array.
-@property (nonatomic, strong) NSArray<id> *arguments;  /// May contain NSString, NSData, NSNumber, or F53OSCValue objects. This could be extended in the future, but this covers the required types for OSC 1.0 and OSC 1.1 (with the exception of "timetag").
+@property (nonatomic, copy) NSString *addressPattern;   // default "/"
+@property (nonatomic, strong) NSString *typeTagString;  // Normally not set directly. Automatically constructed when setting `arguments`.
+@property (nonatomic, strong) NSArray<id> *arguments;   // May contain NSString, NSData, NSNumber, or F53OSCValue objects. This could be extended in the future, but this covers the required types for OSC 1.0 and OSC 1.1 (with the exception of "timetag").
+
+// Transient - not archived
 @property (nonatomic, strong, nullable) id userData;
 
 - (NSArray<NSString *> *) addressParts;
 
 // redeclare as nonnull for this subclass
 - (NSData *) packetData;
-- (NSString *) asQSC;
+- (NSString *) asQSC; // not localized, formatted equivalent to `en_US_POSIX` locale
 
 @end
 

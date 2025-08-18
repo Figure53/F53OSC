@@ -345,6 +345,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     [coder encodeObject:self.addressPattern forKey:@"addressPattern"];
     [coder encodeObject:self.typeTagString forKey:@"typeTagString"];
     [coder encodeObject:self.arguments forKey:@"arguments"];
+    // NOTE: `userData` is not archived.
 }
 
 - (nullable instancetype) initWithCoder:(NSCoder *)coder
@@ -355,6 +356,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         [self setAddressPattern:[coder decodeObjectOfClass:[NSString class] forKey:@"addressPattern"]];
         [self setTypeTagString:[coder decodeObjectOfClass:[NSString class] forKey:@"typeTagString"]];
         [self setArguments:[coder decodeObjectOfClasses:[NSSet setWithObjects:[NSArray class], [NSString class], [NSNumber class], [NSData class], [F53OSCValue class], nil] forKey:@"arguments"]];
+        // NOTE: `userData` is not archived.
     }
     return self;
 }

@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable F53OSCBundle *) bundleWithString:(NSString *)qscString;
 + (F53OSCBundle *) bundleWithTimeTag:(F53OSCTimeTag *)timeTag
-                            elements:(NSArray<NSData *> *)elements; ///< Elements must be an array of NSData objects; convert F53OSCMessages using their packetData method.
+                            elements:(NSArray<NSData *> *)elements; // Elements must be an array of NSData objects; convert F53OSCMessages using their packetData method.
 
 @property (strong) F53OSCTimeTag *timeTag;
 @property (strong) NSArray<NSData *> *elements;

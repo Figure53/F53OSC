@@ -48,9 +48,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak)                 id<F53OSCServerDelegate> delegate;
 @property (nonatomic, strong, readonly)     F53OSCSocket *udpSocket;
 @property (nonatomic, strong, readonly)     F53OSCSocket *tcpSocket;
-@property (nonatomic, assign)               UInt16 port;
-@property (nonatomic, assign)               UInt16 udpReplyPort;
-@property (nonatomic, getter=isIPv6Enabled) BOOL IPv6Enabled; // default NO
+@property (nonatomic, assign)               UInt16 port;         // default 0
+@property (nonatomic, assign)               UInt16 udpReplyPort; // default 0
+@property (nonatomic, getter=isIPv6Enabled) BOOL IPv6Enabled;    // default NO
 @property (strong, nullable)                NSData *keyPair;
 
 - (instancetype) initWithDelegateQueue:(nullable dispatch_queue_t)queue;

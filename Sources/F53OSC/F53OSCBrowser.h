@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface F53OSCClientRecord : NSObject <NSCopying>
 
 @property (nonatomic)                   UInt16 port;
-@property (nonatomic)                   BOOL useTCP;
+@property (nonatomic)                   BOOL useTCP; // default NO
 @property (nonatomic, copy)             NSArray<NSString *> *hostAddresses;
 @property (nonatomic, strong, nullable) NSNetService *netService;
 
