@@ -29,7 +29,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface F53OSCTimeTag : NSObject 
+@interface F53OSCTimeTag : NSObject <NSCopying>
 
 @property (assign) UInt32 seconds;
 @property (assign) UInt32 fraction;

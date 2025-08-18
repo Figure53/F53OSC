@@ -37,6 +37,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation F53OSCTimeTag
 
+- (id) copyWithZone:(nullable NSZone *)zone
+{
+    F53OSCTimeTag *copy = [[self class] allocWithZone:zone];
+    copy.seconds = self.seconds;
+    copy.fraction = self.fraction;
+    return copy;
+}
+
 + (F53OSCTimeTag *) timeTagWithDate:(NSDate *)date
 {
     double fractionsPerSecond = (double)0xffffffff;
@@ -55,16 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
     return result;
 }
 
-- (NSData *) oscTimeTagData
-{
-    UInt32 swappedSeconds = OSSwapHostToBigInt32( self.seconds );
-    UInt32 swappedFraction = OSSwapHostToBigInt32( self.fraction );
-    NSMutableData *data = [NSMutableData data];
-    [data appendBytes:&swappedSeconds length:sizeof( UInt32 )];
-    [data appendBytes:&swappedFraction length:sizeof( UInt32 )];
-    return [data copy];
-}
-
 + (nullable F53OSCTimeTag *) timeTagWithOSCTimeBytes:(char *)buf
 {
     if ( buf == NULL )
@@ -78,6 +76,19 @@ NS_ASSUME_NONNULL_BEGIN
     result.seconds = OSSwapBigToHostInt32( seconds );
     result.fraction = OSSwapBigToHostInt32( fraction );
     return result;
+}
+
+
+#pragma mark -
+
+- (NSData *) oscTimeTagData
+{
+    UInt32 swappedSeconds = OSSwapHostToBigInt32( self.seconds );
+    UInt32 swappedFraction = OSSwapHostToBigInt32( self.fraction );
+    NSMutableData *data = [NSMutableData data];
+    [data appendBytes:&swappedSeconds length:sizeof( UInt32 )];
+    [data appendBytes:&swappedFraction length:sizeof( UInt32 )];
+    return [data copy];
 }
 
 @end
