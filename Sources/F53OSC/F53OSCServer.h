@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign)               UInt16 port;
 @property (nonatomic, assign)               UInt16 udpReplyPort;
 @property (nonatomic, getter=isIPv6Enabled) BOOL IPv6Enabled; // default NO
-@property (strong)                          NSData *keyPair;
+@property (strong, nullable)                NSData *keyPair;
 
 - (instancetype) initWithDelegateQueue:(nullable dispatch_queue_t)queue;
 
