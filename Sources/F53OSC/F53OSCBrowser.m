@@ -105,8 +105,8 @@ NS_ASSUME_NONNULL_BEGIN
         self.running = NO;
         self.netServiceBrowser = nil;
         
-        self.unresolvedNetServices = [NSMutableArray arrayWithCapacity:1];
-        self.mutableClientRecords = [NSMutableArray arrayWithCapacity:1];
+        self.unresolvedNetServices = [NSMutableArray array];
+        self.mutableClientRecords = [NSMutableArray array];
     }
     return self;
 }
@@ -118,14 +118,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - custom getters/setters
 
-- (NSArray<F53OSCClientRecord *> *)clients
+- (NSArray<F53OSCClientRecord *> *)clientRecords
 {
     return self.mutableClientRecords.copy;
 }
 
 - (void)setDomain:(NSString *)domain
 {
-    if ( domain.length == 0 )
+    if ( !domain )
         return;
     
     if ( [_domain isEqualToString:domain] == NO )
@@ -143,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setServiceType:(NSString *)serviceType
 {
-    if ( serviceType.length == 0 )
+    if ( !serviceType )
         return;
     
     if ( [_serviceType isEqualToString:serviceType] == NO )
@@ -198,6 +198,8 @@ NS_ASSUME_NONNULL_BEGIN
     self.netServiceDomainsBrowser.delegate = self;
     
     [self.netServiceDomainsBrowser searchForBrowsableDomains];
+
+    // NOTE: `running` is set to YES once `netServiceBrowserWillSearch:` is notified the `netServiceDomainsBrowser` has started.
 }
 
 - (void)stop
@@ -205,13 +207,21 @@ NS_ASSUME_NONNULL_BEGIN
 #if DEBUG_BROWSER
     NSLog( @"[browser] stopping browser" );
 #endif
-    
+
+    // Update `running` to NO immediately, in case we are starting again very quickly with a new browser.
+    self.running = NO;
+
     self.delegate = nil;
     
-    // Stop bonjour browsers - delegate methods will perform cleanup
+    // Stop bonjour browsers and immediately cleanup
     [self.netServiceDomainsBrowser stop];
+    self.netServiceDomainsBrowser.delegate = nil;
+    self.netServiceDomainsBrowser = nil;
+
     [self.netServiceBrowser stop];
-    
+    self.netServiceBrowser.delegate = nil;
+    self.netServiceBrowser = nil;
+
     // Stop/remove all clients
     NSArray<F53OSCClientRecord *> *clientRecords = self.mutableClientRecords.copy;
     for ( F53OSCClientRecord *aClientRecord in clientRecords )
