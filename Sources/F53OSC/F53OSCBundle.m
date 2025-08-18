@@ -64,6 +64,14 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (id) copyWithZone:(nullable NSZone *)zone
+{
+    F53OSCBundle *copy = [super copyWithZone:zone];
+    copy.timeTag = [self.timeTag copyWithZone:zone];
+    copy.elements = [self.elements copyWithZone:zone];
+    return copy;
+}
+
 - (NSString *) description
 {
     return [NSString stringWithFormat:@"%@", self.elements];
