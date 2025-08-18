@@ -48,8 +48,8 @@
 		3D1E08A5242A829300655E76 /* NSString+F53OSCString.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E08AB242A844E00655E76 /* F53OSC.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0822242A7E1000655E76 /* F53OSC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E08AC242A844E00655E76 /* F53OSC.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0822242A7E1000655E76 /* F53OSC.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3D1E08AD242A847A00655E76 /* F53OSCServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E07FD242A7E1000655E76 /* F53OSCServerTests.m */; };
-		3D1E08AE242A847C00655E76 /* F53OSCMessageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E07FE242A7E1000655E76 /* F53OSCMessageTests.m */; };
+		3D1E08AD242A847A00655E76 /* F53OSC_ServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E07FD242A7E1000655E76 /* F53OSC_ServerTests.m */; };
+		3D1E08AE242A847C00655E76 /* F53OSC_MessageTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E07FE242A7E1000655E76 /* F53OSC_MessageTests.m */; };
 		3D1E08AF242A847E00655E76 /* F53OSC_NSNumberTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */; };
 		3D1E08B2242A84D500655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
 		3D1E08B3242A84D500655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
@@ -174,12 +174,13 @@
 		3D0333AC25AF602100E4EFDA /* F53OSCBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCBrowser.m; sourceTree = "<group>"; };
 		3D083542242BF3C000E4A247 /* F53OSCValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCValue.m; sourceTree = "<group>"; };
 		3D083543242BF3C000E4A247 /* F53OSCValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCValue.h; sourceTree = "<group>"; };
+		3D0DD31A2E53655E00B1A925 /* F53OSC.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = F53OSC.xctestplan; sourceTree = "<group>"; };
 		3D1E07F0242A7D5100655E76 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3D1E07F2242A7D5D00655E76 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		3D1E07F5242A7D6900655E76 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3D1E07F8242A7D7200655E76 /* F53OSC.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = F53OSC.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		3D1E07FD242A7E1000655E76 /* F53OSCServerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCServerTests.m; sourceTree = "<group>"; };
-		3D1E07FE242A7E1000655E76 /* F53OSCMessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCMessageTests.m; sourceTree = "<group>"; };
+		3D1E07F8242A7D7200655E76 /* F53OSC.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = F53OSC.podspec; sourceTree = "<group>"; };
+		3D1E07FD242A7E1000655E76 /* F53OSC_ServerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_ServerTests.m; sourceTree = "<group>"; };
+		3D1E07FE242A7E1000655E76 /* F53OSC_MessageTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_MessageTests.m; sourceTree = "<group>"; };
 		3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NSNumberTests.m; sourceTree = "<group>"; };
 		3D1E0805242A7E1000655E76 /* F53OSCPacket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCPacket.m; sourceTree = "<group>"; };
 		3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+F53OSCString.h"; sourceTree = "<group>"; };
@@ -277,6 +278,7 @@
 		3D1E07FB242A7E1000655E76 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				3D0DD31A2E53655E00B1A925 /* F53OSC.xctestplan */,
 				3D1E07FC242A7E1000655E76 /* F53OSCTests */,
 			);
 			path = Tests;
@@ -285,10 +287,10 @@
 		3D1E07FC242A7E1000655E76 /* F53OSCTests */ = {
 			isa = PBXGroup;
 			children = (
+				3D1E07FE242A7E1000655E76 /* F53OSC_MessageTests.m */,
 				3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */,
 				3DD52F4327B2B80400F1DD6B /* F53OSC_NSStringTests.m */,
-				3D1E07FE242A7E1000655E76 /* F53OSCMessageTests.m */,
-				3D1E07FD242A7E1000655E76 /* F53OSCServerTests.m */,
+				3D1E07FD242A7E1000655E76 /* F53OSC_ServerTests.m */,
 			);
 			path = F53OSCTests;
 			sourceTree = "<group>";
@@ -297,6 +299,7 @@
 			isa = PBXGroup;
 			children = (
 				3D1E0803242A7E1000655E76 /* F53OSC */,
+				66EE17541B729EA0008B6743 /* F53OSC Monitor */,
 				3DA5A9AF242FC5BD0068AF88 /* Vendor */,
 			);
 			path = Sources;
@@ -383,7 +386,6 @@
 			children = (
 				3D1E0802242A7E1000655E76 /* Sources */,
 				3D1E07FB242A7E1000655E76 /* Tests */,
-				66EE17541B729EA0008B6743 /* F53OSC Monitor */,
 				3D1E0914242AAC9C00655E76 /* Supporting Files */,
 				66EE17531B729EA0008B6743 /* Products */,
 				3D1E07F8242A7D7200655E76 /* F53OSC.podspec */,
@@ -770,9 +772,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D1E08AF242A847E00655E76 /* F53OSC_NSNumberTests.m in Sources */,
-				3D1E08AE242A847C00655E76 /* F53OSCMessageTests.m in Sources */,
+				3D1E08AE242A847C00655E76 /* F53OSC_MessageTests.m in Sources */,
 				3DD52F4427B2B80400F1DD6B /* F53OSC_NSStringTests.m in Sources */,
-				3D1E08AD242A847A00655E76 /* F53OSCServerTests.m in Sources */,
+				3D1E08AD242A847A00655E76 /* F53OSC_ServerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1333,7 +1335,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
+				INFOPLIST_FILE = "$PROJECT_DIR/Sources/F53OSC Monitor/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "F53OSC-Swift.h";
@@ -1476,7 +1478,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
+				INFOPLIST_FILE = "$PROJECT_DIR/Sources/F53OSC Monitor/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "F53OSC-Swift.h";
@@ -1490,7 +1492,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "$PROJECT_DIR/F53OSC Monitor/Info.plist";
+				INFOPLIST_FILE = "$PROJECT_DIR/Sources/F53OSC Monitor/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "F53OSC-Swift.h";

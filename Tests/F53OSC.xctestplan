@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "507223CE-E1F2-4648-AE96-2E82682114C7",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:F53OSC.xcodeproj",
+      "identifier" : "3D1E0853242A815100655E76",
+      "name" : "F53OSC-macOS"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:F53OSC.xcodeproj",
+        "identifier" : "3D1E0846242A7F5B00655E76",
+        "name" : "F53OSCTests"
+      }
+    }
+  ],
+  "version" : 1
+}

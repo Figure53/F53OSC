@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -669,45 +671,44 @@
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="58" y="20"/>
         </menu>
         <window title="F53OSC Monitor" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="639" height="600"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="639" height="600"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GnB-br-kru">
                         <rect key="frame" x="-1" y="31" width="641" height="570"/>
-                        <clipView key="contentView" id="qet-vE-xB4">
-                            <rect key="frame" x="1" y="1" width="223" height="133"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <clipView key="contentView" drawsBackground="NO" id="qet-vE-xB4">
+                            <rect key="frame" x="1" y="1" width="639" height="568"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
-                                <textView editable="NO" importsGraphics="NO" richText="NO" findStyle="panel" verticallyResizable="YES" allowsNonContiguousLayout="YES" id="tqp-Gh-9hw">
-                                    <rect key="frame" x="0.0" y="0.0" width="223" height="600"/>
+                                <textView editable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="panel" allowsNonContiguousLayout="YES" id="tqp-Gh-9hw">
+                                    <rect key="frame" x="0.0" y="0.0" width="639" height="568"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="624" height="568"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <size key="minSize" width="639" height="568"/>
                                     <size key="maxSize" width="641" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="624" height="568"/>
-                                    <size key="maxSize" width="641" height="10000000"/>
                                 </textView>
                             </subviews>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="1k8-r9-QAA">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="1k8-r9-QAA">
                             <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="kFj-JQ-Uxd">
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="kFj-JQ-Uxd">
                             <rect key="frame" x="224" y="1" width="15" height="133"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gbc-FM-R7n">
+                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gbc-FM-R7n">
                         <rect key="frame" x="18" y="9" width="307" height="14"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="303" id="T7z-WS-ZWg"/>
@@ -719,20 +720,20 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qmL-3R-kIP">
-                        <rect key="frame" x="520" y="-1" width="105" height="32"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="93" id="Gax-17-n4i"/>
-                        </constraints>
+                        <rect key="frame" x="519" y="-1" width="107" height="32"/>
                         <buttonCell key="cell" type="push" title="Disconnect" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gtK-9u-G45">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="cellTitle"/>
                         </buttonCell>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="93" id="Gax-17-n4i"/>
+                        </constraints>
                         <connections>
                             <action selector="toggleServerActive:" target="Voe-Tx-rLC" id="GC4-aB-rIA"/>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0de-lS-QHi">
-                        <rect key="frame" x="447" y="-1" width="73" height="32"/>
+                        <rect key="frame" x="455" y="-1" width="66" height="32"/>
                         <buttonCell key="cell" type="push" title="Clear" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1t8-hd-VKB">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -758,11 +759,11 @@
             <contentBorderThickness minY="32"/>
             <point key="canvasLocation" x="557.5" y="642"/>
         </window>
-        <window title="Activity" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="w36-HG-bcR">
+        <window title="Activity" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="w36-HG-bcR">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="283" y="305" width="360" height="200"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1512" height="944"/>
             <value key="minSize" type="size" width="360" height="200"/>
             <value key="maxSize" type="size" width="360" height="200"/>
             <view key="contentView" id="KiA-fY-jJL">

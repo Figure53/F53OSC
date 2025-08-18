@@ -1,5 +1,5 @@
 //
-//  F53OSCServerTests.m
+//  F53OSC_ServerTests.m
 //  F53OSC
 //
 //  Created by Brent Lord on 2/24/20.
@@ -18,11 +18,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface F53OSCServerTests : XCTestCase
+@interface F53OSC_ServerTests : XCTestCase
 @end
 
 
-@implementation F53OSCServerTests
+@implementation F53OSC_ServerTests
 
 #pragma mark - XCTest setup/teardown
 
