@@ -36,16 +36,20 @@
 
 #define F53OSCHandshakeProtocolVersion 1
 
+NS_ASSUME_NONNULL_BEGIN
+
 static NSString *const kRequestEncryptionAddress = @"!requestEncryption";
 static NSString *const kApproveEncryptionAddress = @"!approveEncryption";
 static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
 
 
-NS_ASSUME_NONNULL_BEGIN
-
 @interface F53OSCEncryptHandshake ()
 
 @property (weak) F53OSCEncrypt *encrypter;
+
+@property (assign, readwrite) BOOL handshakeComplete;
+@property (strong, readwrite) NSData *peerKey; // Peer's public key
+@property (assign, readwrite) F53OSCEncryptionHandshakeMessage lastProcessedMessage; // Indicated which message was last processed
 
 @end
 
@@ -71,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Request arguments:
 /// 1: Handshake protocol version
 /// 2: Key pair data
-- (nullable F53OSCMessage *) requestEncryptionMessage;
+- (nullable F53OSCMessage *) requestEncryptionMessage
 {
     NSData *pubKey = self.encrypter.publicKeyData;
     if ( pubKey )
@@ -189,7 +193,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.encrypter.salt = salt;
         if ( ![self.encrypter beginEncryptingWithPeerKey:self.peerKey] )
             return NO;
-        self.lastProcessedMessage = F53OSCEncryptionHandshakeMessageAppprove;
+        self.lastProcessedMessage = F53OSCEncryptionHandshakeMessageApprove;
         return YES;
     }
     else if ( [message.addressPattern isEqualToString:kBeginEncryptionAddress] )
@@ -200,6 +204,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     NSLog(@"F53OSC received unknown encryption handshake message: %@", message.addressPattern);
     return NO;
+}
+
++ (int)protocolVersion
+{
+    return F53OSCHandshakeProtocolVersion;
 }
 
 @end

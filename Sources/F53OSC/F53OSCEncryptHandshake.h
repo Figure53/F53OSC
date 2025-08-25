@@ -39,16 +39,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, F53OSCEncryptionHandshakeMessage)
 {
-    F53OSCEncryptionHandshakeMessageRequest = 0,
-    F53OSCEncryptionHandshakeMessageAppprove,
+    F53OSCEncryptionHandshakeMessageNone = 0,
+    F53OSCEncryptionHandshakeMessageRequest,
+    F53OSCEncryptionHandshakeMessageApprove,
     F53OSCEncryptionHandshakeMessageBegin,
 };
 
 @interface F53OSCEncryptHandshake : NSObject
 
-@property (assign) BOOL handshakeComplete;
-@property (strong) NSData *peerKey; // Peer's public key
-@property (assign) F53OSCEncryptionHandshakeMessage lastProcessedMessage; // Indicated which message was last processed
+@property (readonly) BOOL handshakeComplete;
+@property (readonly) NSData *peerKey; // Peer's public key
+@property (readonly) F53OSCEncryptionHandshakeMessage lastProcessedMessage; // Indicated which message was last processed
 
 + (instancetype) handshakeWithEncrypter:(F53OSCEncrypt *)encrypter;
 + (BOOL) isEncryptHandshakeMessage:(F53OSCMessage *)message;
@@ -57,6 +58,13 @@ typedef NS_ENUM(NSUInteger, F53OSCEncryptionHandshakeMessage)
 - (F53OSCMessage *) beginEncryptionMessage;
 - (BOOL) processHandshakeMessage:(F53OSCMessage *)message;
 
++ (int)protocolVersion;
+
+@end
+
+
+@interface F53OSCEncryptHandshake (DisallowedInits)
+- (instancetype)init __attribute__((unavailable("Use +handshakeWithEncrypter: instead.")));
 @end
 
 NS_ASSUME_NONNULL_END
