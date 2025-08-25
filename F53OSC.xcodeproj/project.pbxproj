@@ -129,7 +129,19 @@
 		3DA5A9AB242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3DA5A9AC242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3DA5A9AD242FC4AB0068AF88 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3DA895E22E4B9F7E00084A98 /* F53OSC_BrowserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA895DD2E4B9F7E00084A98 /* F53OSC_BrowserTests.m */; };
+		3DA895E32E4B9F7E00084A98 /* F53OSC_ClientTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA895DE2E4B9F7E00084A98 /* F53OSC_ClientTests.m */; };
+		3DA895E52E4B9F7E00084A98 /* F53OSC_ConcurrencyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA895DF2E4B9F7E00084A98 /* F53OSC_ConcurrencyTests.m */; };
+		3DA895E62E4B9F7E00084A98 /* F53OSC_EncryptTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA895E02E4B9F7E00084A98 /* F53OSC_EncryptTests.m */; };
+		3DA895EA2E4B9F8800084A98 /* F53OSC_NetworkFailureTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA895E82E4B9F8800084A98 /* F53OSC_NetworkFailureTests.m */; };
+		3DA895EC2E4B9F9200084A98 /* F53OSC_ParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA895EB2E4B9F9200084A98 /* F53OSC_ParserTests.m */; };
+		3DA895F22E4B9F9900084A98 /* F53OSC_SocketTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA895ED2E4B9F9900084A98 /* F53OSC_SocketTests.m */; };
+		3DB807D02E54F89B009A16ED /* F53OSC_NSDataTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DB807CF2E54F89B009A16ED /* F53OSC_NSDataTests.m */; };
 		3DD52F4427B2B80400F1DD6B /* F53OSC_NSStringTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DD52F4327B2B80400F1DD6B /* F53OSC_NSStringTests.m */; };
+		3DEF13052E4BECAB000605AB /* F53OSC_BundleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DEF13042E4BECAB000605AB /* F53OSC_BundleTests.m */; };
+		3DEF13072E4C2436000605AB /* F53OSC_TimeTagTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DEF13062E4C2436000605AB /* F53OSC_TimeTagTests.m */; };
+		3DEF13092E4C2521000605AB /* F53OSC_PacketTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DEF13082E4C2521000605AB /* F53OSC_PacketTests.m */; };
+		3DEF130B2E4E0B74000605AB /* F53OSC_OSCValueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DEF130A2E4E0B74000605AB /* F53OSC_OSCValueTests.m */; };
 		66AFE43C1B79485100985C54 /* ActivityChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66AFE43B1B79485100985C54 /* ActivityChartView.m */; };
 		66EE17591B729EA0008B6743 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE17581B729EA0008B6743 /* AppDelegate.m */; };
 		66EE175B1B729EA0008B6743 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE175A1B729EA0008B6743 /* main.m */; };
@@ -220,7 +232,19 @@
 		3DA5A9A0242FC4AB0068AF88 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		3DA5A9A1242FC4AB0068AF88 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		3DA5A9B02432674F0068AF88 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		3DA895DD2E4B9F7E00084A98 /* F53OSC_BrowserTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_BrowserTests.m; sourceTree = "<group>"; };
+		3DA895DE2E4B9F7E00084A98 /* F53OSC_ClientTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_ClientTests.m; sourceTree = "<group>"; };
+		3DA895DF2E4B9F7E00084A98 /* F53OSC_ConcurrencyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_ConcurrencyTests.m; sourceTree = "<group>"; };
+		3DA895E02E4B9F7E00084A98 /* F53OSC_EncryptTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_EncryptTests.m; sourceTree = "<group>"; };
+		3DA895E82E4B9F8800084A98 /* F53OSC_NetworkFailureTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NetworkFailureTests.m; sourceTree = "<group>"; };
+		3DA895EB2E4B9F9200084A98 /* F53OSC_ParserTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_ParserTests.m; sourceTree = "<group>"; };
+		3DA895ED2E4B9F9900084A98 /* F53OSC_SocketTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_SocketTests.m; sourceTree = "<group>"; };
+		3DB807CF2E54F89B009A16ED /* F53OSC_NSDataTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NSDataTests.m; sourceTree = "<group>"; };
 		3DD52F4327B2B80400F1DD6B /* F53OSC_NSStringTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_NSStringTests.m; sourceTree = "<group>"; };
+		3DEF13042E4BECAB000605AB /* F53OSC_BundleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = F53OSC_BundleTests.m; sourceTree = "<group>"; };
+		3DEF13062E4C2436000605AB /* F53OSC_TimeTagTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_TimeTagTests.m; sourceTree = "<group>"; };
+		3DEF13082E4C2521000605AB /* F53OSC_PacketTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_PacketTests.m; sourceTree = "<group>"; };
+		3DEF130A2E4E0B74000605AB /* F53OSC_OSCValueTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_OSCValueTests.m; sourceTree = "<group>"; };
 		66AFE43A1B79485100985C54 /* ActivityChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityChartView.h; sourceTree = "<group>"; };
 		66AFE43B1B79485100985C54 /* ActivityChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ActivityChartView.m; sourceTree = "<group>"; };
 		66EE17521B729EA0008B6743 /* F53OSC Monitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "F53OSC Monitor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -287,10 +311,22 @@
 		3D1E07FC242A7E1000655E76 /* F53OSCTests */ = {
 			isa = PBXGroup;
 			children = (
+				3DA895DD2E4B9F7E00084A98 /* F53OSC_BrowserTests.m */,
+				3DEF13042E4BECAB000605AB /* F53OSC_BundleTests.m */,
+				3DA895DE2E4B9F7E00084A98 /* F53OSC_ClientTests.m */,
+				3DA895E02E4B9F7E00084A98 /* F53OSC_EncryptTests.m */,
 				3D1E07FE242A7E1000655E76 /* F53OSC_MessageTests.m */,
+				3DEF130A2E4E0B74000605AB /* F53OSC_OSCValueTests.m */,
+				3DEF13082E4C2521000605AB /* F53OSC_PacketTests.m */,
+				3DA895EB2E4B9F9200084A98 /* F53OSC_ParserTests.m */,
+				3D1E07FD242A7E1000655E76 /* F53OSC_ServerTests.m */,
+				3DA895ED2E4B9F9900084A98 /* F53OSC_SocketTests.m */,
+				3DEF13062E4C2436000605AB /* F53OSC_TimeTagTests.m */,
+				3DA895DF2E4B9F7E00084A98 /* F53OSC_ConcurrencyTests.m */,
+				3DA895E82E4B9F8800084A98 /* F53OSC_NetworkFailureTests.m */,
+				3DB807CF2E54F89B009A16ED /* F53OSC_NSDataTests.m */,
 				3D1E07FF242A7E1000655E76 /* F53OSC_NSNumberTests.m */,
 				3DD52F4327B2B80400F1DD6B /* F53OSC_NSStringTests.m */,
-				3D1E07FD242A7E1000655E76 /* F53OSC_ServerTests.m */,
 			);
 			path = F53OSCTests;
 			sourceTree = "<group>";
@@ -776,9 +812,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D1E08AF242A847E00655E76 /* F53OSC_NSNumberTests.m in Sources */,
+				3DEF13052E4BECAB000605AB /* F53OSC_BundleTests.m in Sources */,
 				3D1E08AE242A847C00655E76 /* F53OSC_MessageTests.m in Sources */,
+				3DA895E22E4B9F7E00084A98 /* F53OSC_BrowserTests.m in Sources */,
+				3DB807D02E54F89B009A16ED /* F53OSC_NSDataTests.m in Sources */,
+				3DEF130B2E4E0B74000605AB /* F53OSC_OSCValueTests.m in Sources */,
+				3DA895E32E4B9F7E00084A98 /* F53OSC_ClientTests.m in Sources */,
+				3DA895EA2E4B9F8800084A98 /* F53OSC_NetworkFailureTests.m in Sources */,
+				3DA895E52E4B9F7E00084A98 /* F53OSC_ConcurrencyTests.m in Sources */,
+				3DA895F22E4B9F9900084A98 /* F53OSC_SocketTests.m in Sources */,
+				3DA895E62E4B9F7E00084A98 /* F53OSC_EncryptTests.m in Sources */,
 				3DD52F4427B2B80400F1DD6B /* F53OSC_NSStringTests.m in Sources */,
+				3DEF13092E4C2521000605AB /* F53OSC_PacketTests.m in Sources */,
+				3DA895EC2E4B9F9200084A98 /* F53OSC_ParserTests.m in Sources */,
 				3D1E08AD242A847A00655E76 /* F53OSC_ServerTests.m in Sources */,
+				3DEF13072E4C2436000605AB /* F53OSC_TimeTagTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
