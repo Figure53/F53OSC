@@ -72,6 +72,27 @@ NS_ASSUME_NONNULL_BEGIN
     return copy;
 }
 
+- (void) setElements:(NSArray<NSData *> *)elements
+{
+    if (_elements != elements)
+    {
+        NSMutableArray<NSData *> *dataElements = [NSMutableArray arrayWithCapacity:elements.count];
+        
+        for ( id element in elements )
+        {
+            if ( ![element isKindOfClass:[NSData class]] )
+            {
+                NSLog( @"Encountered an unknown bundle element of class %@. Bundles can only contain NSData elements. Skipping.", NSStringFromClass( [element class] ) );
+                continue;
+            }
+
+            [dataElements addObject:(NSData *)element];
+        }
+
+        _elements = dataElements.copy;
+    }
+}
+
 - (NSString *) description
 {
     return [NSString stringWithFormat:@"%@", self.elements];
@@ -84,15 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
     [result appendData:[self.timeTag oscTimeTagData]];
     
     for ( NSData *element in self.elements )
-    {
-        if ( ![element isKindOfClass:[NSData class]] )
-        {
-            NSLog( @"Encountered an unknown bundle element of class %@. Bundles can only contain NSData elements. Skipping.", NSStringFromClass( [element class] ) );
-            continue;
-        }
-        
         [result appendData:[element oscBlobData]];
-    }
     
     return result;
 }
