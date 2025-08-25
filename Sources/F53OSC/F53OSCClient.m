@@ -380,12 +380,14 @@ NS_ASSUME_NONNULL_BEGIN
         F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
         F53OSCMessage *requestMessage = [handshake requestEncryptionMessage];
         if ( requestMessage )
+        {
             [self sendPacket:requestMessage];
+            return;
+        }
     }
-    else
-    {
-        [self tellDelegateDidConnect];
-    }
+
+    // else
+    [self tellDelegateDidConnect];
 }
 
 - (void) tellDelegateDidConnect
