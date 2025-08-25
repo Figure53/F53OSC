@@ -451,9 +451,11 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
             case kCFNumberCGFloatType:
                 return @"f"; // OSC float - 'f'
 
+#if !F53OSC_EXHAUSTIVE_SWITCH_ENABLED // see F53OSC.h
             default:
                 NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, arg );
                 return nil;
+#endif
         }
     }
 
@@ -528,7 +530,6 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         }
         else if ( [obj isKindOfClass:[NSNumber class]] )
         {
-            SInt32 intValue;
             CFNumberType numberType = CFNumberGetType( (CFNumberRef)obj );
             switch ( numberType )
             {
@@ -541,21 +542,26 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
                 case kCFNumberIntType:
                 case kCFNumberLongType:
                 case kCFNumberLongLongType:
-                case kCFNumberNSIntegerType:
-                    intValue = [(NSNumber *)obj oscIntValue]; // 'i'
+                case kCFNumberCFIndexType: // aka signed long
+                case kCFNumberNSIntegerType: {
+                    SInt32 intValue = [(NSNumber *)obj oscIntValue]; // 'i'
                     [result appendBytes:&intValue length:sizeof( SInt32 )];
-                    break;
+                } break;
+
                 case kCFNumberFloat32Type:
                 case kCFNumberFloat64Type:
                 case kCFNumberFloatType:
                 case kCFNumberDoubleType:
-                case kCFNumberCGFloatType:
-                    intValue = [(NSNumber *)obj oscFloatValue]; // 'f'
+                case kCFNumberCGFloatType: {
+                    SInt32 intValue = [(NSNumber *)obj oscFloatValue]; // 'f'
                     [result appendBytes:&intValue length:sizeof( SInt32 )];
-                    break;
+                } break;
+
+#if !F53OSC_EXHAUSTIVE_SWITCH_ENABLED // see F53OSC.h
                 default:
                     NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, obj );
                     continue;
+#endif
             }
         }
         else if ( [obj isKindOfClass:[F53OSCValue class]] )
@@ -591,9 +597,11 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
                 case kCFNumberIntType:
                 case kCFNumberLongType:
                 case kCFNumberLongLongType:
+                case kCFNumberCFIndexType: // aka signed long
                 case kCFNumberNSIntegerType:
                     [qscString appendFormat:@" %ld", ((NSNumber *)arg).longValue]; // 'i'
                     break;
+
                 case kCFNumberFloat32Type:
                 case kCFNumberFloat64Type:
                 case kCFNumberFloatType:
@@ -601,10 +609,13 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
                 case kCFNumberCGFloatType:
                     [qscString appendFormat:@" %@", arg]; // 'f'
                     break;
+
+#if !F53OSC_EXHAUSTIVE_SWITCH_ENABLED // see F53OSC.h
                 default:
                     NSLog( @"Number with unrecognized type: %i (value = %@).", (int)numberType, arg );
                     [qscString appendFormat:@" %@", arg];
                     break;
+#endif
             }
         }
         else if ( [arg isKindOfClass:[NSData class]] ) // 'b'

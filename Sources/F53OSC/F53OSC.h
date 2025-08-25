@@ -28,6 +28,12 @@
 // If not building as a framework, the Swift compatibility header is not required.
 #define F53OSC_BUILT_AS_FRAMEWORK __has_include(<F53OSC/F53OSC-Swift.h>)
 
+// Set this to agree with your GCC_WARN_CHECK_SWITCH_STATEMENTS build setting.
+// If GCC_WARN_CHECK_SWITCH_STATEMENTS is "No", set to 0. Otherwise leave set to 1
+// which omits several `default:` cases and allows the compiler to verify all cases.
+#define F53OSC_EXHAUSTIVE_SWITCH_ENABLED    1
+
+
 #if F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSCBrowser.h>
 #import <F53OSC/F53OSCEncryptHandshake.h>
