@@ -723,6 +723,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${HOME}/Desktop/${PRODUCT_NAME}.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -741,6 +742,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${HOME}/Desktop/${PRODUCT_NAME}.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -759,6 +761,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${HOME}/Desktop/${PRODUCT_NAME}.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
