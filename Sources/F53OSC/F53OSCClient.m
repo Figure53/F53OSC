@@ -79,13 +79,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) dealloc
 {
     _delegate = nil;
-    _interface = nil;
-    _host = nil;
-    _userData = nil;
-    
+
     [self destroySocket];
-    _readData = nil;
-    _readState = nil;
 }
 
 - (void) encodeWithCoder:(NSCoder *)coder
@@ -147,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) destroySocket
 {
-    [self.readState removeObjectForKey:@"socket"];
+    self.readState[@"socket"] = nil;
     
     [self.socket disconnect];
     if ( self.useTcp )
@@ -159,39 +154,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) createSocket
 {
+    F53OSCSocket *socket;
+
     if ( self.useTcp )
     {
         GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
-        self.socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
-        self.socket.IPv6Enabled = self.isIPv6Enabled;
-        if ( self.socket )
-            [self.readState setObject:self.socket forKey:@"socket"];
+        socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+        self.readState[@"socket"] = socket;
     }
     else // use UDP
     {
         GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
-        self.socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
-        self.socket.IPv6Enabled = self.isIPv6Enabled;
+        socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
     }
-    self.socket.interface = self.interface;
-    self.socket.host = self.host;
-    self.socket.port = self.port;
-}
+    socket.interface = self.interface;
+    socket.IPv6Enabled = self.isIPv6Enabled;
+    socket.host = self.host;
+    socket.port = self.port;
 
-@synthesize interface = _interface;
-
-- (nullable NSString *) interface
-{
-    // GCDAsyncSocket interprets "nil" as "allow the OS to decide what interface to use".
-    // We additionally interpret "" as nil before passing the interface along.
-    if ( [_interface isEqualToString:@""] )
-        return nil;
-    
-    return _interface;
+    self.socket = socket;
 }
 
 - (void) setInterface:(nullable NSString *)interface
 {
+    // GCDAsyncSocket interprets "nil" as "allow the OS to decide what interface to use".
+    // So here we additionally interpret "" as nil.
     if ( [interface isEqualToString:@""] )
         interface = nil;
     
@@ -296,27 +283,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) connect
 {
     if ( !self.socket )
-        [self createSocket];
-    if ( self.socket )
-        return [self.socket connect];
-    return NO;
+        [self createSocket]; // should always create a socket
+    if ( !self.socket )
+        return NO;
+
+    return [self.socket connect];
 }
 
 - (BOOL) connectEncryptedWithKeyPair:(NSData *)keyPair
 {
     if ( !self.socket )
-        [self createSocket];
+        [self createSocket]; // should always create a socket
     [self.socket setKeyPair:keyPair];
-    if ( self.socket )
-        return [self.socket connect];
-    return NO;
+    if ( !self.socket )
+        return NO;
+
+    return [self.socket connect];
 }
 
 - (void) disconnect
 {
     [self.socket disconnect];
     [self.readData setData:[NSData data]];
-    [self.readState setObject:@NO forKey:@"dangling_ESC"];
+    self.readState[@"dangling_ESC"] = @NO;
 }
 
 - (void) sendPacket:(F53OSCPacket *)packet
@@ -489,7 +478,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     dispatch_block_t block = ^{
         [self.readData setData:[NSData data]];
-        [self.readState setObject:@NO forKey:@"dangling_ESC"];
+        self.readState[@"dangling_ESC"] = @NO;
     };
     
     if ( [NSThread isMainThread] )
@@ -508,7 +497,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     dispatch_block_t block = ^{
         [self.readData setData:[NSData data]];
-        [self.readState setObject:@NO forKey:@"dangling_ESC"];
+        self.readState[@"dangling_ESC"] = @NO;
         
         if ( [self.delegate respondsToSelector:@selector(clientDidDisconnect:)] )
             [self.delegate clientDidDisconnect:self];
