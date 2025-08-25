@@ -183,15 +183,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     [_tcpSocket synchronouslySetDelegate:nil delegateQueue:nil];
     [_tcpSocket disconnect];
-    _tcpSocket = nil;
 
     [_udpSocket synchronouslySetDelegate:nil delegateQueue:nil];
-    _udpSocket = nil;
-
-    _host = nil;
 
     [_stats stop];
-    _stats = nil;
 }
 
 - (NSString *) description
