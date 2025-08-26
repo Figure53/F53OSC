@@ -349,7 +349,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNil(socket.stats, @"Socket still should not have a stats object");
 }
 
-- (void)testThat_uspSocketHasStatsObjectAfterCreation
+- (void)testThat_udpSocketHasStatsObjectAfterCreation
 {
     GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
