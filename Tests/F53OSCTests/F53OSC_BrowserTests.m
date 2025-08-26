@@ -178,7 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
-    XCTAssertThrows(browser.copy, "Browser does not conform to NSCopying");
+    XCTAssertThrows(browser.copy, @"Browser does not conform to NSCopying");
 }
 
 - (void)testThat_browserHandlesIPv6Configuration

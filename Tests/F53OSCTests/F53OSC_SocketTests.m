@@ -34,12 +34,16 @@
 #import "F53OSCMessage.h"
 #import "F53OSCServer.h"
 
-@class F53OSCEncrypt; // forward declaration of Swift class
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSC-Swift.h>
+#elif __has_include("F53OSC-Swift.h")
+#import "F53OSC-Swift.h"
+#endif
 
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PORT_BASE   9400
+#define PORT_BASE   9300
 
 @interface F53OSC_SocketTests : XCTestCase <F53OSCServerDelegate, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 
@@ -68,7 +72,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setupTestServer
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 10;
 
     F53OSCServer *testServer = [[F53OSCServer alloc] init];
@@ -179,7 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_socketWithTcpSocketHasCorrectDefaults
 {
-    // NOTE: F53OSCSocket requires either TCP or UDP socket for initialization.
+    // NOTE: F53OSCSocket requires either a TCP or UDP socket for initialization.
     // Test defaults with a minimal TCP socket setup.
     GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
@@ -204,8 +207,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_socketWithUdpSocketHasCorrectDefaults
 {
-    // NOTE: F53OSCSocket requires either TCP or UDP socket for initialization.
-    // Test defaults with a minimal TCP socket setup.
+    // NOTE: F53OSCSocket requires either a TCP or UDP socket for initialization.
+    // Test defaults with a minimal UDP socket setup.
     GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
 
@@ -253,7 +256,7 @@ NS_ASSUME_NONNULL_BEGIN
     GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
 
-    XCTAssertThrows(socket.copy, "Socket does not conform to NSCopying");
+    XCTAssertThrows(socket.copy, @"Socket does not conform to NSCopying");
 }
 
 - (void)testThat_tcpSocketHandlesMinimumPortNumber
@@ -411,14 +414,14 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
 
     socket.host = @"localhost";
-    socket.port = 9000;
+    socket.port = 9123;
 
     NSString *description = [socket description];
     XCTAssertNotNil(description, @"Description should not be nil");
     XCTAssertTrue([description containsString:@"UDP"], @"Description should mention UDP");
     XCTAssertTrue([description containsString:@"localhost"], @"Description should contain host");
-    XCTAssertTrue([description containsString:@"9000"], @"Description should contain port");
-    XCTAssertEqualObjects(description, @"<F53OSCSocket UDP localhost:9000>", @"Description is incorrect");
+    XCTAssertTrue([description containsString:@"9123"], @"Description should contain port");
+    XCTAssertEqualObjects(description, @"<F53OSCSocket UDP localhost:9123>", @"Description is incorrect");
 }
 
 - (void)testThat_socketHandlesIPv6Configuration
@@ -511,7 +514,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 
-#pragma mark - Connection lifecycle tests
+#pragma mark - Connection tests
 
 - (void)testThat_tcpSocketCanConnect
 {
@@ -661,7 +664,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse([socket isConnected], @"Socket should not be connected after connect");
 }
 
-- (void)testThat_socketHandlesMultipleConnectAttempts
+- (void)testThat_tcpSocketHandlesMultipleConnectAttempts
 {
     [self setupTestServer];
 
@@ -689,7 +692,35 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue([socket isConnected], @"Socket should remain connected");
 }
 
-- (void)testThat_socketHandlesConnectionFailure
+- (void)testThat_udpSocketHandlesMultipleConnectAttempts
+{
+    [self setupTestServer];
+
+    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
+
+    [self addTeardownBlock:^{
+        [socket disconnect];
+        [socket stopListening];
+    }];
+
+    socket.host = @"localhost";
+    socket.port = self.testServer.port;
+
+    // First connect.
+    BOOL firstConnect = [socket connect];
+    XCTAssertTrue(firstConnect, @"First connect should succeed");
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+
+    // Second connect while already connected should return NO.
+    BOOL secondConnect = [socket connect];
+    XCTAssertTrue(secondConnect, @"Second connect should return YES, UDP sockets always connect");
+
+    XCTAssertTrue([socket isConnected], @"Socket should remain connected");
+}
+
+- (void)testThat_tcpSocketHandlesConnectionFailure
 {
     GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
@@ -714,6 +745,56 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse([socket isConnected], @"Should not be connected to non-existent server");
 }
 
+- (void)testThat_udpSocketHandlesConnectionFailure
+{
+    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
+
+    [self addTeardownBlock:^{
+        [socket disconnect];
+        [socket stopListening];
+    }];
+
+    // Try to connect to non-existent server.
+    socket.host = @"localhost";
+    socket.port = 9999; // Assume this port is not in use
+
+    BOOL connectResult = [socket connect];
+    // Connect may return YES initially but fail later.
+    NSLog(@"Connect to non-existent server result: %@", connectResult ? @"YES" : @"NO");
+
+    // Give it time to fail.
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+
+    // Should be connected.
+    XCTAssertTrue([socket isConnected], @"UDP sockets are always connected, even to a non-existent server");
+}
+
+- (void)testThat_tcpSocketHandlesInvalidInterface
+{
+    // Create TCP socket with invalid interface
+    GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    F53OSCSocket *socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+    socket.port = PORT_BASE + 30;
+    socket.interface = @"invalid_interface_name_999";
+
+    BOOL didStart = [socket startListening];
+    XCTAssertFalse(didStart, @"Should fail to listen on invalid interface");
+}
+
+- (void)testThat_udpSocketHandlesInvalidInterface
+{
+    // Create UDP socket with invalid interface
+    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
+    socket.port = PORT_BASE + 40;
+    socket.interface = @"invalid_interface_name_999";
+
+    BOOL didStart = [socket startListening];
+    XCTAssertFalse(didStart, @"Should fail to bind to invalid interface");
+}
+
+
 
 #pragma mark - Server listening tests
 
@@ -727,9 +808,7 @@ NS_ASSUME_NONNULL_BEGIN
         [socket stopListening];
     }];
 
-    // Avoid port conflicts.
-    UInt16 port = PORT_BASE + 30;
-    socket.port = port;
+    socket.port = PORT_BASE + 50;
 
     BOOL didStart = [socket startListening];
     XCTAssertTrue(didStart, @"Should start listening successfully");
@@ -745,44 +824,67 @@ NS_ASSUME_NONNULL_BEGIN
         [socket stopListening];
     }];
 
-    // Avoid port conflicts.
-    UInt16 port = PORT_BASE + 40;
-    socket.port = port;
+    socket.port = PORT_BASE + 60;
 
     BOOL didStart = [socket startListening];
     XCTAssertTrue(didStart, @"UDP should start listening successfully");
 }
 
-- (void)testThat_socketHandlesPortConflicts
+- (void)testThat_tcpSocketHandlesPortConflicts
 {
+    // Create two TCP sockets and try to listen on the same port.
     GCDAsyncSocket *tcpSocket1 = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *socket1 = [F53OSCSocket socketWithTcpSocket:tcpSocket1];
-
-    [self addTeardownBlock:^{
-        [socket1 disconnect];
-        [socket1 stopListening];
-    }];
-
-    // Avoid port conflicts.
-    UInt16 port = PORT_BASE + 50;
-    socket1.port = port;
-
-    BOOL firstListen = [socket1 startListening];
-    XCTAssertTrue(firstListen, @"First socket should start listening");
+    socket1.port = PORT_BASE + 70;
 
     // Try to listen on same port with second socket.
     GCDAsyncSocket *tcpSocket2 = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *socket2 = [F53OSCSocket socketWithTcpSocket:tcpSocket2];
+    socket2.port = socket1.port; // Same port
 
     [self addTeardownBlock:^{
+        [socket1 disconnect];
         [socket2 disconnect];
+
+        [socket1 stopListening];
         [socket2 stopListening];
     }];
 
-    socket2.port = port;
+    // First socket should bind successfully
+    BOOL didStart1 = [socket1 startListening];
+    XCTAssertTrue(didStart1, @"First socket should start listening");
 
-    BOOL secondListen = [socket2 startListening];
-    XCTAssertFalse(secondListen, @"Second socket should fail to listen on same port");
+    // Second socket should fail to bind to same port
+    BOOL didStart2 = [socket2 startListening];
+    XCTAssertFalse(didStart2, @"Second socket should fail to listen on same port");
+}
+
+- (void)testThat_udpSocketHandlesPortConflicts
+{
+    // Create two UDP sockets and try to bind both to the same port.
+    GCDAsyncUdpSocket *udpSocket1 = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    F53OSCSocket *socket1 = [F53OSCSocket socketWithUdpSocket:udpSocket1];
+    socket1.port = PORT_BASE + 80;
+
+    GCDAsyncUdpSocket *udpSocket2 = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    F53OSCSocket *socket2 = [F53OSCSocket socketWithUdpSocket:udpSocket2];
+    socket2.port = socket1.port; // Same port
+
+    [self addTeardownBlock:^{
+        [socket1 disconnect];
+        [socket2 disconnect];
+
+        [socket1 stopListening];
+        [socket2 stopListening];
+    }];
+
+    // First socket should bind successfully
+    BOOL didStart1 = [socket1 startListening];
+    XCTAssertTrue(didStart1, @"First socket should bind successfully");
+
+    // Second socket should fail to bind to same port
+    BOOL didStart2 = [socket2 startListening];
+    XCTAssertFalse(didStart2, @"Second socket should fail to bind to same port");
 }
 
 
@@ -865,7 +967,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)testThat_socketHandlesSendingWithoutConnection
+- (void)testThat_socketHandlesSendingWithoutConnect
 {
     GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     F53OSCSocket *socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
@@ -904,7 +1006,6 @@ NS_ASSUME_NONNULL_BEGIN
     // Create a message that contains SLIP special characters
     F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:@"/slip/test" arguments:@[@"data with END and ESC bytes"]];
 
-    // This should exercise the SLIP framing code path
     XCTAssertNoThrow([socket sendPacket:message], @"Should handle SLIP framing without crashing");
 }
 
@@ -932,7 +1033,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:@"/interface/test" arguments:@[@"test"]];
 
-    // This should exercise the interface binding code path
     XCTAssertNoThrow([socket sendPacket:message], @"Should handle interface binding without crashing");
 }
 
@@ -960,7 +1060,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:@"/error/test" arguments:@[@"test"]];
 
-    // This should exercise the interface binding error path and return early
     XCTAssertNoThrow([socket sendPacket:message], @"Should handle interface binding failure gracefully");
 }
 
@@ -987,7 +1086,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:@"/nohost/test" arguments:@[@"test"]];
 
-    // This should exercise the path where host is nil and sendData is skipped
     XCTAssertNoThrow([socket sendPacket:message], @"Should handle UDP without host gracefully");
 }
 
@@ -1015,7 +1113,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:@"/noframe/test" arguments:@[@"test"]];
 
-    // This should exercise the no-framing TCP path
     XCTAssertNoThrow([socket sendPacket:message], @"Should handle TCP with no framing without crashing");
 }
 
@@ -1044,63 +1141,6 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic ignored "-Wnonnull"
     XCTAssertNoThrow([socket sendPacket:nil], @"Sending nil packet should not crash");
 #pragma clang diagnostic pop
-}
-
-
-#pragma mark - Additional startListening tests for better coverage
-
-- (void)testThat_startListeningHandlesUDPBindingFailure
-{
-    // Create two UDP sockets and try to bind both to the same port
-    GCDAsyncUdpSocket *udpSocket1 = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-    F53OSCSocket *socket1 = [F53OSCSocket socketWithUdpSocket:udpSocket1];
-    socket1.port = PORT_BASE + 60;
-
-    GCDAsyncUdpSocket *udpSocket2 = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-    F53OSCSocket *socket2 = [F53OSCSocket socketWithUdpSocket:udpSocket2];
-    socket2.port = PORT_BASE + 60; // Same port as first socket
-
-    // First socket should bind successfully
-    BOOL didStart1 = [socket1 startListening];
-    XCTAssertTrue(didStart1, @"First socket should bind successfully");
-
-    // Second socket should fail to bind to same port
-    BOOL didStart2 = [socket2 startListening];
-    XCTAssertFalse(didStart2, @"Second socket should fail to bind to same port");
-
-    // Clean up
-    [socket1 stopListening];
-    [socket2 stopListening];
-}
-
-- (void)testThat_startListeningHandlesInvalidInterface
-{
-    // Create UDP socket with invalid interface
-    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-    F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
-    socket.port = PORT_BASE + 70;
-    socket.interface = @"invalid_interface_name_999";
-
-    // This should exercise the UDP binding failure path
-    BOOL didStart = [socket startListening];
-    XCTAssertFalse(didStart, @"Should fail to bind to invalid interface");
-}
-
-
-#pragma mark - Additional isConnected tests for better coverage
-
-- (void)testThat_isConnectedHandlesNeitherSocketType
-{
-    // We can't create F53OSCSocket without underlying socket, so skip this test
-    // The default return NO path in isConnected method is not reachable in normal usage
-    // since F53OSCSocket must be initialized with either TCP or UDP socket
-
-    // Test with UDP socket instead to ensure it returns YES for UDP
-    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-    F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
-
-    BOOL connected = [socket isConnected];
-    XCTAssertTrue(connected, @"UDP socket should always return connected = YES");
 }
 
 

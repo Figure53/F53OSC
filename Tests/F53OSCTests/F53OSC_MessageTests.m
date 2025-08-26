@@ -38,7 +38,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PORT_BASE   9200
+#define PORT_BASE   9100
 
 static NSString *legalAddressCharacters = @"\"$%&'()+-.0123456789:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\^_`abcdefghijklmnopqrstuvwxyz|~!";
 static NSString *legalWildcardCharacters = @"/*?[]{,}";
@@ -69,7 +69,6 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     self.messageExpectations = [NSMutableArray array];
     self.matchedExpectations = [NSMutableDictionary dictionary];
 
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 10;
 
     dispatch_queue_t oscQueue = dispatch_queue_create("com.figure53.testServer", DISPATCH_QUEUE_SERIAL);
@@ -77,31 +76,33 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     testServer.delegate = self;
     testServer.port = port;
     testServer.udpReplyPort = port + 1;
-    self.testServer = testServer;
-
-    BOOL isListening = [testServer startListening];
-    XCTAssertTrue(isListening, @"F53OSCServer was unable to start listening on port %hu", testServer.port);
 
     F53OSCClient *testClient = [[F53OSCClient alloc] init];
     testClient.useTcp = YES;
     testClient.host = @"localhost";
     testClient.port = port;
     testClient.delegate = self;
+
+    [self addTeardownBlock:^{
+        testClient.delegate = nil;
+        testServer.delegate = nil;
+
+        [testClient disconnect];
+        [testServer stopListening];
+    }];
+    self.testServer = testServer;
     self.testClient = testClient;
+
+    BOOL isListening = [testServer startListening];
+    XCTAssertTrue(isListening, @"F53OSCServer was unable to start listening on port %hu", testServer.port);
 
     [self connectOSCClientAndVerify];
 }
 
-- (void)tearDown
-{
-    self.testClient.delegate = nil;
-    [self.testClient disconnect];
-
-    self.testServer.delegate = nil;
-    [self.testServer stopListening];
-
-    [super tearDown];
-}
+//- (void)tearDown
+//{
+//    [super tearDown];
+//}
 
 - (void)connectOSCClientAndVerify
 {

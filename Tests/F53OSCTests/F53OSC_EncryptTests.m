@@ -123,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCEncrypt *encrypter = [[F53OSCEncrypt alloc] init];
 
-    XCTAssertThrows(encrypter.copy, "Encrypter does not conform to NSCopying");
+    XCTAssertThrows(encrypter.copy, @"Encrypter does not conform to NSCopying");
 }
 
 - (void)testThat_encryptCanGenerateKeyPair

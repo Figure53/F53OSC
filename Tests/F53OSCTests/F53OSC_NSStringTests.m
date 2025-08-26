@@ -123,8 +123,8 @@ NS_INLINE NSUInteger fourBytePaddedInteger(NSUInteger value)
         NSUInteger expectedDataLength = [testStrings[testString] unsignedIntegerValue];
 
         // then
-        XCTAssertNotNil(oscStringData, "%@", testString);
-        XCTAssertEqual(oscStringData.length, expectedDataLength, "%@", testString);
+        XCTAssertNotNil(oscStringData, @"%@", testString);
+        XCTAssertEqual(oscStringData.length, expectedDataLength, @"%@", testString);
 
         // DECODE
         // when
@@ -132,37 +132,37 @@ NS_INLINE NSUInteger fourBytePaddedInteger(NSUInteger value)
         decodedString = [NSString stringWithOSCStringBytes:oscStringData.bytes maxLength:oscStringData.length bytesRead:&bytesRead];
 
         // then
-        XCTAssertNotNil(decodedString, "%@", testString);
-        XCTAssertGreaterThanOrEqual(bytesRead, 4, "%@", testString); // empty string encodes as a minimum of 4 null bytes
-        XCTAssertEqual(bytesRead % 4, 0, "%@", testString); // multiple of 4 bytes
+        XCTAssertNotNil(decodedString, @"%@", testString);
+        XCTAssertGreaterThanOrEqual(bytesRead, 4, @"%@", testString); // empty string encodes as a minimum of 4 null bytes
+        XCTAssertEqual(bytesRead % 4, 0, @"%@", testString); // multiple of 4 bytes
 
-        XCTAssertEqualObjects(testString, decodedString, "%@", testString);
-        XCTAssertEqual([testString compare:decodedString options:NSDiacriticInsensitiveSearch], NSOrderedSame, "%@", testString);
+        XCTAssertEqualObjects(testString, decodedString, @"%@", testString);
+        XCTAssertEqual([testString compare:decodedString options:NSDiacriticInsensitiveSearch], NSOrderedSame, @"%@", testString);
         XCTAssertEqualObjects(testString.decomposedStringWithCanonicalMapping, decodedString.decomposedStringWithCanonicalMapping);
 
-        XCTAssertEqual(testString.length, decodedString.length, "%@", testString);
-        XCTAssertEqual([testString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], [decodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], "%@", testString);
+        XCTAssertEqual(testString.length, decodedString.length, @"%@", testString);
+        XCTAssertEqual([testString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], [decodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], @"%@", testString);
 
-        XCTAssertEqual(bytesRead, expectedDataLength, "%@", testString);
+        XCTAssertEqual(bytesRead, expectedDataLength, @"%@", testString);
 
-        XCTAssertEqual(fourBytePaddedInteger([testString lengthOfBytesUsingEncoding:NSUTF8StringEncoding]), bytesRead, "%@", testString);
-        XCTAssertEqual(fourBytePaddedInteger([decodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding]), bytesRead, "%@", testString);
+        XCTAssertEqual(fourBytePaddedInteger([testString lengthOfBytesUsingEncoding:NSUTF8StringEncoding]), bytesRead, @"%@", testString);
+        XCTAssertEqual(fourBytePaddedInteger([decodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding]), bytesRead, @"%@", testString);
 
         NSString *escapedTestString = [testString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
         if ([testString isEqual:escapedTestString] == NO)
         {
             // NSString `-length` counts composed characters as 1, while `-lengthOfBytesUsingEncoding` & `bytesRead` counts the decomposed character length.
-            XCTAssertLessThan(testString.length, [testString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], "%@", testString);
-            XCTAssertLessThan(decodedString.length, [decodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], "%@", testString);
-            XCTAssertLessThanOrEqual(fourBytePaddedInteger(testString.length), bytesRead, "%@", testString);
-            XCTAssertLessThanOrEqual(fourBytePaddedInteger(decodedString.length), bytesRead, "%@", testString);
+            XCTAssertLessThan(testString.length, [testString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], @"%@", testString);
+            XCTAssertLessThan(decodedString.length, [decodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], @"%@", testString);
+            XCTAssertLessThanOrEqual(fourBytePaddedInteger(testString.length), bytesRead, @"%@", testString);
+            XCTAssertLessThanOrEqual(fourBytePaddedInteger(decodedString.length), bytesRead, @"%@", testString);
         }
         else
         {
-            XCTAssertEqual(testString.length, [testString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], "%@", testString);
-            XCTAssertEqual(decodedString.length, [decodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], "%@", testString);
-            XCTAssertEqual(fourBytePaddedInteger(testString.length), bytesRead, "%@", testString);
-            XCTAssertEqual(fourBytePaddedInteger(decodedString.length), bytesRead, "%@", testString);
+            XCTAssertEqual(testString.length, [testString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], @"%@", testString);
+            XCTAssertEqual(decodedString.length, [decodedString lengthOfBytesUsingEncoding:NSUTF8StringEncoding], @"%@", testString);
+            XCTAssertEqual(fourBytePaddedInteger(testString.length), bytesRead, @"%@", testString);
+            XCTAssertEqual(fourBytePaddedInteger(decodedString.length), bytesRead, @"%@", testString);
         }
     }
 }
@@ -195,21 +195,21 @@ NS_INLINE NSUInteger fourBytePaddedInteger(NSUInteger value)
     for (NSArray<NSString *> *testArgs in allTestArgs)
     {
         message = [F53OSCMessage messageWithAddressPattern:@"/some/method" arguments:testArgs];
-        XCTAssertNotNil(message, "%@", testArgs);
-        XCTAssertEqualObjects(message.arguments, testArgs, "%@", testArgs);
-        XCTAssertNotNil(message.packetData, "%@", testArgs);
+        XCTAssertNotNil(message, @"%@", testArgs);
+        XCTAssertEqualObjects(message.arguments, testArgs, @"%@", testArgs);
+        XCTAssertNotNil(message.packetData, @"%@", testArgs);
 
         // when
         NSData *packetData = message.packetData; // encodes strings for OSC
         F53OSCMessage *parsedMessage = [F53OSCParser parseOscMessageData:packetData]; // decodes data
 
         // then
-        XCTAssertNotNil(parsedMessage, "%@", testArgs);
-        XCTAssertEqualObjects(parsedMessage.arguments, testArgs, "%@", testArgs);
-        XCTAssertEqualObjects(message, parsedMessage, "%@", testArgs);
-        XCTAssertEqualObjects(message.addressPattern, parsedMessage.addressPattern, "%@", testArgs);
-        XCTAssertEqual(message.arguments.count, parsedMessage.arguments.count, "%@", testArgs);
-        XCTAssertTrue([message.arguments isEqualToArray:parsedMessage.arguments], "%@", testArgs);
+        XCTAssertNotNil(parsedMessage, @"%@", testArgs);
+        XCTAssertEqualObjects(parsedMessage.arguments, testArgs, @"%@", testArgs);
+        XCTAssertEqualObjects(message, parsedMessage, @"%@", testArgs);
+        XCTAssertEqualObjects(message.addressPattern, parsedMessage.addressPattern, @"%@", testArgs);
+        XCTAssertEqual(message.arguments.count, parsedMessage.arguments.count, @"%@", testArgs);
+        XCTAssertTrue([message.arguments isEqualToArray:parsedMessage.arguments], @"%@", testArgs);
     }
 }
 

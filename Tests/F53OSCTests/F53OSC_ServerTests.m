@@ -32,10 +32,16 @@
 
 #import "F53OSCServer.h"
 
-@class F53OSCEncrypt; // forward declaration of Swift class
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSC-Swift.h>
+#elif __has_include("F53OSC-Swift.h")
+#import "F53OSC-Swift.h"
+#endif
 
 
 NS_ASSUME_NONNULL_BEGIN
+
+#define PORT_BASE   9200
 
 @interface F53OSCServer (F53OSC_ServerTestsAccess)
 @property (atomic, strong) dispatch_queue_t queue;
@@ -139,13 +145,17 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCServer *server = [[F53OSCServer alloc] init];
 
-    XCTAssertThrows(server.copy, "Server does not conform to NSCopying");
+    XCTAssertThrows(server.copy, @"Server does not conform to NSCopying");
 }
 
 - (void)testThat_serverHandlesIPv6Configuration
 {
     F53OSCServer *server = [[F53OSCServer alloc] init];
-    server.port = 9506;
+    server.port = PORT_BASE + 10;
+
+    [self addTeardownBlock:^{
+        [server stopListening];
+    }];
 
     XCTAssertFalse(server.isIPv6Enabled, @"Default IPv6Enabled should be NO");
 
@@ -155,8 +165,6 @@ NS_ASSUME_NONNULL_BEGIN
     // Test that server can still start with IPv6 enabled
     BOOL started = [server startListening];
     XCTAssertTrue(started, @"Server should start listening with IPv6 enabled");
-
-    [server stopListening];
 }
 
 
@@ -1573,18 +1581,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testThat_serverHandlesSocketDelegateMethods
 {
     F53OSCServer *server = [[F53OSCServer alloc] init];
-    server.port = 9500;
+    server.port = PORT_BASE + 20;
 
     GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
     GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
 
-    // Test socket delegate methods that have 0% coverage
     XCTAssertNoThrow([server socket:tcpSocket didConnectToHost:@"localhost" port:9500], @"Should handle didConnectToHost gracefully");
-
     XCTAssertNoThrow([server socket:tcpSocket didReadPartialDataOfLength:100 tag:0], @"Should handle didReadPartialDataOfLength gracefully");
-
     XCTAssertNoThrow([server socket:tcpSocket didWriteDataWithTag:0], @"Should handle didWriteDataWithTag gracefully");
-
     XCTAssertNoThrow([server socket:tcpSocket didWritePartialDataOfLength:50 tag:0], @"Should handle didWritePartialDataOfLength gracefully");
 
     // Test timeout methods
@@ -1619,7 +1623,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testThat_serverHandlesSocketAcceptance
 {
     F53OSCServer *server = [[F53OSCServer alloc] init];
-    server.port = 9501;
+    server.port = PORT_BASE + 30;
+
+    [self addTeardownBlock:^{
+        [server stopListening];
+    }];
 
     // Start listening to initialize socket infrastructure
     BOOL started = [server startListening];
@@ -1628,16 +1636,17 @@ NS_ASSUME_NONNULL_BEGIN
     GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
     GCDAsyncSocket *newSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
 
-    // Test socket acceptance - this should exercise the socket:didAcceptNewSocket: method
     XCTAssertNoThrow([server socket:socket didAcceptNewSocket:newSocket], @"Should handle socket acceptance gracefully");
-
-    [server stopListening];
 }
 
-- (void)testThat_serverHandlesSocketDisconnection
+- (void)testThat_serverHandlesSocketDisconnect
 {
     F53OSCServer *server = [[F53OSCServer alloc] init];
-    server.port = 9502;
+    server.port = PORT_BASE + 40;
+
+    [self addTeardownBlock:^{
+        [server stopListening];
+    }];
 
     // Start listening to initialize socket infrastructure
     BOOL started = [server startListening];
@@ -1651,8 +1660,6 @@ NS_ASSUME_NONNULL_BEGIN
     // Test disconnection with error
     NSError *disconnectError = [NSError errorWithDomain:@"TestErrorDomain" code:200 userInfo:@{NSLocalizedDescriptionKey: @"Test disconnect error"}];
     XCTAssertNoThrow([server socketDidDisconnect:socket withError:disconnectError], @"Should handle disconnection with error gracefully");
-
-    [server stopListening];
 }
 
 - (void)testThat_serverNewSocketQueueMethod

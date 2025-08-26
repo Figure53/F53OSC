@@ -38,7 +38,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PORT_BASE   9100
+#define PORT_BASE   9400
 
 @interface F53OSC_ConcurrencyTests : XCTestCase <F53OSCServerDelegate, F53OSCClientDelegate>
 
@@ -72,34 +72,29 @@ NS_ASSUME_NONNULL_BEGIN
     self.testServerQueue = dispatch_queue_create("com.figure53.osctest.server", DISPATCH_QUEUE_SERIAL);
 }
 
-- (void)tearDown
-{
-    for (F53OSCClient *client in self.clients)
-    {
-        [client disconnect];
-        client.delegate = nil;
-    }
-
-    [self.testServer stopListening];
-    self.testServer.delegate = nil;
-
-    [super tearDown];
-}
+//- (void)tearDown
+//{
+//    [super tearDown];
+//}
 
 - (void)setupServerAndMultipleClients:(NSUInteger)clientCount useTCP:(BOOL)useTCP
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 10;
 
     // Setup server with dedicated queue.
-    self.testServer = [[F53OSCServer alloc] initWithDelegateQueue:self.testServerQueue];
-    self.testServer.delegate = self;
-    self.testServer.port = port;
-
+    F53OSCServer *testServer = [[F53OSCServer alloc] initWithDelegateQueue:self.testServerQueue];
+    testServer.delegate = self;
+    testServer.port = port;
     if (!useTCP)
-        self.testServer.udpReplyPort = port + 1;
+        testServer.udpReplyPort = port + 1;
 
-    BOOL isListening = [self.testServer startListening];
+    [self addTeardownBlock:^{
+        testServer.delegate = nil;
+        [testServer stopListening];
+    }];
+    self.testServer = testServer;
+
+    BOOL isListening = [testServer startListening];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
 
     // Create multiple clients.
@@ -110,6 +105,11 @@ NS_ASSUME_NONNULL_BEGIN
         client.host = @"localhost";
         client.port = port;
         client.delegate = self;
+
+        [self addTeardownBlock:^{
+            client.delegate = nil;
+            [client disconnect];
+        }];
 
         [self.clients addObject:client];
         [self.clientConnectionStates addObject:@(NO)]; // Not connected initially
@@ -372,7 +372,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_serverHandlesMixedTCPAndUDPConcurrentClients
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 20;
 
     self.testServer = [[F53OSCServer alloc] initWithDelegateQueue:self.testServerQueue];

@@ -1,5 +1,5 @@
 //
-//  F53OSC_ClientConfigurationTests.m
+//  F53OSC_ClientTests.m
 //  F53OSC
 //
 //  Created by Brent Lord on 8/5/25.
@@ -34,7 +34,11 @@
 #import "F53OSCMessage.h"
 #import "F53OSCServer.h"
 
-@class F53OSCEncrypt; // forward declaration of Swift class
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSC-Swift.h>
+#elif __has_include("F53OSC-Swift.h")
+#import "F53OSC-Swift.h"
+#endif
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -45,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nullable)    F53OSCSocket *socket;
 @end
 
-@interface F53OSC_ClientConfigurationTests : XCTestCase <F53OSCServerDelegate, F53OSCClientDelegate>
+@interface F53OSC_ClientTests : XCTestCase <F53OSCServerDelegate, F53OSCClientDelegate>
 
 @property (nonatomic, strong, nullable) XCTestExpectation *connectionExpectation;
 @property (nonatomic, strong, nullable) XCTestExpectation *disconnectionExpectation;
@@ -58,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation F53OSC_ClientConfigurationTests
+@implementation F53OSC_ClientTests
 
 //- (void)setUp
 //{
@@ -194,13 +198,16 @@ NS_ASSUME_NONNULL_BEGIN
     BOOL isListening = [server startListening];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", client.port);
 
+    // Unset interface before connect, in case 'en0' is unavailable on test machine.
+    client.interface = @"";
+
     [client connect];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(client.isConnected, @"Client should be connected");
 
     XCTAssertEqualObjects(client.delegate, self, @"Client delegate should remain self");
     XCTAssertEqualObjects(client.socketDelegateQueue, queue, @"Client socketDelegateQueue should remain %@", queue);
-    XCTAssertEqualObjects(client.interface, @"en0", @"Client interface should remain 'en0'");
+    XCTAssertNil(client.interface, @"Client interface set to empty-string should be nil");
     XCTAssertEqualObjects(client.host, @"127.0.0.1", @"Client interface should remain '127.0.0.1'");
     XCTAssertEqual(client.port, 9999, @"Client interface should remain 9999");
     XCTAssertTrue(client.IPv6Enabled, @"Client IPv6Enabled should remain YES");
@@ -214,7 +221,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCClient *client = [[F53OSCClient alloc] init];
 
-    XCTAssertThrows(client.copy, "Client does not conform to NSCopying");
+    XCTAssertThrows(client.copy, @"Client does not conform to NSCopying");
 }
 
 - (void)testThat_clientSupportsNSSecureCoding
@@ -305,7 +312,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_clientInterfaceHandlesInvalidValue
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 10;
 
     F53OSCClient *client = [[F53OSCClient alloc] init];
@@ -346,7 +352,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_clientReadChunkSizeAffectsTCPConnections
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 20;
 
     F53OSCServer *server = [self basicServerWithPort:port];
@@ -419,7 +424,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_clientUserDataPersistsThroughOperations
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 30;
 
     F53OSCServer *server = [self basicServerWithPort:port];
@@ -462,7 +466,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Configure client with various properties.
     client.interface = @"en0";
     client.host = @"test.example.com";
-    client.port = 9500;
+    client.port = 9123;
     client.useTcp = YES;
     client.tcpTimeout = 10.0;
     client.userData = @{@"session": @"test"};
@@ -472,7 +476,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqual(state.count, 6, @"State should have 6 key/values");
     XCTAssertEqualObjects(state[@"interface"], @"en0", @"State should include interface");
     XCTAssertEqualObjects(state[@"host"], @"test.example.com", @"State should include host");
-    XCTAssertEqualObjects(state[@"port"], @(9500), @"State should include port");
+    XCTAssertEqualObjects(state[@"port"], @(9123), @"State should include port");
     XCTAssertEqualObjects(state[@"useTcp"], @(YES), @"State should include useTcp");
     XCTAssertEqualObjects(state[@"tcpTimeout"], @(10.0), @"State should include tcpTimeout");
     XCTAssertEqualObjects(state[@"userData"], @{@"session": @"test"}, @"State should include userData");
@@ -527,7 +531,7 @@ NS_ASSUME_NONNULL_BEGIN
     // Configure client.
     client.interface = @"en0";
     client.host = @"test.local";
-    client.port = 9700;
+    client.port = 9234;
     client.useTcp = YES;
     client.tcpTimeout = 15.0;
     client.userData = @[@"item1", @"item2"];
@@ -590,10 +594,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Change configuration and verify title updates.
     client.host = @"example.com";
-    client.port = 9000;
+    client.port = 9345;
 
     XCTAssertTrue(client.isValid, @"Client should be valid");
-    XCTAssertEqualObjects(client.title, @"example.com : 9000", @"Title should be 'example.com : 9000'");
+    XCTAssertEqualObjects(client.title, @"example.com : 9345", @"Title should be 'example.com : 9345'");
 
     // Client with invalid configuration (no host).
     client.host = nil;
@@ -759,7 +763,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCClient *client = [[F53OSCClient alloc] init];
     client.host = @"localhost";
-    client.port = PORT_BASE + 50;
+    client.port = PORT_BASE + 60;
     client.useTcp = YES;
     client.delegate = self;
 
@@ -816,7 +820,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCClient *client = [[F53OSCClient alloc] init];
     client.host = @"localhost";
-    client.port = PORT_BASE + 50;
+    client.port = PORT_BASE + 70;
     client.useTcp = YES;
     client.delegate = self;
 
@@ -874,7 +878,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCClient *client = [[F53OSCClient alloc] init];
     client.host = @"localhost";
-    client.port = PORT_BASE + 60;
+    client.port = PORT_BASE + 80;
     client.useTcp = NO; // UDP, encryption not supported
     client.delegate = self;
 
@@ -968,7 +972,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue([client connectEncryptedWithKeyPair:keyPairData], @"Should connect with valid key pair");
     XCTAssertNotNil(client.socket.encrypter.keyPairData, @"Client internal socket encrypter keyPairData should not be nil");
     XCTAssertEqualObjects(client.socket.encrypter.keyPairData, keyPairData, @"Client internal socket encrypter keyPairData should equal server keyPair");
-    XCTAssertFalse(client.socket.isEncrypting, @"Message replySocket should not be encrypting before handling approve message");
+    XCTAssertFalse(client.socket.isEncrypting, @"Client internal socket should not be encrypting before handling approve message");
 
     // NOTE: Full handshake testing is in F53OSC_EncryptTests.m.
     // We are only testing the F53OSCClient requirements here.
@@ -978,7 +982,7 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCMessage *message = [handshake approveEncryptionMessage];
 
     XCTAssertNoThrow([client handleF53OSCControlMessage:message], @"Should handle valid approve message gracefully");
-    XCTAssertTrue(client.socket.isEncrypting, @"Message replySocket should be encrypting after handling approve message");
+    XCTAssertTrue(client.socket.isEncrypting, @"Client internal socket should be encrypting after handling approve message");
 }
 
 - (void)testThat_clientHandlesNilControlMessage
@@ -1175,7 +1179,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testThat_clientSocketDelegateQueueHandlesConnectionStateChanges
 {
     F53OSCClient *client = [[F53OSCClient alloc] init];
-    client.port = PORT_BASE + 70;
+    client.port = PORT_BASE + 90;
 
     [self addTeardownBlock:^{
         [client disconnect];

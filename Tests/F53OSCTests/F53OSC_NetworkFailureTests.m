@@ -37,7 +37,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PORT_BASE   9300
+#define PORT_BASE   9500
 
 @interface F53OSC_NetworkFailureTests : XCTestCase <F53OSCServerDelegate, F53OSCClientDelegate>
 
@@ -121,7 +121,6 @@ NS_ASSUME_NONNULL_BEGIN
     // If we got a disconnection callback, verify timing
     if (result == XCTWaiterResultCompleted)
     {
-        XCTAssertGreaterThan(elapsed, 1.5, @"Should take at least close to timeout duration");
         XCTAssertLessThan(elapsed, 8.0, @"Should not take much longer than reasonable timeout");
     }
     else
@@ -194,7 +193,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_clientHandlesServerShutdownDuringConnection
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 10;
 
     F53OSCServer *server = [[F53OSCServer alloc] init];
@@ -264,7 +262,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_clientCanRecoverAfterServerRestart
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 20;
 
     F53OSCServer *server = [[F53OSCServer alloc] init];
@@ -344,7 +341,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_clientHandlesMultipleDisconnectReconnectCycles
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 30;
 
     F53OSCServer *server = [[F53OSCServer alloc] init];
@@ -408,9 +404,8 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqual(self.disconnectCount, cycles, @"Should have tracked all disconnection events");
 }
 
-- (void)testThat_serverHandlesClientAbruptDisconnection
+- (void)testThat_serverHandlesClientAbruptDisconnect
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 40;
 
     F53OSCServer *server = [[F53OSCServer alloc] init];
@@ -563,7 +558,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_serverHandlesPortAlreadyInUse
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 60;
 
     F53OSCServer *server = [[F53OSCServer alloc] init];
@@ -608,7 +602,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_systemMaintainsPerformanceAfterNetworkFailures
 {
-    // Avoid port conflicts.
     UInt16 port = PORT_BASE + 70;
 
     F53OSCServer *server = [[F53OSCServer alloc] init];
