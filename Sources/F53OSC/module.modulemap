@@ -1,0 +1,49 @@
+module F53OSC {
+    umbrella header "F53OSC.h"
+    export *
+
+    explicit module Browser {
+        header "F53OSCBrowser.h"
+        export *
+    }
+
+    explicit module Bundle {
+        header "F53OSCBundle.h"
+        export *
+    }
+
+    explicit module Client {
+        header "F53OSCClient.h"
+        export *
+    }
+
+    explicit module EncryptHandshake {
+        header "F53OSCEncryptHandshake.h"
+        export *
+    }
+
+    explicit module Message {
+        header "F53OSCMessage.h"
+        export *
+    }
+
+    explicit module Packet {
+        header "F53OSCPacket.h"
+        export *
+    }
+
+    explicit module Parser {
+        header "F53OSCParser.h"
+        export *
+    }
+
+    explicit module Server {
+        header "F53OSCServer.h"
+        export *
+    }
+
+    explicit module Socket {
+        header "F53OSCSocket.h"
+        export *
+    }
+}

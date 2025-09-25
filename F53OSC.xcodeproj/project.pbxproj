@@ -224,6 +224,8 @@
 		3D1E0854242A815100655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D1E0861242A81F600655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D1E08E4242A8EC700655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D645F792E86E14500B8A91D /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		3D645F7A2E86E16500B8A91D /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		3D89C46B27B410F90089D3B0 /* F53OSCEncrypt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = F53OSCEncrypt.swift; sourceTree = "<group>"; };
 		3D89C46F27B411000089D3B0 /* F53OSCEncryptHandshake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCEncryptHandshake.h; sourceTree = "<group>"; };
 		3D89C47027B411000089D3B0 /* F53OSCEncryptHandshake.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCEncryptHandshake.m; sourceTree = "<group>"; };
@@ -369,6 +371,7 @@
 				3D1E081F242A7E1000655E76 /* F53OSCTimeTag.m */,
 				3D083543242BF3C000E4A247 /* F53OSCValue.h */,
 				3D083542242BF3C000E4A247 /* F53OSCValue.m */,
+				3D645F7A2E86E16500B8A91D /* module.modulemap */,
 				3D1E080D242A7E1000655E76 /* NSData+F53OSCBlob.h */,
 				3D1E0820242A7E1000655E76 /* NSData+F53OSCBlob.m */,
 				3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */,
@@ -425,6 +428,7 @@
 				3D1E0914242AAC9C00655E76 /* Supporting Files */,
 				66EE17531B729EA0008B6743 /* Products */,
 				3D1E07F8242A7D7200655E76 /* F53OSC.podspec */,
+				3D645F792E86E14500B8A91D /* Package.swift */,
 				3D1E07F2242A7D5D00655E76 /* LICENSE.txt */,
 				3DA5A9B02432674F0068AF88 /* CHANGELOG.md */,
 				3D1E07F0242A7D5100655E76 /* README.md */,

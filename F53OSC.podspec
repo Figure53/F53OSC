@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'F53OSC'
-  s.version      = '1.3.0'
+  s.version      = '1.3.1'
   s.summary      = 'A nice open source OSC library for Objective-C.'
 
   s.description  = <<-DESC
@@ -26,6 +26,14 @@ Pod::Spec.new do |s|
   s.source_files = [
     'Sources/F53OSC/*.{h,m,swift}',
     'Sources/Vendor/CocoaAsyncSocket/*.{h,m}',
+  ]
+
+  s.exclude_files = [
+    'Sources/F53OSC/module.modulemap',
+
+    # Exclude symlinks created for SPM framework compatibility.
+    'Sources/F53OSC/GCDAsyncSocket.h',
+    'Sources/F53OSC/GCDAsyncUdpSocket.h',
   ]
   
   s.frameworks = 'Security', 'CFNetwork'

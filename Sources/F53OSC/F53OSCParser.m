@@ -32,6 +32,8 @@
 
 #if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSC-Swift.h>
+#elif SWIFT_PACKAGE // Swift Package Manager
+@import F53OSCEncrypt;
 #endif
 #import "F53OSCMessage.h"
 #import "F53OSCSocket.h"
