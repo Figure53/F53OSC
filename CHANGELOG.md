@@ -1,3 +1,47 @@
+## [1.3.1 - September 29, 2025](https://github.com/Figure53/F53OSC/releases/tag/1.3.1)
+
+- Adds support for Swift Package Manager.
+- Adds F53OSC.xctestplan and comprehensive test suite.
+
+### F53OSCBrowser
+- Properties `domain` and `serviceType` now allow setting an empty string.
+- Fixes the getter implementation of read-only property `clientRecords`.
+- Fixes `stop` to allow for quicker restarts.
+
+### F53OSCBundle
+- Adds `copyWithZone:` for proper subclass conformance to NSCopying, declared in the `F53OSCPacket` superclass.
+- Invalid `elements` (i.e. non-`NSData`) are now discarded when setting, rather than when reading `packetData`. This fixes an edge case where the bundle `description` could report elements that would not be included in the `packetData`.
+
+### F53OSCClient
+- Adds `hostIsLocal` convenience getter.
+- Modernizes `readState` dictionary code.
+- Refactors `createSocket`, `connect`, and `connectEncryptedWithKeyPair:` for clarity, with the assumption that `createSocket` will always populate the client `socket` property with a non-nil value.
+- Fixes a bug when connecting that prevented sending the `clientDidConnect:` delegate message in cases where an encryption handshake request failed.
+
+### F53OSCEncryptHandshake
+- Adds enum value `F53OSCEncryptionHandshakeMessageNone` at raw value `0`. This allows `lastProcessedMessage` to be initialized more accurately as "None", prior to making a handshake request. NOTE: Inserting this enum value at position 0 shifts all previously-existing raw values in `F53OSCEncryptionHandshakeMessage` up by 1.
+- Exposes `protocolVersion` to public as a class method.
+- Changes all public properties to be read-only.
+- Generic `init` is now marked as unavailable in favor of using `+handshakeWithEncrypter:` which ensures an encrypter is provided.
+- Fixes a typo in `F53OSCEncryptionHandshakeMessageApprove`.
+
+### F53OSCMessage
+- Adds missing `kCFNumberCFIndexType` switch cases.
+- Adds #define `F53OSC_EXHAUSTIVE_SWITCH_ENABLED` (enabled by default) for compatibility with the `GCC_WARN_CHECK_SWITCH_STATEMENTS` build setting.
+- Number formatting now uses `NSNumberFormatter` rounding mode `NSNumberFormatterRoundHalfUp`.
+- Fixes a small regression in `+messageWithString:` related to parsing quotation marks.
+
+### F53OSCSocket
+- Adds `hostIsLocal` convenience getter.
+- Generic `init` is now marked as unavailable in favor of using init methods that ensure an internal TCP or UDP socket is provided.
+- Fixes `keyPair` property nullable annotation.
+
+### More
+- Misc code cleanups.
+- Removes F53OSC Monitor.xcodeproj in favor of having multiple targets in F53OSC.xcodeproj.
+- Light optimizations and cleanups in the F53OSC Monitor app code.
+- F53OSC.xcodeproj is updated for Xcode 16.2.
+
 ## [1.3.0 - August 30, 2022](https://github.com/Figure53/F53OSC/releases/tag/1.3.0)
 
 ### F53OSCEncrypt

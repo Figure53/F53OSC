@@ -10,14 +10,57 @@ For convenience, we've included a few public domain source files from [CocoaAsyn
 
 - F53OSC must be compiled with ARC.
 - You must link against `Security.framework` and `CFNetwork.framework`.
-- F53OSC requires Xcode 13.2.1 or later and a minimum deployment target of macOS 11, iOS 14, or tvOS 14.
+- F53OSC requires Xcode 16.2 or later and a minimum deployment target of macOS 11, iOS 14, or tvOS 14.
 
-You can also use CocoaPods to include F53OSC into your project:
 
-```
+## Installation
+
+F53OSC includes support for [CocoaPods](https://cocoapods.org) and [Swift Package Manager](https://github.com/swiftlang/swift-package-manager/blob/main/Documentation/Usage.md). You can also manually integrate the files in your project.
+
+### CocoaPods
+
+Add the following line to your `Podfile`:
+
+```ruby
 pod 'F53OSC', :git => 'https://github.com/Figure53/F53OSC.git'
 ```
 
+Then run:
+
+```bash
+pod install
+```
+
+Make sure to open the `.xcworkspace` file rather than the `.xcodeproj` file after installation.
+
+### Swift Package Manager
+
+For Xcode projects, go to **File** > **Add Package Dependencies...**, enter the repository URL `https://github.com/Figure53/F53OSC`, and select the version you want to use.
+
+If you're developing a Swift Package, add the dependency to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/Figure53/F53OSC.git", from: "X.Y.Z") // Replace with desired version
+]
+```
+
+Then add the library to your target dependencies:
+
+```swift
+targets: [
+    .target(
+        name: "YourTarget",
+        dependencies: ["F53OSC"]
+    )
+]
+```
+
+
 ## Demo
 
-Included is a small demo app "F53OSC Monitor", which logs OSC messages sent to it via port 9999 and displays some basic stats about incoming traffic.
+F53OSC.xcodeproj includes "F53OSC Monitor", a small demo app that logs OSC messages sent to it on port 9999 and displays some basic stats about incoming traffic.
+
+## Version History
+
+* Full [changelog](https://github.com/Figure53/F53OSC/blob/main/CHANGELOG.md).
