@@ -60,7 +60,8 @@ let package = Package(
                 "NSNumber+F53OSCNumber.h", "NSNumber+F53OSCNumber.m",
                 "NSString+F53OSCString.h", "NSString+F53OSCString.m",
                 "module.modulemap",
-            ]
+            ],
+            sources: ["F53OSCEncrypt.swift"]
         ),
         .testTarget(
             name: "F53OSCTests",
