@@ -108,9 +108,9 @@
 		3D1E0909242A9F7C00655E76 /* NSString+F53OSCString.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D1E0807242A7E1000655E76 /* NSString+F53OSCString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D1E090A242A9F7C00655E76 /* NSString+F53OSCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D1E0815242A7E1000655E76 /* NSString+F53OSCString.m */; };
 		3D1E090D242A9FAE00655E76 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D1E07F2242A7D5D00655E76 /* LICENSE.txt */; };
-		3D89C46C27B410F90089D3B0 /* F53OSCEncrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D89C46B27B410F90089D3B0 /* F53OSCEncrypt.swift */; };
-		3D89C46D27B410F90089D3B0 /* F53OSCEncrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D89C46B27B410F90089D3B0 /* F53OSCEncrypt.swift */; };
-		3D89C46E27B410F90089D3B0 /* F53OSCEncrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D89C46B27B410F90089D3B0 /* F53OSCEncrypt.swift */; };
+		3D794FA62E90129100BD7AD1 /* F53OSCEncrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D794FA42E90129100BD7AD1 /* F53OSCEncrypt.swift */; };
+		3D794FA72E90129100BD7AD1 /* F53OSCEncrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D794FA42E90129100BD7AD1 /* F53OSCEncrypt.swift */; };
+		3D794FA82E90129100BD7AD1 /* F53OSCEncrypt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D794FA42E90129100BD7AD1 /* F53OSCEncrypt.swift */; };
 		3D89C47127B411010089D3B0 /* F53OSCEncryptHandshake.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D89C46F27B411000089D3B0 /* F53OSCEncryptHandshake.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D89C47227B411010089D3B0 /* F53OSCEncryptHandshake.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D89C46F27B411000089D3B0 /* F53OSCEncryptHandshake.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D89C47327B411010089D3B0 /* F53OSCEncryptHandshake.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D89C46F27B411000089D3B0 /* F53OSCEncryptHandshake.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -226,7 +226,7 @@
 		3D1E08E4242A8EC700655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D645F792E86E14500B8A91D /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		3D645F7A2E86E16500B8A91D /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
-		3D89C46B27B410F90089D3B0 /* F53OSCEncrypt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = F53OSCEncrypt.swift; sourceTree = "<group>"; };
+		3D794FA42E90129100BD7AD1 /* F53OSCEncrypt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F53OSCEncrypt.swift; sourceTree = "<group>"; };
 		3D89C46F27B411000089D3B0 /* F53OSCEncryptHandshake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCEncryptHandshake.h; sourceTree = "<group>"; };
 		3D89C47027B411000089D3B0 /* F53OSCEncryptHandshake.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSCEncryptHandshake.m; sourceTree = "<group>"; };
 		3DA5A99E242FC4AB0068AF88 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
@@ -337,6 +337,7 @@
 			isa = PBXGroup;
 			children = (
 				3D1E0803242A7E1000655E76 /* F53OSC */,
+				3D794FA52E90129100BD7AD1 /* F53OSCEncrypt */,
 				66EE17541B729EA0008B6743 /* F53OSC Monitor */,
 				3DA5A9AF242FC5BD0068AF88 /* Vendor */,
 			);
@@ -354,7 +355,6 @@
 				3D1E0824242A7E1000655E76 /* F53OSCBundle.m */,
 				3D1E080B242A7E1000655E76 /* F53OSCClient.h */,
 				3D1E0819242A7E1000655E76 /* F53OSCClient.m */,
-				3D89C46B27B410F90089D3B0 /* F53OSCEncrypt.swift */,
 				3D89C46F27B411000089D3B0 /* F53OSCEncryptHandshake.h */,
 				3D89C47027B411000089D3B0 /* F53OSCEncryptHandshake.m */,
 				3D1E0812242A7E1000655E76 /* F53OSCMessage.h */,
@@ -390,6 +390,14 @@
 				3D1E07F5242A7D6900655E76 /* Info.plist */,
 			);
 			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		3D794FA52E90129100BD7AD1 /* F53OSCEncrypt */ = {
+			isa = PBXGroup;
+			children = (
+				3D794FA42E90129100BD7AD1 /* F53OSCEncrypt.swift */,
+			);
+			path = F53OSCEncrypt;
 			sourceTree = "<group>";
 		};
 		3DA5A9AE242FC5B20068AF88 /* CocoaAsyncSocket */ = {
@@ -838,6 +846,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D794FA82E90129100BD7AD1 /* F53OSCEncrypt.swift in Sources */,
 				3D1E08D4242A8C8000655E76 /* F53OSCTimeTag.m in Sources */,
 				3D0333B025AF602100E4EFDA /* F53OSCBrowser.m in Sources */,
 				3D1E08D0242A8C8000655E76 /* F53OSCPacket.m in Sources */,
@@ -848,7 +857,6 @@
 				3D1E08BF242A8C7500655E76 /* F53OSCBundle.m in Sources */,
 				3DA5A9A5242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */,
 				3D1E08D3242A8C8000655E76 /* F53OSCSocket.m in Sources */,
-				3D89C46C27B410F90089D3B0 /* F53OSCEncrypt.swift in Sources */,
 				3D1E08D8242A8C8000655E76 /* NSDate+F53OSCTimeTag.m in Sources */,
 				3D083544242BF3C100E4A247 /* F53OSCValue.m in Sources */,
 				3D1E08CF242A8C8000655E76 /* F53OSCMessage.m in Sources */,
@@ -863,6 +871,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D794FA72E90129100BD7AD1 /* F53OSCEncrypt.swift in Sources */,
 				3D1E08C6242A8C8000655E76 /* F53OSCTimeTag.m in Sources */,
 				3D0333B125AF602100E4EFDA /* F53OSCBrowser.m in Sources */,
 				3D1E08C2242A8C8000655E76 /* F53OSCPacket.m in Sources */,
@@ -873,7 +882,6 @@
 				3D1E08BE242A8C7400655E76 /* F53OSCBundle.m in Sources */,
 				3DA5A9A6242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */,
 				3D1E08C5242A8C8000655E76 /* F53OSCSocket.m in Sources */,
-				3D89C46D27B410F90089D3B0 /* F53OSCEncrypt.swift in Sources */,
 				3D1E08CA242A8C8000655E76 /* NSDate+F53OSCTimeTag.m in Sources */,
 				3D083545242BF3C100E4A247 /* F53OSCValue.m in Sources */,
 				3D1E08C1242A8C8000655E76 /* F53OSCMessage.m in Sources */,
@@ -888,6 +896,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D794FA62E90129100BD7AD1 /* F53OSCEncrypt.swift in Sources */,
 				3D1E08FE242A9F7C00655E76 /* F53OSCTimeTag.m in Sources */,
 				3D0333B225AF602100E4EFDA /* F53OSCBrowser.m in Sources */,
 				3D1E08F6242A9F7C00655E76 /* F53OSCPacket.m in Sources */,
@@ -898,7 +907,6 @@
 				3D1E08F0242A9F7C00655E76 /* F53OSCBundle.m in Sources */,
 				3DA5A9A7242FC4AB0068AF88 /* GCDAsyncSocket.m in Sources */,
 				3D1E08FC242A9F7C00655E76 /* F53OSCSocket.m in Sources */,
-				3D89C46E27B410F90089D3B0 /* F53OSCEncrypt.swift in Sources */,
 				3D1E0906242A9F7C00655E76 /* NSDate+F53OSCTimeTag.m in Sources */,
 				3D083546242BF3C100E4A247 /* F53OSCValue.m in Sources */,
 				3D1E08F4242A9F7C00655E76 /* F53OSCMessage.m in Sources */,
