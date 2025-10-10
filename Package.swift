@@ -7,43 +7,43 @@ let package = Package(
     platforms: [
         .macOS(.v11),
         .iOS(.v14),
-        .tvOS(.v14)
+        .tvOS(.v14),
     ],
     products: [
         .library(
             name: "F53OSC",
-            targets: ["F53OSC", "F53OSCEncrypt"]
-        )
+            targets: [
+                "F53OSC",
+                "F53OSCEncrypt",
+            ]
+        ),
     ],
     targets: [
         .target(
             name: "F53OSC",
-            dependencies: ["F53OSCEncrypt"],
-            path: "Sources",
-            exclude: [
-                "F53OSC/module.modulemap",
-                "F53OSC Monitor"
+            dependencies: [
+                "CocoaAsyncSocket",
+                "F53OSCEncrypt",
             ],
-            sources: [
-                "F53OSC",
-                "Vendor/CocoaAsyncSocket"
-            ],
-            publicHeadersPath: "F53OSC",
-            cSettings: [
-                .headerSearchPath("Vendor/CocoaAsyncSocket")
-            ],
-            linkerSettings: [
-                .linkedFramework("Security"),
-                .linkedFramework("CFNetwork")
-            ]
+            publicHeadersPath: "."
         ),
         .target(
-            name: "F53OSCEncrypt",
-            path: "Sources/F53OSCEncrypt"
+            name: "F53OSCEncrypt"
+        ),
+        .target(
+            name: "CocoaAsyncSocket",
+            path: "Sources/Vendor/CocoaAsyncSocket",
+            publicHeadersPath: ".",
+            linkerSettings: [
+                .linkedFramework("Security"),
+                .linkedFramework("CFNetwork"),
+            ]
         ),
         .testTarget(
             name: "F53OSCTests",
-            dependencies: ["F53OSC", "F53OSCEncrypt"]
-        )
+            dependencies: [
+                "F53OSC",
+            ]
+        ),
     ]
 )
