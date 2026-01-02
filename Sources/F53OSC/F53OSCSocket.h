@@ -76,6 +76,7 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 @property (strong, readonly, nullable) GCDAsyncUdpSocket *udpSocket;
 @property (nonatomic, readonly) BOOL isTcpSocket;
 @property (nonatomic, readonly) BOOL isUdpSocket;
+@property (strong, readonly, nullable) NSError * lastErrorTcp;
 @property (nonatomic, assign) F53TCPDataFraming tcpDataFraming; // Default SLIP
 
 @property (nonatomic, copy, nullable) NSString *interface;      // Default nil, aka default interface

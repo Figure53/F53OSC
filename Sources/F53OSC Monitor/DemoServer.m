@@ -65,8 +65,13 @@ NS_ASSUME_NONNULL_BEGIN
 
     if ( ![self.server startListening] )
     {
-        NSLog( @"Error: F53OSC Monitor was unable to start listening on port %hu.", self.server.port );
-        errorString = [NSString stringWithFormat:@"F53OSC Monitor was unable to start listening for OSC messages on port %hu.", self.server.port ];
+        NSError * errorTcp = [self.server getLastErrorTcpSocket];
+        NSString * errorTcpString = @"";
+        if (errorTcp != nil){
+            errorTcpString = [NSString stringWithFormat:@" (TCP Error : %@ ; %@)", errorTcp.localizedDescription, errorTcp.localizedFailureReason];
+        }
+        NSLog( @"Error: F53OSC Monitor was unable to start listening on port %hu%@.", self.server.port, errorTcpString);
+        errorString = [NSString stringWithFormat:@"F53OSC Monitor was unable to start listening for OSC messages on port %hu%@.", self.server.port, errorTcpString];
     }
     else
     {

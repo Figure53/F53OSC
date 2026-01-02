@@ -58,6 +58,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) startListening;
 - (void) stopListening;
 
+-(NSError * __nullable)getLastErrorTcpSocket;
+
 @end
 
 @protocol F53OSCServerDelegate <F53OSCPacketDestination>

@@ -129,6 +129,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, readwrite, nullable) GCDAsyncSocket *tcpSocket;
 @property (strong, readwrite, nullable) GCDAsyncUdpSocket *udpSocket;
+@property (nonatomic, readwrite, nullable) NSError * lastErrorTcp;
 @property (strong, readwrite, nullable) F53OSCStats *stats;
 
 @end
@@ -152,6 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         self.tcpSocket = socket;
         self.udpSocket = nil;
+        self.lastErrorTcp = nil;
         self.interface = nil;
         self.host = @"localhost";
         self.port = 0;
@@ -172,6 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
         
         self.tcpSocket = nil;
         self.udpSocket = socket;
+        self.lastErrorTcp = nil;
         self.interface = nil;
         self.host = @"localhost";
         self.port = 0;
@@ -242,9 +245,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL) startListening
 {
+    NSError * lastError = nil;
     if ( self.tcpSocket )
     {
-        return [self.tcpSocket acceptOnInterface:self.interface port:self.port error:nil];
+        BOOL res = [self.tcpSocket acceptOnInterface:self.interface port:self.port error:&lastError];
+        self.lastErrorTcp = lastError;
+        return res;
     }
 
     if ( self.udpSocket )

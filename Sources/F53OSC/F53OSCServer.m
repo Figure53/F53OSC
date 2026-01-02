@@ -211,6 +211,14 @@ NS_ASSUME_NONNULL_BEGIN
     [self.udpSocket.udpSocket synchronouslySetDelegateQueue:nil];
 }
 
+-(NSError * __nullable)getLastErrorTcpSocket
+{
+    if (self.tcpSocket != nil){
+        return self.tcpSocket.lastErrorTcp;
+    }
+    return nil;
+}
+
 - (void) handleF53OSCControlMessage:(F53OSCMessage *)message
 {
     if ( [F53OSCEncryptHandshake isEncryptHandshakeMessage:message] )
