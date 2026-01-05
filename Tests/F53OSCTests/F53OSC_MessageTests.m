@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 2/14/20.
-//  Copyright (c) 2020-2025 Figure 53, LLC. All rights reserved.
+//  Copyright (c) 2020-2026 Figure 53, LLC. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -93,8 +93,10 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     self.testServer = testServer;
     self.testClient = testClient;
 
-    BOOL isListening = [testServer startListening];
+    NSError *error = nil;
+    BOOL isListening = [testServer startListening:&error];
     XCTAssertTrue(isListening, @"F53OSCServer was unable to start listening on port %hu", testServer.port);
+    XCTAssertNil(error, @"F53OSCServer should start listening without error");
 
     [self connectOSCClientAndVerify];
 }

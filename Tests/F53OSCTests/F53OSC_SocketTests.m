@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 8/5/25.
-//  Copyright (c) 2025 Figure 53. All rights reserved.
+//  Copyright (c) 2025-2026 Figure 53. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -84,8 +84,10 @@ NS_ASSUME_NONNULL_BEGIN
     }];
     self.testServer = testServer;
 
-    BOOL isListening = [testServer startListening];
+    NSError *error = nil;
+    BOOL isListening = [testServer startListening:&error];
     XCTAssertTrue(isListening, @"Test server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Test server should start listening without error");
 }
 
 
@@ -273,8 +275,10 @@ NS_ASSUME_NONNULL_BEGIN
     socket.port = 0;
     XCTAssertEqual(socket.port, 0, @"Socket port should be 0");
 
-    BOOL didStartMin = [socket startListening];
-    XCTAssertTrue(didStartMin, @"Should start listening on min port %hu", socket.port);
+    NSError *error = nil;
+    BOOL isListeningMin = [socket startListening:&error];
+    XCTAssertTrue(isListeningMin, @"Should start listening on min port %hu", socket.port);
+    XCTAssertNil(error, @"Server should start listening without error");
 }
 
 - (void)testThat_udpSocketHandlesMinimumPortNumber
@@ -291,8 +295,10 @@ NS_ASSUME_NONNULL_BEGIN
     socket.port = 0;
     XCTAssertEqual(socket.port, 0, @"Socket port should be 0");
 
-    BOOL didStartMin = [socket startListening];
-    XCTAssertTrue(didStartMin, @"Should start listening on min port %hu", socket.port);
+    NSError *error = nil;
+    BOOL isListeningMin = [socket startListening:&error];
+    XCTAssertTrue(isListeningMin, @"Should start listening on min port %hu", socket.port);
+    XCTAssertNil(error, @"Server should start listening without error");
 }
 
 - (void)testThat_tcpSocketHandlesMaximumPortNumber
@@ -309,8 +315,10 @@ NS_ASSUME_NONNULL_BEGIN
     socket.port = UINT16_MAX;
     XCTAssertEqual(socket.port, 65535, @"Socket port should be 65535");
 
-    BOOL didStartMax = [socket startListening];
-    XCTAssertTrue(didStartMax, @"Should start listening on max port %hu", socket.port);
+    NSError *error = nil;
+    BOOL isListeningMax = [socket startListening:&error];
+    XCTAssertTrue(isListeningMax, @"Should start listening on max port %hu", socket.port);
+    XCTAssertNil(error, @"Server should start listening without error");
 }
 
 - (void)testThat_udpSocketHandlesMaximumPortNumber
@@ -327,8 +335,10 @@ NS_ASSUME_NONNULL_BEGIN
     socket.port = UINT16_MAX;
     XCTAssertEqual(socket.port, 65535, @"Socket port should be 65535");
 
-    BOOL didStartMax = [socket startListening];
-    XCTAssertTrue(didStartMax, @"Should start listening on max port %hu", socket.port);
+    NSError *error = nil;
+    BOOL isListeningMax = [socket startListening:&error];
+    XCTAssertTrue(isListeningMax, @"Should start listening on max port %hu", socket.port);
+    XCTAssertNil(error, @"Server should start listening without error");
 }
 
 - (void)testThat_tcpSocketHasNoStatsObjectAfterCreation
@@ -343,8 +353,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     XCTAssertNil(socket.stats, @"Socket should not have a stats object yet");
 
-    BOOL didStart = [socket startListening];
-    XCTAssertTrue(didStart, @"Should start listening successfully");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertTrue(isListening, @"Socket should start listening");
+    XCTAssertNil(error, @"Should start listening without error");
 
     XCTAssertNil(socket.stats, @"Socket still should not have a stats object");
 }
@@ -361,8 +373,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     XCTAssertNil(socket.stats, @"Socket should not have a stats object yet");
 
-    BOOL didStart = [socket startListening];
-    XCTAssertTrue(didStart, @"Should start listening successfully");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertTrue(isListening, @"Socket should start listening");
+    XCTAssertNil(error, @"Socket should start listening without error");
 
     XCTAssertNotNil(socket.stats, @"Socket should now have a stats object");
     XCTAssertEqualWithAccuracy([socket.stats totalBytes], 0.0, 0.01, @"Initial stats should be zero");
@@ -484,8 +498,10 @@ NS_ASSUME_NONNULL_BEGIN
     socket.port = PORT_BASE + 20;
 
     // Start listening.
-    BOOL didStart = [socket startListening];
-    XCTAssertTrue(didStart, @"Should start listening");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertTrue(isListening, @"Socket should start listening");
+    XCTAssertNil(error, @"Socket should start listening without error");
 
     // Stop listening.
     XCTAssertNoThrow([socket stopListening], @"Stop listening should not crash");
@@ -607,8 +623,10 @@ NS_ASSUME_NONNULL_BEGIN
         [socket stopListening];
     }];
 
-    BOOL didStart = [socket startListening];
-    XCTAssertFalse(didStart, @"Should not start listening");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertFalse(isListening, @"Socket should not start listening");
+    XCTAssertNotNil(error, @"Socket start should return error");
 }
 
 - (void)testThat_udpSocketWithNilInternalSocketCannotStartListening
@@ -618,8 +636,10 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCSocket *socket = [F53OSCSocket socketWithUdpSocket:nil];
 #pragma clang diagnostic pop
 
-    BOOL didStart = [socket startListening];
-    XCTAssertFalse(didStart, @"Should not start listening");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertFalse(isListening, @"Socket should not start listening");
+    XCTAssertNotNil(error, @"Socket start should return error");
 }
 
 - (void)testThat_tcpSocketWithNilInternalSocketCannotConnect
@@ -778,8 +798,10 @@ NS_ASSUME_NONNULL_BEGIN
     socket.port = PORT_BASE + 30;
     socket.interface = @"invalid_interface_name_999";
 
-    BOOL didStart = [socket startListening];
-    XCTAssertFalse(didStart, @"Should fail to listen on invalid interface");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertFalse(isListening, @"Socket should fail to listen on invalid interface");
+    XCTAssertNotNil(error, @"Socket start should return error");
 }
 
 - (void)testThat_udpSocketHandlesInvalidInterface
@@ -790,8 +812,10 @@ NS_ASSUME_NONNULL_BEGIN
     socket.port = PORT_BASE + 40;
     socket.interface = @"invalid_interface_name_999";
 
-    BOOL didStart = [socket startListening];
-    XCTAssertFalse(didStart, @"Should fail to bind to invalid interface");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertFalse(isListening, @"Should fail to bind to invalid interface");
+    XCTAssertNotNil(error, @"Socket start should return error");
 }
 
 
@@ -810,8 +834,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     socket.port = PORT_BASE + 50;
 
-    BOOL didStart = [socket startListening];
-    XCTAssertTrue(didStart, @"Should start listening successfully");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertTrue(isListening, @"Socket should start listening");
+    XCTAssertNil(error, @"Socket should start listening without error");
 }
 
 - (void)testThat_udpSocketCanStartListening
@@ -826,8 +852,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     socket.port = PORT_BASE + 60;
 
-    BOOL didStart = [socket startListening];
-    XCTAssertTrue(didStart, @"UDP should start listening successfully");
+    NSError *error = nil;
+    BOOL isListening = [socket startListening:&error];
+    XCTAssertTrue(isListening, @"Socket should start listening");
+    XCTAssertNil(error, @"Socket should start listening without error");
 }
 
 - (void)testThat_tcpSocketHandlesPortConflicts
@@ -850,13 +878,19 @@ NS_ASSUME_NONNULL_BEGIN
         [socket2 stopListening];
     }];
 
+    NSError *error;
+
     // First socket should bind successfully
-    BOOL didStart1 = [socket1 startListening];
-    XCTAssertTrue(didStart1, @"First socket should start listening");
+    error = nil;
+    BOOL isListening1 = [socket1 startListening:&error];
+    XCTAssertTrue(isListening1, @"First socket should start listening");
+    XCTAssertNil(error, @"First socket should start listening without error");
 
     // Second socket should fail to bind to same port
-    BOOL didStart2 = [socket2 startListening];
-    XCTAssertFalse(didStart2, @"Second socket should fail to listen on same port");
+    error = nil;
+    BOOL isListening2 = [socket2 startListening:&error];
+    XCTAssertFalse(isListening2, @"Second socket should fail to listen on same port");
+    XCTAssertNotNil(error, @"Second socket start should return error");
 }
 
 - (void)testThat_udpSocketHandlesPortConflicts
@@ -878,13 +912,19 @@ NS_ASSUME_NONNULL_BEGIN
         [socket2 stopListening];
     }];
 
+    NSError *error;
+
     // First socket should bind successfully
-    BOOL didStart1 = [socket1 startListening];
-    XCTAssertTrue(didStart1, @"First socket should bind successfully");
+    error = nil;
+    BOOL isListening1 = [socket1 startListening:&error];
+    XCTAssertTrue(isListening1, @"First socket should bind successfully");
+    XCTAssertNil(error, @"First socket should start listening without error");
 
     // Second socket should fail to bind to same port
-    BOOL didStart2 = [socket2 startListening];
-    XCTAssertFalse(didStart2, @"Second socket should fail to bind to same port");
+    error = nil;
+    BOOL isListening2 = [socket2 startListening:&error];
+    XCTAssertFalse(isListening2, @"Second socket should fail to bind to same port");
+    XCTAssertNotNil(error, @"Second socket start should return error");
 }
 
 

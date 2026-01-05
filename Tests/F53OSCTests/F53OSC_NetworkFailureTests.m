@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 8/5/25.
-//  Copyright (c) 2025 Figure 53. All rights reserved.
+//  Copyright (c) 2025-2026 Figure 53. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -214,8 +214,10 @@ NS_ASSUME_NONNULL_BEGIN
         client.delegate = nil;
     }];
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Setup expectations.
     self.connectionExpectation = [[XCTestExpectation alloc] initWithDescription:@"Initial connection"];
@@ -283,8 +285,10 @@ NS_ASSUME_NONNULL_BEGIN
         client.delegate = nil;
     }];
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Initial connection.
     self.connectionExpectation = [[XCTestExpectation alloc] initWithDescription:@"Initial connection"];
@@ -314,8 +318,10 @@ NS_ASSUME_NONNULL_BEGIN
     server.delegate = self;
     server.port = originalPort;
 
-    BOOL restarted = [server startListening];
-    XCTAssertTrue(restarted, @"Server should restart successfully");
+    error = nil;
+    BOOL restarted = [server startListening:&error];
+    XCTAssertTrue(restarted, @"Server should restart listening");
+    XCTAssertNil(error, @"Server should restart listening without error");
 
     // Give the server a moment to be ready.
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
@@ -362,8 +368,10 @@ NS_ASSUME_NONNULL_BEGIN
         client.delegate = nil;
     }];
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     NSUInteger cycles = 3;
     for (NSUInteger cycle = 0; cycle < cycles; cycle++)
@@ -427,8 +435,10 @@ NS_ASSUME_NONNULL_BEGIN
         client.delegate = nil;
     }];
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Connect client.
     self.connectionExpectation = [[XCTestExpectation alloc] initWithDescription:@"Client connects"];
@@ -579,15 +589,21 @@ NS_ASSUME_NONNULL_BEGIN
         client.delegate = nil;
     }];
 
-    BOOL isListening = [server startListening];
+    NSError *error;
+
+    error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Try to create second server on same port.
     F53OSCServer *secondServer = [[F53OSCServer alloc] init];
     secondServer.port = server.port;
 
-    BOOL secondStarted = [secondServer startListening];
+    error = nil;
+    BOOL secondStarted = [secondServer startListening:&error];
     XCTAssertFalse(secondStarted, @"Second server should fail to start on same port");
+    XCTAssertNotNil(error, @"Second server start should return error");
 
     // Verify first server still works.
     self.connectionExpectation = [[XCTestExpectation alloc] initWithDescription:@"First server still works"];
@@ -623,8 +639,10 @@ NS_ASSUME_NONNULL_BEGIN
         client.delegate = nil;
     }];
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     NSTimeInterval totalStartTime = [NSDate timeIntervalSinceReferenceDate];
 

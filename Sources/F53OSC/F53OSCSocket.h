@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Christopher Ashworth on 1/28/13.
-//  Copyright (c) 2013-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -91,6 +91,7 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 @property (assign) BOOL isEncrypting;
 
 - (BOOL) startListening;
+- (BOOL) startListening:(out NSError **)outError;
 - (void) stopListening;
 
 - (BOOL) connect;       // when using TCP, returns NO if already connected

@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 2/24/20.
-//  Copyright (c) 2020-2025 Figure 53, LLC. All rights reserved.
+//  Copyright (c) 2020-2026 Figure 53, LLC. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -163,8 +163,10 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(server.isIPv6Enabled, @"Server IPv6Enabled should be YES");
 
     // Test that server can still start with IPv6 enabled
-    BOOL started = [server startListening];
+    NSError *error = nil;
+    BOOL started = [server startListening:&error];
     XCTAssertTrue(started, @"Server should start listening with IPv6 enabled");
+    XCTAssertNil(error, @"Server should start listening without error");
 }
 
 
@@ -1630,8 +1632,10 @@ NS_ASSUME_NONNULL_BEGIN
     }];
 
     // Start listening to initialize socket infrastructure
-    BOOL started = [server startListening];
+    NSError *error = nil;
+    BOOL started = [server startListening:&error];
     XCTAssertTrue(started, @"Server should start listening on custom port");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
     GCDAsyncSocket *newSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
@@ -1649,8 +1653,10 @@ NS_ASSUME_NONNULL_BEGIN
     }];
 
     // Start listening to initialize socket infrastructure
-    BOOL started = [server startListening];
+    NSError *error = nil;
+    BOOL started = [server startListening:&error];
     XCTAssertTrue(started, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
 

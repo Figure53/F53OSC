@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Siobhán Dougall on 3/23/11.
-//  Copyright (c) 2011-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -188,14 +188,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL) startListening
 {
+    return [self startListening:nil];
+}
+
+- (BOOL) startListening:(out NSError **)outError
+{
     // delegateQueue must be set before starting listening
     [self.tcpSocket.tcpSocket synchronouslySetDelegateQueue:self.queue];
     [self.udpSocket.udpSocket synchronouslySetDelegateQueue:self.queue];
     
     BOOL success;
-    success = [self.tcpSocket startListening];
+    success = [self.tcpSocket startListening:outError];
     if ( success )
-        success = [self.udpSocket startListening];
+        success = [self.udpSocket startListening:outError];
     return success;
 }
 

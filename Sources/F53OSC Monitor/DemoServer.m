@@ -3,7 +3,7 @@
 //  F53OSC Monitor
 //
 //  Created by Adam Bachman on 8/5/15.
-//  Copyright (c) 2015-2025 Figure 53. All rights reserved.
+//  Copyright (c) 2015-2026 Figure 53. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -61,21 +61,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)start
 {
     NSLog( @"starting F53OSC Monitor" );
-    NSString *errorString = nil;
 
-    if ( ![self.server startListening] )
+    NSError *error = nil;
+    if ( ![self.server startListening:&error] || error )
     {
-        NSLog( @"Error: F53OSC Monitor was unable to start listening on port %hu.", self.server.port );
-        errorString = [NSString stringWithFormat:@"F53OSC Monitor was unable to start listening for OSC messages on port %hu.", self.server.port ];
+        NSString *errorString = [NSString stringWithFormat:@"F53OSC Monitor was unable to start listening for OSC messages on port %hu", self.server.port ];
+        if ( error )
+        {
+            if ( error.localizedDescription && error.localizedFailureReason )
+                errorString = [errorString stringByAppendingFormat:@" - (%@ : %@)", error.localizedDescription, error.localizedFailureReason];
+            else if ( error.localizedDescription )
+                errorString = [errorString stringByAppendingFormat:@" - (%@)", error.localizedDescription];
+        }
+
+        NSLog( @"Error: %@", errorString );
+        [self.app log:errorString];
     }
     else
     {
         [self.app log:[NSString stringWithFormat:@"F53OSC Monitor is listening for OSC messages on port %hu", self.server.port]];
         self.active = YES;
     }
-
-    if (errorString)
-        [self.app log:errorString];
 }
 
 - (void)stop

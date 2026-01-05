@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 8/5/25.
-//  Copyright (c) 2025 Figure 53. All rights reserved.
+//  Copyright (c) 2025-2026 Figure 53. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -94,8 +94,10 @@ NS_ASSUME_NONNULL_BEGIN
     }];
     self.testServer = testServer;
 
-    BOOL isListening = [testServer startListening];
+    NSError *error = nil;
+    BOOL isListening = [testServer startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Create multiple clients.
     for (NSUInteger i = 0; i < clientCount; i++)
@@ -379,8 +381,10 @@ NS_ASSUME_NONNULL_BEGIN
     self.testServer.port = port;
     self.testServer.udpReplyPort = port + 1;
 
-    BOOL isListening = [self.testServer startListening];
+    NSError *error = nil;
+    BOOL isListening = [self.testServer startListening:&error];
     XCTAssertTrue(isListening, @"Server should listen for mixed protocol test");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Create 2 TCP clients and 2 UDP clients.
     NSUInteger tcpClients = 2;

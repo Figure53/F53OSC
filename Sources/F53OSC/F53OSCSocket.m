@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Christopher Ashworth on 1/28/13.
-//  Copyright (c) 2013-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -242,24 +242,32 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL) startListening
 {
+    return [self startListening:nil];
+}
+
+- (BOOL) startListening:(out NSError **)outError
+{
     if ( self.tcpSocket )
     {
-        return [self.tcpSocket acceptOnInterface:self.interface port:self.port error:nil];
+        return [self.tcpSocket acceptOnInterface:self.interface port:self.port error:outError];
     }
-
-    if ( self.udpSocket )
+    else if ( self.udpSocket )
     {
-        if ( [self.udpSocket bindToPort:self.port interface:self.interface error:nil] )
+        if ( [self.udpSocket bindToPort:self.port interface:self.interface error:outError] )
         {
             if ( !self.stats )
                 self.stats = [[F53OSCStats alloc] init];
-            return [self.udpSocket beginReceiving:nil];
+            return [self.udpSocket beginReceiving:outError];
         }
         else
         {
             return NO;
         }
     }
+
+    // else - no socket
+    if ( outError != NULL )
+        *outError = [NSError errorWithDomain:@"F53OSCSocketErrorDomain" code:-1 userInfo:@{ NSLocalizedDescriptionKey : @"A TCP or UDP socket is required." }];
 
     return NO;
 }

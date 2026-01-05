@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 8/5/25.
-//  Copyright (c) 2025 Figure 53. All rights reserved.
+//  Copyright (c) 2025-2026 Figure 53. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -195,8 +195,10 @@ NS_ASSUME_NONNULL_BEGIN
     // Test that properties remain unchanged when client connects to a server.
     F53OSCServer *server = [self basicServerWithPort:client.port];
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", client.port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Unset interface before connect, in case 'en0' is unavailable on test machine.
     client.interface = @"";
@@ -357,8 +359,10 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCServer *server = [self basicServerWithPort:port];
     F53OSCClient *client = [self basicClientWithPort:port];
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Configure client for partial reads.
     client.readChunkSize = 512;
@@ -429,8 +433,10 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCServer *server = [self basicServerWithPort:port];
     F53OSCClient *client = [self basicClientWithPort:port];
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
+    XCTAssertNil(error, @"Server should start listening without error");
 
     client.useTcp = YES; // needed for delegate callback to fulfill `connectionExpectation`
 
@@ -662,8 +668,10 @@ NS_ASSUME_NONNULL_BEGIN
     // Configure server with same key pair for encryption
     server.keyPair = keyPairData;
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     [self addTeardownBlock:^{
         [client disconnect];
@@ -719,8 +727,10 @@ NS_ASSUME_NONNULL_BEGIN
     // Configure server with same key pair for encryption
     server.keyPair = keyPairData;
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     [self addTeardownBlock:^{
         [client disconnect];
@@ -776,8 +786,10 @@ NS_ASSUME_NONNULL_BEGIN
     // Configure server with same key pair for encryption
     server.keyPair = keyPairData;
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     [self addTeardownBlock:^{
         [client disconnect];
@@ -829,8 +841,10 @@ NS_ASSUME_NONNULL_BEGIN
     // Configure server with nil key pair (no encryption)
     server.keyPair = nil;
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     [self addTeardownBlock:^{
         [client disconnect];
@@ -891,8 +905,10 @@ NS_ASSUME_NONNULL_BEGIN
     // Configure server with same key pair for encryption
     server.keyPair = keyPairData;
 
-    BOOL isListening = [server startListening];
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     [self addTeardownBlock:^{
         [client disconnect];
@@ -1187,8 +1203,11 @@ NS_ASSUME_NONNULL_BEGIN
     }];
 
     F53OSCServer *server = [self basicServerWithPort:client.port];
-    BOOL isListening = [server startListening];
+
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
     XCTAssertTrue(isListening, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
 
     // Connect with default queue
     [client connect];

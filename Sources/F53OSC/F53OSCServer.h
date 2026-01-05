@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Siobhán Dougall on 3/23/11.
-//  Copyright (c) 2011-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -56,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype) initWithDelegateQueue:(nullable dispatch_queue_t)queue;
 
 - (BOOL) startListening;
+- (BOOL) startListening:(out NSError **)outError;
 - (void) stopListening;
 
 @end
