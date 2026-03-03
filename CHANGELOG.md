@@ -1,5 +1,18 @@
-## [1.3.1 - September 29, 2025](https://github.com/Figure53/F53OSC/releases/tag/1.3.1)
+## x.x.x - ???
 
+### F53OSCServer
+- Adds a version of `-startListening:` that returns an error, if any.
+
+### F53OSCSocket
+- Adds a version of `-startListening:` that returns an error, if any.
+
+### F53OSCMessage
+- Fixes `+legalMethod:` to return NO for empty string.
+
+### F53OSCEncryptHandshake
+- Fixes `keyPair` property nullable annotation.
+
+## [1.3.1 - September 29, 2025](https://github.com/Figure53/F53OSC/releases/tag/1.3.1)
 - Adds support for Swift Package Manager.
 - Adds F53OSC.xctestplan and comprehensive test suite.
 
