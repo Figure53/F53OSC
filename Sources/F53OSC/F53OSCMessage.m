@@ -145,7 +145,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
 
 + (BOOL) legalMethod:(nullable NSString *)method
 {
-    if ( method == nil )
+    if ( method == nil || method.length == 0 )
         return NO;
     
     if ( [LEGAL_METHOD_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:method]] )

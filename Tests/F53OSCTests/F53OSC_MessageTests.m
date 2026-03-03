@@ -2433,7 +2433,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertFalse([F53OSCMessage legalMethod:@"test\0"], @"Method with a null character should be invalid");
 
     XCTAssertFalse([F53OSCMessage legalMethod:nil], @"nil method should be invalid");
-    XCTAssertTrue([F53OSCMessage legalMethod:@""], @"Empty method should be valid (implementation allows this)");
+    XCTAssertFalse([F53OSCMessage legalMethod:@""], @"Empty method should be invalid");
 
     // Test various Unicode characters.
     XCTAssertFalse([F53OSCMessage legalMethod:@"plây"], @"Method with accented characters should be invalid");
