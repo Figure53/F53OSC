@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Chad Sellers on 1/14/22.
-//  Copyright (c) 2022-2025 Figure 53, LLC. All rights reserved.
+//  Copyright (c) 2022-2026 Figure 53, LLC. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,7 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
 @property (weak) F53OSCEncrypt *encrypter;
 
 @property (assign, readwrite) BOOL handshakeComplete;
-@property (strong, readwrite) NSData *peerKey; // Peer's public key
+@property (strong, nullable, readwrite) NSData *peerKey; // Peer's public key
 @property (assign, readwrite) F53OSCEncryptionHandshakeMessage lastProcessedMessage; // Indicated which message was last processed
 
 @end
@@ -165,9 +165,10 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
             return NO;
         }
 
-        self.peerKey = message.arguments[1];
+        NSData *peerKey = message.arguments[1];
+        self.peerKey = peerKey;
         [self.encrypter generateSalt];
-        if ( ![self.encrypter beginEncryptingWithPeerKey:self.peerKey] )
+        if ( ![self.encrypter beginEncryptingWithPeerKey:peerKey] )
             return NO;
         self.lastProcessedMessage = F53OSCEncryptionHandshakeMessageRequest;
         return YES;
@@ -190,10 +191,11 @@ static NSString *const kBeginEncryptionAddress = @"!beginEncryption";
             return NO;
         }
 
-        self.peerKey = message.arguments[1];
+        NSData *peerKey = message.arguments[1];
         NSData *salt = message.arguments[2];
+        self.peerKey = peerKey;
         self.encrypter.salt = salt;
-        if ( ![self.encrypter beginEncryptingWithPeerKey:self.peerKey] )
+        if ( ![self.encrypter beginEncryptingWithPeerKey:peerKey] )
             return NO;
         self.lastProcessedMessage = F53OSCEncryptionHandshakeMessageApprove;
         return YES;

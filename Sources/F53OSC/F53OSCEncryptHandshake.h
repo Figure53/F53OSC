@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Chad Sellers on 1/14/22.
-//  Copyright (c) 2022-2025 Figure 53, LLC. All rights reserved.
+//  Copyright (c) 2022-2026 Figure 53, LLC. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ typedef NS_ENUM(NSUInteger, F53OSCEncryptionHandshakeMessage)
 @interface F53OSCEncryptHandshake : NSObject
 
 @property (readonly) BOOL handshakeComplete;
-@property (readonly) NSData *peerKey; // Peer's public key
+@property (nullable, readonly) NSData *peerKey; // Peer's public key
 @property (readonly) F53OSCEncryptionHandshakeMessage lastProcessedMessage; // Indicated which message was last processed
 
 + (instancetype) handshakeWithEncrypter:(F53OSCEncrypt *)encrypter;
