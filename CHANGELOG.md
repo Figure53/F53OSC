@@ -13,6 +13,7 @@
 - Fixes `keyPair` property nullable annotation.
 
 ## [1.3.1 - September 29, 2025](https://github.com/Figure53/F53OSC/releases/tag/1.3.1)
+
 - Adds support for Swift Package Manager.
 - Adds F53OSC.xctestplan and comprehensive test suite.
 
@@ -58,9 +59,9 @@
 ## [1.3.0 - August 30, 2022](https://github.com/Figure53/F53OSC/releases/tag/1.3.0)
 
 ### F53OSCEncrypt
-- Adds the ability to transmit OSC messages using encryption. (NOTE: this is F53OSC-specific, not based on the OSC spec.) The core of the encryption is written in Swift using CryptoKit, including P521 public/private keys, HKDF derived symmetric keys, and ChaChaPoly symmetric encryption.
+- Adds the ability to transmit OSC messages using encryption over TCP. (NOTE: this is F53OSC-specific, not based on the OSC spec.) Encryption is only supported over TCP because the multi-step handshake and per-connection state require a persistent connection. The core of the encryption is written in Swift using CryptoKit, including P521 public/private keys, HKDF derived symmetric keys, and ChaChaPoly symmetric encryption.
   - Adds an encryption handshake protocol transmitted over an F53OSC control message channel (starting with `!` instead of `/` to differentiate it from OSC messages). 
-  - Adds an encrypted message type, which consists of encrypted OSC message data prefixed by a `#` character.
+  - Adds an encrypted message type, which consists of encrypted OSC message data prefixed by a `*` character.
 - Clients wishing to support encryption must first generate a key pair using the `generateKeyPair` method of `F53OSCEncrypt` and then call `connectEncryptedWithKeyPair:` on their `F53OSCClient`.
 - Servers wishing to support encryption must first generate a key pair using the `generateKeyPair` method of `F53OSCEncrypt` and then call `setKeyPair:` on their `F53OSCServer`. 
 - Additionally, both servers and clients can check the `encrypter.publicKey` property of an `F53OSCSocket` to verify the identity of a peer if they wish to do so.
