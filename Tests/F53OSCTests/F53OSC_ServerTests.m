@@ -47,10 +47,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (atomic, strong) dispatch_queue_t queue;
 @end
 
+@interface F53OSCClient (F53OSC_ServerTestsAccess)
+@property (strong, nullable) F53OSCSocket *socket;
+@end
+
 
 #pragma - mark
 
-@interface F53OSC_ServerTests : XCTestCase <F53OSCServerDelegate>
+@interface F53OSC_ServerTests : XCTestCase <F53OSCServerDelegate, F53OSCClientDelegate>
+
+@property (nonatomic, strong, nullable) XCTestExpectation *connectionExpectation;
+@property (nonatomic, strong, nullable) F53OSCMessage *receivedMessage;
+@property (nonatomic, strong, nullable) XCTestExpectation *encryptedMessageExpectation;
+
 @end
 
 @implementation F53OSC_ServerTests
@@ -1691,9 +1700,233 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 
+#pragma mark - Encryption rejection tests
+
+- (void)testThat_serverRejectsMessageEncryptedWithDifferentKeyPair
+{
+    UInt16 port = PORT_BASE + 50;
+
+    // Generate the server's key pair.
+    F53OSCEncrypt *serverEncrypter = [[F53OSCEncrypt alloc] init];
+    NSData *serverKeyPairData = [serverEncrypter generateKeyPair];
+    XCTAssertNotNil(serverKeyPairData, @"Server keyPairData should not be nil");
+
+    // Set up server and client with the same key pair.
+    F53OSCServer *server = [[F53OSCServer alloc] init];
+    server.delegate = self;
+    server.port = port;
+    server.udpReplyPort = port + 1;
+    server.keyPair = serverKeyPairData;
+
+    [self addTeardownBlock:^{
+        [server stopListening];
+        server.delegate = nil;
+    }];
+
+    F53OSCClient *client = [[F53OSCClient alloc] init];
+    client.delegate = self;
+    client.host = @"localhost";
+    client.port = port;
+    client.useTcp = YES;
+
+    [self addTeardownBlock:^{
+        [client disconnect];
+        client.delegate = nil;
+    }];
+
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
+    XCTAssertTrue(isListening, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
+
+    // Connect with encryption.
+    XCTestExpectation *connectionExpectation = [[XCTestExpectation alloc] initWithDescription:@"Client connected"];
+    self.connectionExpectation = connectionExpectation;
+
+    XCTAssertTrue([client connectEncryptedWithKeyPair:serverKeyPairData], @"Should connect with valid key pair");
+
+    XCTWaiterResult connectionResult = [XCTWaiter waitForExpectations:@[connectionExpectation] timeout:5.0];
+    XCTAssertEqual(connectionResult, XCTWaiterResultCompleted, @"Should connect within timeout");
+    XCTAssertTrue(client.isConnected, @"Client should be connected");
+    XCTAssertTrue(client.socket.isEncrypting, @"Client should be encrypting");
+
+    // Create a second encrypter with a different key pair.
+    F53OSCEncrypt *otherEncrypter = [[F53OSCEncrypt alloc] init];
+    [otherEncrypter generateKeyPair];
+    [otherEncrypter generateSalt];
+
+    // Use the server's public key as peer key to derive a (wrong) symmetric key.
+    [otherEncrypter beginEncryptingWithPeerKey:serverEncrypter.publicKeyData];
+
+    // Encrypt an OSC message with the second encrypter.
+    F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:@"/tcp/encrypted/test" arguments:@[@"other_data", @(53)]];
+    NSData *messageData = [message packetData];
+    NSData *otherEncrypted = [otherEncrypter encryptDataWithClearData:messageData];
+    XCTAssertNotNil(otherEncrypted, @"Second encrypter should produce encrypted data");
+
+    // Build the raw payload: '*' prefix + encrypted data, then SLIP-frame it.
+    NSMutableData *rawPayload = [NSMutableData dataWithBytes:"*" length:1];
+    [rawPayload appendData:otherEncrypted];
+
+    // SLIP-encode the payload for TCP framing.
+    NSMutableData *slipData = [NSMutableData data];
+    Byte slipEnd = 0xC0;
+    [slipData appendBytes:&slipEnd length:1];
+    const Byte *buffer = rawPayload.bytes;
+    for (NSUInteger i = 0; i < rawPayload.length; i++)
+    {
+        if (buffer[i] == 0xC0) // END
+        {
+            Byte esc_end[2] = {0xDB, 0xDC};
+            [slipData appendBytes:esc_end length:2];
+        }
+        else if (buffer[i] == 0xDB) // ESC
+        {
+            Byte esc_esc[2] = {0xDB, 0xDD};
+            [slipData appendBytes:esc_esc length:2];
+        }
+        else
+        {
+            [slipData appendBytes:&buffer[i] length:1];
+        }
+    }
+    [slipData appendBytes:&slipEnd length:1];
+
+    // Inject the other-encrypted data directly onto the TCP socket.
+    [client.socket.tcpSocket writeData:slipData withTimeout:-1 tag:slipData.length];
+
+    // The server should silently drop the message because decryption fails.
+    XCTestExpectation *encryptedMessageExpectation = [[XCTestExpectation alloc] initWithDescription:@"Other encrypted message received"];
+    self.encryptedMessageExpectation = encryptedMessageExpectation;
+
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[encryptedMessageExpectation] timeout:2.0];
+    XCTAssertEqual(result, XCTWaiterResultTimedOut, @"Server should not deliver message encrypted with different key pair");
+    XCTAssertNil(self.receivedMessage, @"Server should not deliver message encrypted with different key pair");
+}
+
+- (void)testThat_serverRejectsMessageEncryptedWithDifferentSalt
+{
+    UInt16 port = PORT_BASE + 60;
+
+    // Generate the server's key pair.
+    F53OSCEncrypt *serverEncrypter = [[F53OSCEncrypt alloc] init];
+    NSData *serverKeyPairData = [serverEncrypter generateKeyPair];
+    XCTAssertNotNil(serverKeyPairData, @"Server keyPairData should not be nil");
+
+    // Set up server and client with the same key pair.
+    F53OSCServer *server = [[F53OSCServer alloc] init];
+    server.delegate = self;
+    server.port = port;
+    server.udpReplyPort = port + 1;
+    server.keyPair = serverKeyPairData;
+
+    [self addTeardownBlock:^{
+        [server stopListening];
+        server.delegate = nil;
+    }];
+
+    F53OSCClient *client = [[F53OSCClient alloc] init];
+    client.delegate = self;
+    client.host = @"localhost";
+    client.port = port;
+    client.useTcp = YES;
+
+    [self addTeardownBlock:^{
+        [client disconnect];
+        client.delegate = nil;
+    }];
+
+    NSError *error = nil;
+    BOOL isListening = [server startListening:&error];
+    XCTAssertTrue(isListening, @"Server should start listening");
+    XCTAssertNil(error, @"Server should start listening without error");
+
+    // Connect with encryption.
+    XCTestExpectation *connectionExpectation = [[XCTestExpectation alloc] initWithDescription:@"Client connected"];
+    self.connectionExpectation = connectionExpectation;
+
+    XCTAssertTrue([client connectEncryptedWithKeyPair:serverKeyPairData], @"Should connect with valid key pair");
+
+    XCTWaiterResult connectionResult = [XCTWaiter waitForExpectations:@[connectionExpectation] timeout:5.0];
+    XCTAssertEqual(connectionResult, XCTWaiterResultCompleted, @"Should connect within timeout");
+    XCTAssertTrue(client.isConnected, @"Client should be connected");
+    XCTAssertTrue(client.socket.isEncrypting, @"Client should be encrypting");
+
+    // Create a second encrypter with the same key pair but a different salt.
+    F53OSCEncrypt *otherEncrypter = [[F53OSCEncrypt alloc] init];
+    [otherEncrypter generateKeyPair];
+    [otherEncrypter generateSalt]; // different salt than what the handshake agreed upon
+
+    // Use the server's public key as peer key to derive a symmetric key (wrong due to different salt).
+    [otherEncrypter beginEncryptingWithPeerKey:serverEncrypter.publicKeyData];
+
+    // Encrypt an OSC message with the second encrypter.
+    F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:@"/tcp/encrypted/test" arguments:@[@"other_salt_data", @(99)]];
+    NSData *messageData = [message packetData];
+    NSData *otherEncrypted = [otherEncrypter encryptDataWithClearData:messageData];
+    XCTAssertNotNil(otherEncrypted, @"Other encrypter should produce encrypted data");
+
+    // Build the raw payload: '*' prefix + encrypted data, then SLIP-frame it.
+    NSMutableData *rawPayload = [NSMutableData dataWithBytes:"*" length:1];
+    [rawPayload appendData:otherEncrypted];
+
+    // SLIP-encode the payload for TCP framing.
+    NSMutableData *slipData = [NSMutableData data];
+    Byte slipEnd = 0xC0;
+    [slipData appendBytes:&slipEnd length:1];
+    const Byte *buffer = rawPayload.bytes;
+    for (NSUInteger i = 0; i < rawPayload.length; i++)
+    {
+        if (buffer[i] == 0xC0) // END
+        {
+            Byte esc_end[2] = {0xDB, 0xDC};
+            [slipData appendBytes:esc_end length:2];
+        }
+        else if (buffer[i] == 0xDB) // ESC
+        {
+            Byte esc_esc[2] = {0xDB, 0xDD};
+            [slipData appendBytes:esc_esc length:2];
+        }
+        else
+        {
+            [slipData appendBytes:&buffer[i] length:1];
+        }
+    }
+    [slipData appendBytes:&slipEnd length:1];
+
+    // Inject the other-encrypted data directly onto the TCP socket.
+    [client.socket.tcpSocket writeData:slipData withTimeout:-1 tag:slipData.length];
+
+    // The server should silently drop the message because decryption fails.
+    XCTestExpectation *encryptedMessageExpectation = [[XCTestExpectation alloc] initWithDescription:@"Other salt encrypted message received"];
+    self.encryptedMessageExpectation = encryptedMessageExpectation;
+
+    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[encryptedMessageExpectation] timeout:2.0];
+    XCTAssertEqual(result, XCTWaiterResultTimedOut, @"Server should not deliver message encrypted with different salt");
+    XCTAssertNil(self.receivedMessage, @"Server should not deliver message encrypted with different salt");
+}
+
+
 #pragma mark - F53OSCServerDelegate
 
 - (void)takeMessage:(nullable F53OSCMessage *)message
+{
+    self.receivedMessage = message;
+
+    if ([message.addressPattern hasPrefix:@"/tcp/encrypted"])
+        [self.encryptedMessageExpectation fulfill];
+}
+
+
+#pragma mark - F53OSCClientDelegate
+
+- (void)clientDidConnect:(F53OSCClient *)client
+{
+    if (self.connectionExpectation)
+        [self.connectionExpectation fulfill];
+}
+
+- (void)clientDidDisconnect:(F53OSCClient *)client
 {
 }
 
