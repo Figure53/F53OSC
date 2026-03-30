@@ -172,10 +172,10 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqualObjects(client.interface, @"en0", @"Client interface should be 'en0'");
 
     client.host = @"127.0.0.1";
-    XCTAssertEqualObjects(client.host, @"127.0.0.1", @"Client interface should be '127.0.0.1'");
+    XCTAssertEqualObjects(client.host, @"127.0.0.1", @"Client host should be '127.0.0.1'");
 
     client.port = 9999;
-    XCTAssertEqual(client.port, 9999, @"Client interface should be 9999");
+    XCTAssertEqual(client.port, 9999, @"Client port should be 9999");
 
     client.IPv6Enabled = YES;
     XCTAssertTrue(client.IPv6Enabled, @"Client IPv6Enabled should be YES");
@@ -184,13 +184,13 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(client.useTcp, @"Client useTcp should be YES");
 
     client.tcpTimeout = 3;
-    XCTAssertEqual(client.tcpTimeout, 3, @"Client interface should be 3");
+    XCTAssertEqual(client.tcpTimeout, 3, @"Client tcpTimeout should be 3");
 
     client.readChunkSize = 1024;
-    XCTAssertEqual(client.readChunkSize, 1024, @"Client interface should be 1024");
+    XCTAssertEqual(client.readChunkSize, 1024, @"Client readChunkSize should be 1024");
 
     client.userData = @"some user data";
-    XCTAssertEqualObjects(client.userData, @"some user data", @"Client interface should be 'some user data'");
+    XCTAssertEqualObjects(client.userData, @"some user data", @"Client userData should be 'some user data'");
 
     // Test that properties remain unchanged when client connects to a server.
     F53OSCServer *server = [self basicServerWithPort:client.port];
@@ -210,13 +210,13 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqualObjects(client.delegate, self, @"Client delegate should remain self");
     XCTAssertEqualObjects(client.socketDelegateQueue, queue, @"Client socketDelegateQueue should remain %@", queue);
     XCTAssertNil(client.interface, @"Client interface set to empty-string should be nil");
-    XCTAssertEqualObjects(client.host, @"127.0.0.1", @"Client interface should remain '127.0.0.1'");
-    XCTAssertEqual(client.port, 9999, @"Client interface should remain 9999");
+    XCTAssertEqualObjects(client.host, @"127.0.0.1", @"Client host should remain '127.0.0.1'");
+    XCTAssertEqual(client.port, 9999, @"Client port should remain 9999");
     XCTAssertTrue(client.IPv6Enabled, @"Client IPv6Enabled should remain YES");
     XCTAssertTrue(client.useTcp, @"Client useTcp should remain YES");
-    XCTAssertEqual(client.tcpTimeout, 3, @"Client interface should remain 3");
-    XCTAssertEqual(client.readChunkSize, 1024, @"Client interface should remain 1024");
-    XCTAssertEqualObjects(client.userData, @"some user data", @"Client interface should remain 'some user data'");
+    XCTAssertEqual(client.tcpTimeout, 3, @"Client tcpTimeout should remain 3");
+    XCTAssertEqual(client.readChunkSize, 1024, @"Client readChunkSize should remain 1024");
+    XCTAssertEqualObjects(client.userData, @"some user data", @"Client userData should remain 'some user data'");
 }
 
 - (void)testThat_clientCannotBeCopied
