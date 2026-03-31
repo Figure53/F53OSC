@@ -119,9 +119,8 @@ NS_ASSUME_NONNULL_BEGIN
         [client connect];
     }
 
-    // Wait a moment for TCP connections to establish
-    if (useTCP)
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    // Allow connections to establish.
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
 }
 
 
@@ -376,10 +375,16 @@ NS_ASSUME_NONNULL_BEGIN
 {
     UInt16 port = PORT_BASE + 20;
 
-    self.testServer = [[F53OSCServer alloc] initWithDelegateQueue:self.testServerQueue];
-    self.testServer.delegate = self;
-    self.testServer.port = port;
-    self.testServer.udpReplyPort = port + 1;
+    F53OSCServer *testServer = [[F53OSCServer alloc] initWithDelegateQueue:self.testServerQueue];
+    testServer.delegate = self;
+    testServer.port = port;
+    testServer.udpReplyPort = port + 1;
+
+    [self addTeardownBlock:^{
+        testServer.delegate = nil;
+        [testServer stopListening];
+    }];
+    self.testServer = testServer;
 
     NSError *error = nil;
     BOOL isListening = [self.testServer startListening:&error];
@@ -414,6 +419,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.clients addObject:client];
     }
 
+    // Allow connections to establish.
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
 
     NSUInteger expectedMessageCount = (tcpClients + udpClients) * messagesPerClient;
@@ -649,7 +655,11 @@ NS_ASSUME_NONNULL_BEGIN
     // Wait for initial connections.
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
 
-    // Disconnect and reconnect concurrently.
+    // Verify all clients connected initially.
+    for (F53OSCClient *client in self.clients)
+        XCTAssertTrue(client.isConnected, @"All clients should be connected initially");
+
+    // Disconnect and reconnect concurrently from background threads.
     dispatch_group_t lifecycleGroup = dispatch_group_create();
 
     for (NSUInteger i = 0; i < clientCount; i++)
@@ -657,11 +667,8 @@ NS_ASSUME_NONNULL_BEGIN
         F53OSCClient *client = self.clients[i];
 
         dispatch_group_async(lifecycleGroup, self.testQueue, ^{
-            // Disconnect
             [client disconnect];
             usleep(100000); // 100ms
-
-            // Reconnect
             [client connect];
             usleep(100000); // 100ms
 
@@ -672,14 +679,23 @@ NS_ASSUME_NONNULL_BEGIN
         });
     }
 
-    // Wait for all lifecycle operations.
-    dispatch_group_wait(lifecycleGroup, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
-
     // Allow time for messages to be processed.
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2.0]];
 
+    // Wait for background blocks to finish dispatching.
+    dispatch_group_wait(lifecycleGroup, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+
     // Verify we got some messages (reconnection might not be 100% reliable in rapid test)
     XCTAssertGreaterThan(self.receivedMessages.count, 0, @"Should receive some messages after reconnection");
+
+    // Verify at least some clients reconnected successfully.
+    NSUInteger reconnectedCount = 0;
+    for (F53OSCClient *client in self.clients)
+    {
+        if (client.isConnected)
+            reconnectedCount++;
+    }
+    XCTAssertGreaterThan(reconnectedCount, 0, @"At least some clients should reconnect");
 }
 
 
