@@ -103,8 +103,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *complexMessageData = [NSMutableData data];
 
     // Add address pattern.
-    const char *address = "/complex/args\0\0\0\0";
-    [complexMessageData appendBytes:address length:16];
+    char address[16] = "/complex/args";
+    [complexMessageData appendBytes:address length:sizeof(address)];
 
     // Add type tag for multiple argument types: int, float, string, blob, true, false, null, impulse.
     const char *typeTag = ",ifsb";
@@ -125,14 +125,14 @@ NS_ASSUME_NONNULL_BEGIN
     [complexMessageData appendBytes:&floatArg length:4];
 
     // Add string argument.
-    const char *stringArg = "test_string\0\0\0\0\0";
-    [complexMessageData appendBytes:stringArg length:16];
+    char stringArg[12] = "test_string";
+    [complexMessageData appendBytes:stringArg length:sizeof(stringArg)];
 
     // Add blob argument.
     uint32_t blobSize = CFSwapInt32HostToBig(8);
     [complexMessageData appendBytes:&blobSize length:4];
-    const char *blobData = "blobdata";
-    [complexMessageData appendBytes:blobData length:8];
+    char blobData[8] = "blobdata";
+    [complexMessageData appendBytes:blobData length:sizeof(blobData)];
 
     // T, F, N, I arguments have no additional data.
 
@@ -166,8 +166,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *truncatedData = [NSMutableData data];
 
     // Add address pattern "/test" with null termination and padding.
-    const char *address = "/test\0\0\0";
-    [truncatedData appendBytes:address length:8];
+    char address[8] = "/test";
+    [truncatedData appendBytes:address length:sizeof(address)];
 
     // Missing type tag string - this should fail gracefully.
     // The parser is permissive and creates a message with no arguments for truncated data.
@@ -182,12 +182,12 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *invalidData = [NSMutableData data];
 
     // Add invalid address pattern (doesn't start with '/').
-    const char *invalidAddress = "invalid\0";
-    [invalidData appendBytes:invalidAddress length:8];
+    char invalidAddress[8] = "invalid";
+    [invalidData appendBytes:invalidAddress length:sizeof(invalidAddress)];
 
     // Add empty type tag string.
-    const char *typeTag = ",\0\0\0";
-    [invalidData appendBytes:typeTag length:4];
+    char typeTag[4] = ",";
+    [invalidData appendBytes:typeTag length:sizeof(typeTag)];
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:invalidData];
     XCTAssertNotNil(message, @"Parser handles addresses that don't start with / by treating them as '/invalid'");
@@ -199,12 +199,12 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *malformedData = [NSMutableData data];
 
     // Add valid address pattern.
-    const char *address = "/test\0\0\0";
-    [malformedData appendBytes:address length:8];
+    char address[8] = "/test";
+    [malformedData appendBytes:address length:sizeof(address)];
 
     // Add malformed type tag (doesn't start with ',').
-    const char *invalidTypeTag = "ifsb\0\0\0\0";
-    [malformedData appendBytes:invalidTypeTag length:8];
+    char invalidTypeTag[8] = "ifsb";
+    [malformedData appendBytes:invalidTypeTag length:sizeof(invalidTypeTag)];
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:malformedData];
     // The parser is permissive and handles malformed type tags.
@@ -218,16 +218,16 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *mismatchData = [NSMutableData data];
 
     // Add valid address pattern.
-    const char *address = "/test\0\0\0";
-    [mismatchData appendBytes:address length:8];
+    char address[8] = "/test";
+    [mismatchData appendBytes:address length:sizeof(address)];
 
     // Add type tag indicating two arguments.
-    const char *typeTag = ",ii\0";
-    [mismatchData appendBytes:typeTag length:4];
+    char typeTag[4] = ",ii";
+    [mismatchData appendBytes:typeTag length:sizeof(typeTag)];
 
     // But only provide one argument.
     uint32_t arg1 = CFSwapInt32HostToBig(42);
-    [mismatchData appendBytes:&arg1 length:4];
+    [mismatchData appendBytes:&arg1 length:sizeof(arg1)];
     // Missing second argument - should fail gracefully.
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:mismatchData];
@@ -239,16 +239,16 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *corruptedData = [NSMutableData data];
 
     // Add valid address pattern.
-    const char *address = "/test\0\0\0";
-    [corruptedData appendBytes:address length:8];
+    char address[8] = "/test";
+    [corruptedData appendBytes:address length:sizeof(address)];
 
     // Add type tag for string argument.
-    const char *typeTag = ",s\0\0";
-    [corruptedData appendBytes:typeTag length:4];
+    char typeTag[4] = ",s";
+    [corruptedData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add string argument without null termination.
-    const char *invalidString = "hello"; // Missing null terminator
-    [corruptedData appendBytes:invalidString length:5];
+    const char invalidString[] = "hello";
+    [corruptedData appendBytes:invalidString length:strlen(invalidString)]; // deliberately omit null
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:corruptedData];
     XCTAssertNil(message, @"Parser should return nil for string without null termination");
@@ -259,16 +259,16 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *corruptedData = [NSMutableData data];
 
     // Add valid address pattern.
-    const char *address = "/test\0\0\0";
-    [corruptedData appendBytes:address length:8];
+    char address[8] = "/test";
+    [corruptedData appendBytes:address length:sizeof(address)];
 
     // Add type tag for blob argument.
-    const char *typeTag = ",b\0\0";
-    [corruptedData appendBytes:typeTag length:4];
+    char typeTag[4] = ",b";
+    [corruptedData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add blob size that's larger than available data
     uint32_t invalidSize = htonl(100); // Claims 100 bytes but we'll only provide 5
-    [corruptedData appendBytes:&invalidSize length:4];
+    [corruptedData appendBytes:&invalidSize length:sizeof(invalidSize)];
 
     // Add only 5 bytes of actual blob data
     const char *blobData = "hello";
@@ -283,16 +283,16 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *corruptedData = [NSMutableData data];
 
     // Add valid address pattern.
-    const char *address = "/test\0\0\0";
-    [corruptedData appendBytes:address length:8];
+    char address[8] = "/test";
+    [corruptedData appendBytes:address length:sizeof(address)];
 
     // Add type tag for string argument.
-    const char *typeTag = ",i\0\0";
-    [corruptedData appendBytes:typeTag length:4];
+    char typeTag[4] = ",i";
+    [corruptedData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add only 2 bytes instead of required 4 bytes for int32
-    const char *truncatedInt = "12"; // Only 2 bytes, need 4
-    [corruptedData appendBytes:truncatedInt length:2];
+    char truncatedInt[2] = "12"; // Only 2 bytes, need 4
+    [corruptedData appendBytes:truncatedInt length:sizeof(truncatedInt)];
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:corruptedData];
     XCTAssertNil(message, @"Parser should return nil for string without null termination");
@@ -303,16 +303,16 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *corruptedData = [NSMutableData data];
 
     // Add valid address pattern.
-    const char *address = "/test\0\0\0";
-    [corruptedData appendBytes:address length:8];
+    char address[8] = "/test";
+    [corruptedData appendBytes:address length:sizeof(address)];
 
     // Add type tag for string argument.
-    const char *typeTag = ",f\0\0";
-    [corruptedData appendBytes:typeTag length:4];
+    char typeTag[4] = ",f";
+    [corruptedData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add only 2 bytes instead of required 4 bytes for int32
-    const char *truncatedInt = "3."; // Only 2 bytes, need 4
-    [corruptedData appendBytes:truncatedInt length:2];
+    char truncatedInt[2] = "3."; // Only 2 bytes, need 4
+    [corruptedData appendBytes:truncatedInt length:sizeof(truncatedInt)];
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:corruptedData];
     XCTAssertNil(message, @"Parser should return nil for string without null termination");
@@ -323,20 +323,20 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *overrunData = [NSMutableData data];
 
     // Add valid address pattern.
-    const char *address = "/test\0\0\0";
-    [overrunData appendBytes:address length:8];
+    char address[8] = "/test";
+    [overrunData appendBytes:address length:sizeof(address)];
 
     // Add type tag for blob argument.
-    const char *typeTag = ",b\0\0";
-    [overrunData appendBytes:typeTag length:4];
+    char typeTag[4] = ",b";
+    [overrunData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add blob size claiming to be larger than available data.
     uint32_t blobSize = CFSwapInt32HostToBig(1000); // Claim 1000 bytes
     [overrunData appendBytes:&blobSize length:4];
 
     // But only provide 4 bytes of actual data.
-    const char *smallData = "test";
-    [overrunData appendBytes:smallData length:4];
+    char smallData[4] = "test";
+    [overrunData appendBytes:smallData length:sizeof(smallData)];
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:overrunData];
     XCTAssertNil(message, @"Parser should return nil when blob size exceeds available data");
@@ -347,12 +347,12 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *unsupportedData = [NSMutableData data];
 
     // Add valid address pattern.
-    const char *address = "/test\0\0\0";
-    [unsupportedData appendBytes:address length:8];
+    char address[8] = "/test";
+    [unsupportedData appendBytes:address length:sizeof(address)];
 
     // Add type tag with unsupported type 'x'.
-    const char *typeTag = ",x\0\0";
-    [unsupportedData appendBytes:typeTag length:4];
+    char typeTag[4] = ",x";
+    [unsupportedData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add dummy data.
     uint32_t dummyData = 0;
@@ -368,12 +368,12 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *largeData = [NSMutableData data];
 
     // Add address pattern.
-    const char *address = "/large/test\0\0\0\0\0";
-    [largeData appendBytes:address length:16];
+    char address[16] = "/large/test";
+    [largeData appendBytes:address length:sizeof(address)];
 
     // Add type tag for large blob.
-    const char *typeTag = ",b\0\0";
-    [largeData appendBytes:typeTag length:4];
+    char typeTag[4] = ",b";
+    [largeData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add large blob (64KB).
     uint32_t blobSize = CFSwapInt32HostToBig(65536);
@@ -428,12 +428,12 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *testData = [NSMutableData data];
 
     // Create valid OSC message.
-    const char *address = "/repeat/test\0\0\0\0";
-    [testData appendBytes:address length:16];
-    const char *typeTag = ",s\0\0";
-    [testData appendBytes:typeTag length:4];
-    const char *arg = "hello\0\0\0";
-    [testData appendBytes:arg length:8];
+    char address[16] = "/repeat/test";
+    [testData appendBytes:address length:sizeof(address)];
+    char typeTag[4] = ",s";
+    [testData appendBytes:typeTag length:sizeof(typeTag)];
+    char arg[8] = "hello";
+    [testData appendBytes:arg length:sizeof(arg)];
 
     // Parse the same message many times.
     for (int i = 0; i < 1000; i++)
@@ -519,10 +519,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testThat_processOscDataHandlesNullDestination
 {
     NSMutableData *messageData = [NSMutableData data];
-    const char *address = "/null/dest\0\0\0\0\0";
-    [messageData appendBytes:address length:16];
-    const char *typeTag = ",\0\0\0";
-    [messageData appendBytes:typeTag length:4];
+    char address[16] = "/null/dest";
+    [messageData appendBytes:address length:sizeof(address)];
+    char typeTag[4] = ",";
+    [messageData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Test with nil destination.
 #pragma clang diagnostic push
@@ -535,12 +535,12 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // Create F53OSC control message (starts with '!').
     NSMutableData *controlData = [NSMutableData data];
-    const char *controlAddress = "!/control/test\0\0";
-    [controlData appendBytes:controlAddress length:16];
-    const char *typeTag = ",s\0\0";
-    [controlData appendBytes:typeTag length:4];
-    const char *arg = "control_arg\0\0\0\0\0";
-    [controlData appendBytes:arg length:16];
+    char controlAddress[16] = "!/control/test";
+    [controlData appendBytes:controlAddress length:sizeof(controlAddress)];
+    char typeTag[4] = ",s";
+    [controlData appendBytes:typeTag length:sizeof(typeTag)];
+    char arg[16] = "control_arg";
+    [controlData appendBytes:arg length:sizeof(arg)];
 
     XCTAssertNoThrow([F53OSCParser processOscData:controlData forDestination:self.mockDestination replyToSocket:self.mockSocket controlHandler:self.mockControlHandler wasEncrypted:NO], @"Should handle control message data");
 
@@ -556,10 +556,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // Create F53OSC control message.
     NSMutableData *controlData = [NSMutableData data];
-    const char *controlAddress = "!/no/handler\0\0\0\0";
-    [controlData appendBytes:controlAddress length:16];
-    const char *typeTag = ",\0\0\0";
-    [controlData appendBytes:typeTag length:4];
+    char controlAddress[16] = "!/no/handler";
+    [controlData appendBytes:controlAddress length:sizeof(controlAddress)];
+    char typeTag[4] = ",";
+    [controlData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Process without control handler.
     XCTAssertNoThrow([F53OSCParser processOscData:controlData forDestination:self.mockDestination replyToSocket:self.mockSocket controlHandler:nil wasEncrypted:NO], @"Should handle control messages without handler");
@@ -575,8 +575,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *bundleData = [NSMutableData data];
 
     // Add OSC bundle identifier.
-    const char *bundleTag = "#bundle\0";
-    [bundleData appendBytes:bundleTag length:8];
+    char bundleTag[8] = "#bundle";
+    [bundleData appendBytes:bundleTag length:sizeof(bundleTag)];
 
     // Add time tag (8 bytes) - use immediate time.
     uint64_t timeTag = 1;
@@ -584,12 +584,12 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Create first message.
     NSMutableData *message1Data = [NSMutableData data];
-    const char *address1 = "/test1\0\0";
-    [message1Data appendBytes:address1 length:8];
-    const char *typeTag1 = ",s\0\0";
-    [message1Data appendBytes:typeTag1 length:4];
-    const char *arg1 = "hello\0\0\0";
-    [message1Data appendBytes:arg1 length:8];
+    char address1[8] = "/test1";
+    [message1Data appendBytes:address1 length:sizeof(address1)];
+    char typeTag1[4] = ",s";
+    [message1Data appendBytes:typeTag1 length:sizeof(typeTag1)];
+    char arg1[8] = "hello";
+    [message1Data appendBytes:arg1 length:sizeof(arg1)];
 
     // Add message1 size and data to bundle.
     uint32_t message1Size = CFSwapInt32HostToBig((uint32_t)message1Data.length);
@@ -598,10 +598,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Create second message.
     NSMutableData *message2Data = [NSMutableData data];
-    const char *address2 = "/test2\0\0";
-    [message2Data appendBytes:address2 length:8];
-    const char *typeTag2 = ",i\0\0";
-    [message2Data appendBytes:typeTag2 length:4];
+    char address2[8] = "/test2";
+    [message2Data appendBytes:address2 length:sizeof(address2)];
+    char typeTag2[4] = ",i";
+    [message2Data appendBytes:typeTag2 length:sizeof(typeTag2)];
     uint32_t arg2 = CFSwapInt32HostToBig(42);
     [message2Data appendBytes:&arg2 length:4];
 
@@ -622,8 +622,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *outerBundleData = [NSMutableData data];
 
     // Create outer bundle.
-    const char *bundleTag = "#bundle\0";
-    [outerBundleData appendBytes:bundleTag length:8];
+    char bundleTag[8] = "#bundle";
+    [outerBundleData appendBytes:bundleTag length:sizeof(bundleTag)];
 
     // Add time tag.
     uint64_t timeTag = 1;
@@ -631,15 +631,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Create inner bundle.
     NSMutableData *innerBundleData = [NSMutableData data];
-    [innerBundleData appendBytes:bundleTag length:8];
+    [innerBundleData appendBytes:bundleTag length:sizeof(bundleTag)];
     [innerBundleData appendBytes:&timeTag length:8];
 
     // Add message to inner bundle.
     NSMutableData *messageData = [NSMutableData data];
-    const char *address = "/nested\0";
-    [messageData appendBytes:address length:8];
-    const char *typeTag = ",\0\0\0";
-    [messageData appendBytes:typeTag length:4];
+    char address[8] = "/nested";
+    [messageData appendBytes:address length:sizeof(address)];
+    char typeTag[4] = ",";
+    [messageData appendBytes:typeTag length:sizeof(typeTag)];
 
     uint32_t messageSize = CFSwapInt32HostToBig((uint32_t)messageData.length);
     [innerBundleData appendBytes:&messageSize length:4];
@@ -662,8 +662,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *bundleData = [NSMutableData data];
 
     // Add valid bundle identifier
-    const char *bundleTag = "#bundle\0";
-    [bundleData appendBytes:bundleTag length:8];
+    char bundleTag[8] = "#bundle";
+    [bundleData appendBytes:bundleTag length:sizeof(bundleTag)];
 
     // Add insufficient time tag data (only 4 bytes instead of 8)
     uint32_t partialTimeTag = CFSwapInt32HostToBig(1);
@@ -680,8 +680,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *bundleData = [NSMutableData data];
 
     // Add OSC bundle identifier.
-    const char *bundleTag = "#bundle\0";
-    [bundleData appendBytes:bundleTag length:8];
+    char bundleTag[8] = "#bundle";
+    [bundleData appendBytes:bundleTag length:sizeof(bundleTag)];
 
     // Add empty/immediate time tag (8 bytes of zeros).
     uint64_t timeTag = 0;
@@ -689,10 +689,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Add one simple message.
     NSMutableData *messageData = [NSMutableData data];
-    const char *address = "/empty/time\0\0\0\0\0";
-    [messageData appendBytes:address length:16];
-    const char *typeTag = ",\0\0\0";
-    [messageData appendBytes:typeTag length:4];
+    char address[16] = "/empty/time";
+    [messageData appendBytes:address length:sizeof(address)];
+    char typeTag[4] = ",";
+    [messageData appendBytes:typeTag length:sizeof(typeTag)];
 
     uint32_t messageSize = CFSwapInt32HostToBig((uint32_t)messageData.length);
     [bundleData appendBytes:&messageSize length:4];
@@ -708,8 +708,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *bundleData = [NSMutableData data];
 
     // Add OSC bundle identifier.
-    const char *bundleTag = "#bundle\0";
-    [bundleData appendBytes:bundleTag length:8];
+    char bundleTag[8] = "#bundle";
+    [bundleData appendBytes:bundleTag length:sizeof(bundleTag)];
 
     // Add time tag.
     uint64_t timeTag = 1;
@@ -729,8 +729,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *invalidBundleData = [NSMutableData data];
 
     // Add OSC bundle identifier.
-    const char *bundleTag = "#bundle\0";
-    [invalidBundleData appendBytes:bundleTag length:8];
+    char bundleTag[8] = "#bundle";
+    [invalidBundleData appendBytes:bundleTag length:sizeof(bundleTag)];
 
     // Add time tag (8 bytes).
     uint64_t timeTag = 1;
@@ -741,8 +741,8 @@ NS_ASSUME_NONNULL_BEGIN
     [invalidBundleData appendBytes:&invalidSize length:4];
 
     // But only provide small amount of data.
-    const char *smallData = "test";
-    [invalidBundleData appendBytes:smallData length:4];
+    char smallData[4] = "test";
+    [invalidBundleData appendBytes:smallData length:sizeof(smallData)];
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
@@ -757,8 +757,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *invalidBundleData = [NSMutableData data];
 
     // Add invalid bundle identifier (not "#bundle")
-    const char *invalidBundleTag = "#invalid\0";
-    [invalidBundleData appendBytes:invalidBundleTag length:9];
+    char invalidBundleTag[9] = "#invalid";
+    [invalidBundleData appendBytes:invalidBundleTag length:sizeof(invalidBundleTag)];
 
     XCTAssertNoThrow([F53OSCParser processOscData:invalidBundleData forDestination:self.mockDestination replyToSocket:self.mockSocket controlHandler:self.mockControlHandler wasEncrypted:NO], @"Should handle bundle with invalid prefix gracefully");
 
@@ -783,16 +783,16 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *bundleData = [NSMutableData data];
 
     // Add valid bundle header
-    const char *bundleTag = "#bundle\0";
-    [bundleData appendBytes:bundleTag length:8];
+    char bundleTag[8] = "#bundle";
+    [bundleData appendBytes:bundleTag length:sizeof(bundleTag)];
     uint64_t timeTag = 1;
     [bundleData appendBytes:&timeTag length:8];
 
     // Add element that doesn't start with '/' or '#'
     uint32_t elementSize = CFSwapInt32HostToBig(8);
     [bundleData appendBytes:&elementSize length:4];
-    const char *unrecognizedElement = "unknown\0";
-    [bundleData appendBytes:unrecognizedElement length:8];
+    char unrecognizedElement[8] = "unknown";
+    [bundleData appendBytes:unrecognizedElement length:sizeof(unrecognizedElement)];
 
     XCTAssertNoThrow([F53OSCParser processOscData:bundleData forDestination:self.mockDestination replyToSocket:self.mockSocket controlHandler:self.mockControlHandler wasEncrypted:NO], @"Should handle bundle with unrecognized element type gracefully");
 
@@ -804,8 +804,8 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *corruptedBundleData = [NSMutableData data];
 
     // Add OSC bundle identifier.
-    const char *bundleTag = "#bundle\0";
-    [corruptedBundleData appendBytes:bundleTag length:8];
+    char bundleTag[8] = "#bundle";
+    [corruptedBundleData appendBytes:bundleTag length:sizeof(bundleTag)];
 
     // Add incomplete time tag (only 4 bytes instead of 8).
     uint32_t partialTimeTag = 1;
@@ -1034,12 +1034,12 @@ NS_ASSUME_NONNULL_BEGIN
 {
     // Create valid OSC message data.
     NSMutableData *messageData = [NSMutableData data];
-    const char *address = "/encrypted/test\0\0";
-    [messageData appendBytes:address length:16];
-    const char *typeTag = ",s\0\0";
-    [messageData appendBytes:typeTag length:4];
-    const char *arg = "encrypted\0\0\0";
-    [messageData appendBytes:arg length:12];
+    char address[16] = "/encrypted/test";
+    [messageData appendBytes:address length:sizeof(address)];
+    char typeTag[4] = ",s";
+    [messageData appendBytes:typeTag length:sizeof(typeTag)];
+    char arg[12] = "encrypted";
+    [messageData appendBytes:arg length:sizeof(arg)];
 
     XCTAssertNoThrow([F53OSCParser processOscData:messageData forDestination:self.mockDestination replyToSocket:self.mockSocket controlHandler:self.mockControlHandler wasEncrypted:YES], @"Should handle data with encrypted flag set to YES gracefully");
 
@@ -1074,12 +1074,12 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *unencryptedData = [NSMutableData data];
 
     // Add address pattern
-    const char *address = "/debug/values\0\0\0";
-    [unencryptedData appendBytes:address length:16];
+    char address[16] = "/debug/values";
+    [unencryptedData appendBytes:address length:sizeof(address)];
 
     // Add type tag for OSC values: True, False, Null, Impulse
-    const char *typeTag = ",TFNI\0\0\0\0";
-    [unencryptedData appendBytes:typeTag length:8];
+    char typeTag[8] = ",TFNI";
+    [unencryptedData appendBytes:typeTag length:sizeof(typeTag)];
 
     self.mockSocket.isEncrypting = YES;
     XCTAssertTrue(self.mockSocket.isEncrypting, @"Mock socket isEncrypting should be YES");
@@ -1095,12 +1095,12 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *unencryptedData = [NSMutableData data];
 
     // Add address pattern
-    const char *address = "/debug/values\0\0\0";
-    [unencryptedData appendBytes:address length:16];
+    char address[16] = "/debug/values";
+    [unencryptedData appendBytes:address length:sizeof(address)];
 
     // Add type tag for OSC values: True, False, Null, Impulse
-    const char *typeTag = ",TFNI\0\0\0\0";
-    [unencryptedData appendBytes:typeTag length:8];
+    char typeTag[8] = ",TFNI";
+    [unencryptedData appendBytes:typeTag length:sizeof(typeTag)];
 
     XCTAssertFalse(self.mockSocket.isEncrypting, @"Mock socket isEncrypting should not be YES");
 
@@ -1122,16 +1122,16 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *messageData = [NSMutableData data];
 
     // Add address pattern
-    const char *address = "/debug/simple\0\0\0";
-    [messageData appendBytes:address length:16];
+    char address[16] = "/debug/simple";
+    [messageData appendBytes:address length:sizeof(address)];
 
     // Add type tag - just string argument
-    const char *typeTag = ",s\0\0";
-    [messageData appendBytes:typeTag length:4];
+    char typeTag[4] = ",s";
+    [messageData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add string argument
-    const char *stringArg = "test\0\0\0\0";
-    [messageData appendBytes:stringArg length:8];
+    char stringArg[8] = "test";
+    [messageData appendBytes:stringArg length:sizeof(stringArg)];
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:messageData];
 
@@ -1154,18 +1154,18 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *messageData = [NSMutableData data];
 
     // Add address pattern
-    const char *address = "/debug/blob\0\0\0\0\0";
-    [messageData appendBytes:address length:16];
+    char address[16] = "/debug/blob";
+    [messageData appendBytes:address length:sizeof(address)];
 
     // Add type tag for blob
-    const char *typeTag = ",b\0\0";
-    [messageData appendBytes:typeTag length:4];
+    char typeTag[4] = ",b";
+    [messageData appendBytes:typeTag length:sizeof(typeTag)];
 
     // Add blob argument
     uint32_t blobSize = CFSwapInt32HostToBig(4);
     [messageData appendBytes:&blobSize length:4];
-    const char *blobData = "test";
-    [messageData appendBytes:blobData length:4];
+    char blobData[4] = "test";
+    [messageData appendBytes:blobData length:sizeof(blobData)];
 
     F53OSCMessage *message = [F53OSCParser parseOscMessageData:messageData];
 
@@ -1187,12 +1187,12 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *messageData = [NSMutableData data];
 
     // Add address pattern
-    const char *address = "/debug/values\0\0\0";
-    [messageData appendBytes:address length:16];
+    char address[16] = "/debug/values";
+    [messageData appendBytes:address length:sizeof(address)];
 
     // Add type tag for OSC values: True, False, Null, Impulse
-    const char *typeTag = ",TFNI\0\0\0\0";
-    [messageData appendBytes:typeTag length:8];
+    char typeTag[8] = ",TFNI";
+    [messageData appendBytes:typeTag length:sizeof(typeTag)];
 
     // OSC values T, F, N, I have no data payload
 
