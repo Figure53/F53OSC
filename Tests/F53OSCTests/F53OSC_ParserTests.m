@@ -368,7 +368,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableData *largeData = [NSMutableData data];
 
     // Add address pattern.
-    char address[16] = "/large/test";
+    char address[12] = "/large/test";
     [largeData appendBytes:address length:sizeof(address)];
 
     // Add type tag for large blob.
@@ -689,7 +689,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     // Add one simple message.
     NSMutableData *messageData = [NSMutableData data];
-    char address[16] = "/empty/time";
+    char address[12] = "/empty/time";
     [messageData appendBytes:address length:sizeof(address)];
     char typeTag[4] = ",";
     [messageData appendBytes:typeTag length:sizeof(typeTag)];
