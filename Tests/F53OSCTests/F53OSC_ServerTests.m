@@ -1750,7 +1750,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(client.isConnected, @"Client should be connected");
     XCTAssertTrue(client.socket.isEncrypting, @"Client should be encrypting");
 
-    // Create a second encrypter with a different key pair.
+    // Create a second encrypter with a different key pair and salt.
     F53OSCEncrypt *otherEncrypter = [[F53OSCEncrypt alloc] init];
     [otherEncrypter generateKeyPair];
     [otherEncrypter generateSalt];
@@ -1853,11 +1853,13 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(client.socket.isEncrypting, @"Client should be encrypting");
 
     // Create a second encrypter with the same key pair but a different salt.
-    F53OSCEncrypt *otherEncrypter = [[F53OSCEncrypt alloc] init];
-    [otherEncrypter generateKeyPair];
+    // The client was initialized with serverKeyPairData, so reuse it here.
+    // Only the salt differs.
+    F53OSCEncrypt *otherEncrypter = [[F53OSCEncrypt alloc] initWithKeyPairData:serverKeyPairData];
     [otherEncrypter generateSalt]; // different salt than what the handshake agreed upon
 
-    // Use the server's public key as peer key to derive a symmetric key (wrong due to different salt).
+    // Same key pair + same peer key = same shared secret,
+    // but different salt produces a different symmetric key.
     [otherEncrypter beginEncryptingWithPeerKey:serverEncrypter.publicKeyData];
 
     // Encrypt an OSC message with the second encrypter.
