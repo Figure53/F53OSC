@@ -56,7 +56,9 @@ import OSLog
 
     /// Generate key pair.
     /// Note that caller is responsible for storing this to be used in later sessions
-    @objc public func generateKeyPair() -> Data?
+    @objc
+    @discardableResult
+    public func generateKeyPair() -> Data?
     {
         self.keyPair = P521.KeyAgreement.PrivateKey()
         logger.notice("F53OSC generated new key pair")
@@ -92,7 +94,9 @@ import OSLog
 
     /// Setup encryption.
     /// @param peerKey public key data for the peer we are talking to
-    @objc public func beginEncrypting(peerKey: Data) -> Bool
+    @objc
+    @discardableResult
+    public func beginEncrypting(peerKey: Data) -> Bool
     {
         if let salt = self.salt
         {
