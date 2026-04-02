@@ -91,12 +91,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_tcpClientHandlesConnectionTimeout
 {
-    // Use a non-routable IP to force timeout (10.255.255.1 is typically non-routable).
+    // Use an RFC 5737 TEST-NET-2 address to force timeout. These addresses are
+    // reserved for documentation/testing and guaranteed to never be routed.
     UInt16 port = 9999;
 
     F53OSCClient *client = [[F53OSCClient alloc] init];
     client.useTcp = YES;
-    client.host = @"10.255.255.1";
+    client.host = @"198.51.100.1";
     client.port = port;
     client.tcpTimeout = 2.0; // 2 second timeout
     client.delegate = self;
