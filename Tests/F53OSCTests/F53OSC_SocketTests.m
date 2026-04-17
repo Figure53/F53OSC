@@ -43,7 +43,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PORT_BASE   9300
+#define PORT_BASE   9900
 
 @interface F53OSC_SocketTests : XCTestCase <F53OSCServerDelegate, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate>
 

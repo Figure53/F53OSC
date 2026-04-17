@@ -41,7 +41,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PORT_BASE   9200
+#define PORT_BASE   9800
 
 @interface F53OSCServer (F53OSC_ServerTestsAccess)
 @property (atomic, strong) dispatch_queue_t queue;

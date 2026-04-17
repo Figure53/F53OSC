@@ -37,7 +37,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PORT_BASE   9500
+#define PORT_BASE   9600
 
 @interface F53OSC_NetworkFailureTests : XCTestCase <F53OSCServerDelegate, F53OSCClientDelegate>
 

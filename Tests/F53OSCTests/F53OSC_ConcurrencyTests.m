@@ -38,7 +38,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PORT_BASE   9400
+#define PORT_BASE   9200
 
 @interface F53OSC_ConcurrencyTests : XCTestCase <F53OSCServerDelegate, F53OSCClientDelegate>
 
@@ -57,6 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation F53OSC_ConcurrencyTests
+
+static UInt16 sPortOffset = 0;
 
 - (void)setUp
 {
@@ -79,7 +81,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setupServerAndMultipleClients:(NSUInteger)clientCount useTCP:(BOOL)useTCP
 {
-    UInt16 port = PORT_BASE + 10;
+    // Each test gets a unique port pair (server + udpReply) to
+    // avoid collisions when `setUp`/`tearDown` cycle rapidly.
+    UInt16 port = PORT_BASE + (sPortOffset * 2);
+    sPortOffset++;
 
     // Setup server with dedicated queue.
     F53OSCServer *testServer = [[F53OSCServer alloc] initWithDelegateQueue:self.testServerQueue];
@@ -373,7 +378,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)testThat_serverHandlesMixedTCPAndUDPConcurrentClients
 {
-    UInt16 port = PORT_BASE + 20;
+    UInt16 port = PORT_BASE + (sPortOffset * 2);
+    sPortOffset++;
 
     F53OSCServer *testServer = [[F53OSCServer alloc] initWithDelegateQueue:self.testServerQueue];
     testServer.delegate = self;
