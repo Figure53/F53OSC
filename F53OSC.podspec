@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'F53OSC'
-  s.version      = '1.3.1'
+  s.version      = '1.3.2'
   s.summary      = 'A nice open source OSC library for Objective-C.'
 
   s.description  = <<-DESC
@@ -25,6 +25,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.source_files = [
     'Sources/F53OSC/*.{h,m,swift}',
+    'Sources/F53OSCEncrypt/*.swift',
     'Sources/Vendor/CocoaAsyncSocket/*.{h,m}',
   ]
 
