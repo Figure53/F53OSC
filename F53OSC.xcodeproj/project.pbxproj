@@ -227,7 +227,6 @@
 		3D1E0861242A81F600655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D1E08E4242A8EC700655E76 /* F53OSC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = F53OSC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D645F792E86E14500B8A91D /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		3D645F7A2E86E16500B8A91D /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		3D6CE80A2F9270FE006B088A /* F53OSC_MessageLogicTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = F53OSC_MessageLogicTests.m; sourceTree = "<group>"; };
 		3D794FA42E90129100BD7AD1 /* F53OSCEncrypt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = F53OSCEncrypt.swift; sourceTree = "<group>"; };
 		3D89C46F27B411000089D3B0 /* F53OSCEncryptHandshake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = F53OSCEncryptHandshake.h; sourceTree = "<group>"; };
@@ -377,7 +376,6 @@
 				3D1E081F242A7E1000655E76 /* F53OSCTimeTag.m */,
 				3D083543242BF3C000E4A247 /* F53OSCValue.h */,
 				3D083542242BF3C000E4A247 /* F53OSCValue.m */,
-				3D645F7A2E86E16500B8A91D /* module.modulemap */,
 				3D1E080D242A7E1000655E76 /* NSData+F53OSCBlob.h */,
 				3D1E0820242A7E1000655E76 /* NSData+F53OSCBlob.m */,
 				3D1E0808242A7E1000655E76 /* NSDate+F53OSCTimeTag.h */,
