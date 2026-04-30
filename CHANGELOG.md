@@ -8,6 +8,7 @@
 
 ### F53OSCMessage
 - Fixes `+legalMethod:` to return NO for empty string.
+- Adds utility method `+addressWithString:argumentsString:` which uses the same logic as `+messageWithString:` to split a string into address/arguments components but without creating a message object.
 
 ### F53OSCEncryptHandshake
 - Fixes `keyPair` property nullable annotation.

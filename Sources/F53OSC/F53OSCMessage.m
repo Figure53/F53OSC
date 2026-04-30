@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Siobhán Dougall on 1/17/11.
-//  Copyright (c) 2011-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -154,8 +154,11 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         return NO;
 }
 
-+ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString
++ (nullable NSString *) addressWithString:(NSString *)qscString argumentsString:(out NSString * _Nullable * _Nullable)outArgumentsString
 {
+    if ( outArgumentsString )
+        *outArgumentsString = nil;
+
     if ( qscString == nil )
         return nil;
     
@@ -164,8 +167,23 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     if ( [qscString isEqualToString:@""] )
         return nil;
     
-    // Pull out address.
-    NSString *address = [qscString componentsSeparatedByString:@" "].firstObject;
+    // Split at the first space to separate the address from arguments.
+    NSRange firstSpace = [qscString rangeOfString:@" "];
+    if ( firstSpace.location == NSNotFound )
+        return qscString;
+
+    NSString *address = [qscString substringToIndex:firstSpace.location];
+
+    if ( outArgumentsString )
+        *outArgumentsString = [qscString substringFromIndex:NSMaxRange(firstSpace)];
+
+    return address;
+}
+
++ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString
+{
+    NSString *qscArgString = nil;
+    NSString *address = [self addressWithString:qscString argumentsString:&qscArgString];
     if ( ![self legalAddress:address] )
     {
         // Note: We'll return here if caller tried to parse a QSC bundle string as a message string;
@@ -173,9 +191,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         return nil;
     }
     
-    // Pull out arguments...
-    NSString *qscArgString = [qscString substringFromIndex:[address length]];
-    NSArray<id> *arguments = [self argumentsWithString:qscArgString];
+    NSArray<id> *arguments = (qscArgString ? [self argumentsWithString:qscArgString] : @[]);
     if (!arguments)
         return nil;
 
