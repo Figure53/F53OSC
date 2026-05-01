@@ -58,8 +58,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Arguments should be space-delimited following the address.
 // Arguments enclosed in quotes are parsed as string arguments.
-// Numeric, non-string arguments are formatted using the current machine locale.
-+ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString;
+// Numeric arguments are parsed using the provided locale.
++ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString locale:(nullable NSLocale *)locale; // nil means `currentLocale`
 
 + (F53OSCMessage *) messageWithAddressPattern:(NSString *)addressPattern
                                     arguments:(NSArray<id> *)arguments;
@@ -80,7 +80,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 // redeclare as nonnull for this subclass
 - (NSData *) packetData;
-- (NSString *) asQSC; // not localized, formatted equivalent to `en_US_POSIX` locale
+- (NSString *) asQSC:(nullable NSLocale *)locale; // nil means `currentLocale`
+
+// deprecated
++ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString DEPRECATED_MSG_ATTRIBUTE("Use +messageWithString:locale: instead."); // uses current machine locale
+- (NSString *) asQSC DEPRECATED_MSG_ATTRIBUTE("Use -asQSC: instead."); // uses legacy `en_US_POSIX` locale
 
 @end
 

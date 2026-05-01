@@ -1,5 +1,8 @@
 ## x.x.x - ???
 
+- Reorganizes project file, with several fixes to the SPM package manifest.
+- Additional test cases and several fixes to existing tests.
+
 ### F53OSCServer
 - Adds a version of `-startListening:` that returns an error, if any.
 
@@ -8,7 +11,9 @@
 
 ### F53OSCMessage
 - Fixes `+legalMethod:` to return NO for empty string.
-- Adds utility method `+addressWithString:argumentsString:` which uses the same logic as `+messageWithString:` to split a string into address/arguments components but without creating a message object.
+- `+messageWithString:` and `-asQSC` are deprecated in favor of new locale-aware versions that make clear which locale will be used for parsing/number conversion. Pass `nil` locale to use the current machine locale. This fixes a mismatch between legacy `+messageWithString:` which uses the `currentLocale` and `asQSC` which uses implicit `en_US_POSIX` formatting (by way of `appendFormat:` and the `%@` string format specifier, aka `[arg description]`). The new methods `+messageWithString:locale:` and `asQSC:` now support round-trip formatting of string to message and back in all locales.
+- The `description` method now displays float, string, and blob arguments more acurately, equivalent to `asQSC:` using the `en_US_POSIX` locale.
+- Adds utility method `+addressWithString:argumentsString:` which uses the same logic as `+messageWithString:locale:` to split a string into address/arguments components but without creating a message object.
 
 ### F53OSCEncryptHandshake
 - Fixes `keyPair` property nullable annotation.

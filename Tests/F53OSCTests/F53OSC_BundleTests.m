@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 8/5/25.
-//  Copyright (c) 2025 Figure 53. All rights reserved.
+//  Copyright (c) 2025-2026 Figure 53. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -78,7 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNotNil(bundle, @"Bundle should not be nil");
     XCTAssertNil(bundle.replySocket, @"Default replySocket should be nil");
     XCTAssertNotNil([bundle packetData], @"Default packetData should not be nil");
-    XCTAssertNil([bundle asQSC], @"Default asQSC should be nil");
+    XCTAssertNil([bundle asQSC:nil], @"Default asQSC should be nil");
     XCTAssertEqual(bundle.timeTag.seconds, [F53OSCTimeTag immediateTimeTag].seconds, @"Default timeTag should be immediateTimeTag"); // F53OSCTimeTag does not implement `isEqual:`
     XCTAssertEqual(bundle.timeTag.fraction, [F53OSCTimeTag immediateTimeTag].fraction, @"Default timeTag should be immediateTimeTag"); // F53OSCTimeTag does not implement `isEqual:`
     XCTAssertEqualObjects(bundle.timeTag.oscTimeTagData, [F53OSCTimeTag immediateTimeTag].oscTimeTagData, @"Default timeTag should be immediateTimeTag"); // F53OSCTimeTag does not implement `isEqual:`
@@ -99,8 +99,8 @@ NS_ASSUME_NONNULL_BEGIN
     bundle.timeTag = timeTag;
     XCTAssertEqualObjects(bundle.timeTag, timeTag, @"Bundle timeTag should be %@", timeTag);
 
-    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/message1"];
-    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/message2"];
+    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/message1" locale:nil];
+    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/message2" locale:nil];
     NSArray<NSData *> *elements = @[[message1 packetData], [message2 packetData]];
     bundle.elements = elements;
     XCTAssertEqualObjects(bundle.elements, elements, @"Bundle elements should be %@", elements);
@@ -111,7 +111,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNotNil(description, @"Bundle description should not be nil");
     XCTAssertEqualObjects(description, expectedDescription, @"Bundle description should match elements description");
 
-    XCTAssertNil([bundle asQSC], @"Bundle asQSC should be nil");
+    XCTAssertNil([bundle asQSC:nil], @"Bundle asQSC should be nil");
 }
 
 - (void)testThat_bundleCanBeCopied
@@ -126,8 +126,8 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCTimeTag *timeTag = [F53OSCTimeTag timeTagWithDate:[NSDate dateWithTimeIntervalSince1970:1609459200]]; // Jan 1, 2021 UTC
     original.timeTag = timeTag;
 
-    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/copy/test1"];
-    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/copy/test2"];
+    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/copy/test1" locale:nil];
+    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/copy/test2" locale:nil];
     NSArray<NSData *> *elements = @[[message1 packetData], [message2 packetData]];
     original.elements = elements;
 
@@ -142,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqualObjects(copy.timeTag.oscTimeTagData, original.timeTag.oscTimeTagData, @"timeTag should be copied"); // F53OSCTimeTag does not implement `isEqual:`
     XCTAssertEqualObjects(copy.elements, original.elements, @"elements should be copied");
 
-    XCTAssertNil([copy asQSC], @"Copy asQSC should be nil");
+    XCTAssertNil([copy asQSC:nil], @"Copy asQSC should be nil");
 }
 
 - (void)testThat_bundleWithStringReturnsNil
@@ -155,8 +155,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCTimeTag *timeTag = [F53OSCTimeTag timeTagWithDate:[NSDate now]];
 
-    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/message1"];
-    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/message2"];
+    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/message1" locale:nil];
+    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/message2" locale:nil];
     NSArray<NSData *> *elements = @[[message1 packetData], [message2 packetData]];
 
     NSMutableData *expectedData = [[@"#bundle" oscStringData] mutableCopy];
@@ -171,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqualObjects(bundle.timeTag, timeTag, @"Bundle timeTag should be %@", timeTag);
     XCTAssertEqualObjects(bundle.elements, elements, @"Bundle elements should be %@", elements);
     XCTAssertEqualObjects([bundle packetData], expectedData, @"Bundle packetData should be %@", expectedData);
-    XCTAssertNil([bundle asQSC], @"Bundle asQSC should be nil");
+    XCTAssertNil([bundle asQSC:nil], @"Bundle asQSC should be nil");
 }
 
 - (void)testThat_bundleSkipsNonNSDataElements
@@ -179,8 +179,8 @@ NS_ASSUME_NONNULL_BEGIN
     // Test that bundle handles mixed elements where some are not NSData objects.
     F53OSCTimeTag *timeTag = [F53OSCTimeTag timeTagWithDate:[NSDate now]];
 
-    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/valid/message1"];
-    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/valid/message2"];
+    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/valid/message1" locale:nil];
+    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/valid/message2" locale:nil];
     NSData *validElement1 = [message1 packetData];
     NSData *validElement2 = [message2 packetData];
 

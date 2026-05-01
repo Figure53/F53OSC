@@ -84,7 +84,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertNotNil(message, @"Message should not be nil");
     XCTAssertNil(message.replySocket, @"Default replySocket should be nil");
     XCTAssertNotNil([message packetData], @"Default packetData should not be nil");
-    XCTAssertEqualObjects([message asQSC], @"/", @"Default asQSC should be '/'");
+    XCTAssertEqualObjects([message asQSC:nil], @"/", @"Default asQSC should be '/'");
     XCTAssertEqualObjects(message.addressPattern, @"/", @"Default addressPattern should be '/'");
     XCTAssertNotNil(message.typeTagString, @"Default typeTagString should not be nil");
     XCTAssertEqualObjects(message.typeTagString, @",", @"Default typeTagString should be ','");
@@ -133,8 +133,8 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     formatter.allowsFloats = ([[testTypeTagString substringWithRange:NSMakeRange(2, 1)] isEqual:@"f"]); // should be YES
     [expectedAsQSC appendFormat:@" %@", [formatter stringFromNumber:testArguments[1]]];
     XCTAssertEqualObjects(expectedAsQSC, @"/test/address 53 3.14", @"expectedAsQSC should be '/test/address 53 3.14'");
-    XCTAssertNotNil([message asQSC], @"Message asQSC should not be nil");
-    XCTAssertEqualObjects([message asQSC], expectedAsQSC, @"Message userData should be '%@'", expectedAsQSC);
+    XCTAssertNotNil([message asQSC:nil], @"Message asQSC should not be nil");
+    XCTAssertEqualObjects([message asQSC:nil], expectedAsQSC, @"Message userData should be '%@'", expectedAsQSC);
 }
 
 - (void)testThat_messageCanBeCopied
@@ -161,7 +161,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqualObjects(copy.typeTagString, original.typeTagString, @"typeTagString should be copied");
     XCTAssertEqualObjects(copy.arguments, original.arguments, @"arguments should be copied");
     XCTAssertEqualObjects(copy.userData, original.userData, @"userData should be copied");
-    XCTAssertEqualObjects([copy asQSC], [original asQSC], @"asQSC should be equal");
+    XCTAssertEqualObjects([copy asQSC:nil], [original asQSC:nil], @"asQSC should be equal");
 }
 
 - (void)testThat_messageSupportsNSSecureCoding
@@ -233,8 +233,8 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
         @[@"/string", @[@"hello"], @"/string \"hello\""],
         @[@"/int", @[@53], @"/int 53"],
         @[@"/float", @[@3.14f], @"/float 3.14"],
-        @[@"/float_whole", @[@5.0], @"/float_whole 5"],
-        @[@"/blob", @[[@"data" dataUsingEncoding:NSUTF8StringEncoding]], @"/blob {length = 4, bytes = 0x64617461}"],
+        @[@"/float_whole", @[@5.0], @"/float_whole 5.0"],
+        @[@"/blob", @[[@"data" dataUsingEncoding:NSUTF8StringEncoding]], @"/blob #blobZGF0YQ=="],
         @[@"/true", @[[F53OSCValue oscTrue]], @"/true \\T"],
         @[@"/false", @[[F53OSCValue oscFalse]], @"/false \\F"],
         @[@"/null", @[[F53OSCValue oscNull]], @"/null \\N"],
@@ -242,12 +242,12 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
 
         // Multiple arguments
         @[@"/mixed", @[@"hello", @53, @3.14f, [F53OSCValue oscTrue]], @"/mixed \"hello\" 53 3.14 \\T"],
-        @[@"/all_types", @[@"s", @123, @4.56f, [@"b" dataUsingEncoding:NSUTF8StringEncoding], [F53OSCValue oscTrue], [F53OSCValue oscFalse], [F53OSCValue oscNull], [F53OSCValue oscImpulse]], @"/all_types \"s\" 123 4.56 {length = 1, bytes = 0x62} \\T \\F \\N \\I"],
+        @[@"/all_types", @[@"s", @123, @4.56f, [@"b" dataUsingEncoding:NSUTF8StringEncoding], [F53OSCValue oscTrue], [F53OSCValue oscFalse], [F53OSCValue oscNull], [F53OSCValue oscImpulse]], @"/all_types \"s\" 123 4.56 #blobYg== \\T \\F \\N \\I"],
 
         // Edge cases
         @[@"/empty_string", @[@""], @"/empty_string \"\""],
-        @[@"/quotes", @[@"say \"hi\""], @"/quotes \"say \"hi\"\""],
-        @[@"/floats", @[@1.0f, @2.5f, @0.0f, @-3.14f], @"/floats 1 2.5 0 -3.14"],
+        @[@"/quotes", @[@"say \"hi\""], @"/quotes \"say \\\"hi\\\"\""],
+        @[@"/floats", @[@1.0f, @2.5f, @0.0f, @-3.14f], @"/floats 1.0 2.5 0.0 -3.14"],
     ];
     for (NSArray<id> *testCase in testCases)
     {
@@ -476,19 +476,19 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
 - (void)testThat_messageWithStringHandlesValidInputs
 {
     // Test simple message.
-    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/test"];
+    F53OSCMessage *message1 = [F53OSCMessage messageWithString:@"/test" locale:nil];
     XCTAssertNotNil(message1, @"Should parse simple address");
     XCTAssertEqualObjects(message1.addressPattern, @"/test", @"Should set correct address");
     XCTAssertEqual(message1.arguments.count, 0, @"Should have no arguments");
 
     // Test message with arguments.
-    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/test 53 \"hello\" 3.14"];
+    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"/test 53 \"hello\" 3.14" locale:nil];
     XCTAssertNotNil(message2, @"Should parse message with arguments");
     XCTAssertEqualObjects(message2.addressPattern, @"/test", @"Should set correct address");
     XCTAssertEqual(message2.arguments.count, 3, @"Should have three arguments");
 
     // Test message with leading/trailing whitespace.
-    F53OSCMessage *message3 = [F53OSCMessage messageWithString:@"  /test 53  "];
+    F53OSCMessage *message3 = [F53OSCMessage messageWithString:@"  /test 53  " locale:nil];
     XCTAssertNotNil(message3, @"Should handle whitespace");
     XCTAssertEqualObjects(message3.addressPattern, @"/test", @"Should trim whitespace");
 }
@@ -498,33 +498,33 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     // Test nil input.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
-    F53OSCMessage *message1 = [F53OSCMessage messageWithString:nil];
+    F53OSCMessage *message1 = [F53OSCMessage messageWithString:nil locale:nil];
 #pragma clang diagnostic pop
     XCTAssertNil(message1, @"Should return nil for nil input");
 
     // Test empty string.
-    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@""];
+    F53OSCMessage *message2 = [F53OSCMessage messageWithString:@"" locale:nil];
     XCTAssertNil(message2, @"Should return nil for empty string");
 
     // Test whitespace only.
-    F53OSCMessage *message3 = [F53OSCMessage messageWithString:@"   "];
+    F53OSCMessage *message3 = [F53OSCMessage messageWithString:@"   " locale:nil];
     XCTAssertNil(message3, @"Should return nil for whitespace only");
 
     // Test invalid address.
-    F53OSCMessage *message4 = [F53OSCMessage messageWithString:@"invalid"];
+    F53OSCMessage *message4 = [F53OSCMessage messageWithString:@"invalid" locale:nil];
     XCTAssertNil(message4, @"Should return nil for invalid address");
 
     // Test bundle string (starts with #).
-    F53OSCMessage *message5 = [F53OSCMessage messageWithString:@"#bundle"];
+    F53OSCMessage *message5 = [F53OSCMessage messageWithString:@"#bundle" locale:nil];
     XCTAssertNil(message5, @"Should return nil for bundle string");
 
     // Test #blob with no content.
-    F53OSCMessage *message6 = [F53OSCMessage messageWithString:@"/test #blob"];
+    F53OSCMessage *message6 = [F53OSCMessage messageWithString:@"/test #blob" locale:nil];
     XCTAssertNotNil(message6, @"Should handle #blob with no content");
     XCTAssertEqual(message6.arguments.count, 0, @"Should skip empty blob argument");
 
     // Test #blob with invalid base64 data.
-    F53OSCMessage *message7 = [F53OSCMessage messageWithString:@"/test #blob!@#$%"];
+    F53OSCMessage *message7 = [F53OSCMessage messageWithString:@"/test #blob!@#$%" locale:nil];
     XCTAssertNotNil(message7, @"Should handle #blob with invalid base64");
     XCTAssertEqual(message7.arguments.count, 0, @"Should skip invalid blob argument");
 }
@@ -580,7 +580,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     for (NSString *string in stringsAndExpectedArgs)
     {
         // when
-        F53OSCMessage *message = [F53OSCMessage messageWithString:string];
+        F53OSCMessage *message = [F53OSCMessage messageWithString:string locale:nil];
 
         // then
         NSArray<id> *expectedArgs = stringsAndExpectedArgs[string];
@@ -632,7 +632,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
         [F53OSCValue oscImpulse]    // impulse
     ]];
 
-    NSString *qscString = [message asQSC];
+    NSString *qscString = [message asQSC:nil];
     XCTAssertNotNil(qscString, @"Should generate QSC string");
 
     // Verify it starts with address.
@@ -669,7 +669,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(sint8Message.typeTagString.length, 2, @"SInt8 message typeTagString should have 2 characters");
     XCTAssertEqualObjects([sint8Message.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"SInt8 should be tagged as integer");
     XCTAssertNotNil([sint8Message packetData], @"SInt8 message should generate valid packet data");
-    XCTAssertTrue([[sint8Message asQSC] containsString:@"-53"], @"SInt8 QSC should contain value");
+    XCTAssertTrue([[sint8Message asQSC:nil] containsString:@"-53"], @"SInt8 QSC should contain value");
 
     int16_t sint16Value = -1234;
     NSNumber *sint16Number = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt16Type, &sint16Value);
@@ -677,7 +677,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(sint16Message.typeTagString.length, 2, @"SInt16 message typeTagString should have 2 characters");
     XCTAssertEqualObjects([sint16Message.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"SInt16 should be tagged as integer");
     XCTAssertNotNil([sint16Message packetData], @"SInt16 message should generate valid packet data");
-    XCTAssertTrue([[sint16Message asQSC] containsString:@"-1234"], @"SInt16 QSC should contain value");
+    XCTAssertTrue([[sint16Message asQSC:nil] containsString:@"-1234"], @"SInt16 QSC should contain value");
 
     int32_t sint32Value = -123456;
     NSNumber *sint32Number = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &sint32Value);
@@ -685,7 +685,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(sint32Message.typeTagString.length, 2, @"SInt32 message typeTagString should have 2 characters");
     XCTAssertEqualObjects([sint32Message.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"SInt32 should be tagged as integer");
     XCTAssertNotNil([sint32Message packetData], @"SInt32 message should generate valid packet data");
-    XCTAssertTrue([[sint32Message asQSC] containsString:@"-123456"], @"SInt32 QSC should contain value");
+    XCTAssertTrue([[sint32Message asQSC:nil] containsString:@"-123456"], @"SInt32 QSC should contain value");
 
     int64_t sint64Value = 876543210987654321LL;
     NSNumber *sint64Number = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt64Type, &sint64Value);
@@ -694,7 +694,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqualObjects([sint64Message.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"SInt64 should be tagged as integer");
     XCTAssertNotNil([sint64Message packetData], @"SInt64 message should generate valid packet data");
     // QSC will show truncated 32-bit value.
-    NSString *sint64QSC = [sint64Message asQSC];
+    NSString *sint64QSC = [sint64Message asQSC:nil];
     XCTAssertNotNil(sint64QSC, @"SInt64 QSC should be generated");
 
     float float32Value = 3.14159f;
@@ -703,7 +703,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(float32Message.typeTagString.length, 2, @"Float32 message typeTagString should have 2 characters");
     XCTAssertEqualObjects([float32Message.typeTagString substringWithRange:NSMakeRange(1, 1)], @"f", @"Float32 should be tagged as float");
     XCTAssertNotNil([float32Message packetData], @"Float32 message should generate valid packet data");
-    XCTAssertTrue([[float32Message asQSC] containsString:@"3.14"], @"Float32 QSC should contain value");
+    XCTAssertTrue([[float32Message asQSC:nil] containsString:@"3.14"], @"Float32 QSC should contain value");
 
     double float64Value = 2.718281828;
     NSNumber *float64Number = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberFloat64Type, &float64Value);
@@ -711,7 +711,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(float64Message.typeTagString.length, 2, @"Float64 message typeTagString should have 2 characters");
     XCTAssertEqualObjects([float64Message.typeTagString substringWithRange:NSMakeRange(1, 1)], @"f", @"Float64 should be tagged as float");
     XCTAssertNotNil([float64Message packetData], @"Float64 message should generate valid packet data");
-    XCTAssertTrue([[float64Message asQSC] containsString:@"2.71"], @"Float64 QSC should contain truncated value");
+    XCTAssertTrue([[float64Message asQSC:nil] containsString:@"2.71"], @"Float64 QSC should contain truncated value");
 
     // Basic C types.
     char charValue = 'A';
@@ -720,7 +720,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(charMessage.typeTagString.length, 2, @"Char message typeTagString should have 2 characters");
     XCTAssertEqualObjects([charMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"Char should be tagged as integer");
     XCTAssertNotNil([charMessage packetData], @"Char message should generate valid packet data");
-    XCTAssertTrue([[charMessage asQSC] containsString:@"65"], @"Char QSC should contain ASCII value");
+    XCTAssertTrue([[charMessage asQSC:nil] containsString:@"65"], @"Char QSC should contain ASCII value");
 
     short shortValue = 12345;
     NSNumber *shortNumber = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberShortType, &shortValue);
@@ -728,7 +728,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(shortMessage.typeTagString.length, 2, @"Short message typeTagString should have 2 characters");
     XCTAssertEqualObjects([shortMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"Short should be tagged as integer");
     XCTAssertNotNil([shortMessage packetData], @"Short message should generate valid packet data");
-    XCTAssertTrue([[shortMessage asQSC] containsString:@"12345"], @"Short QSC should contain value");
+    XCTAssertTrue([[shortMessage asQSC:nil] containsString:@"12345"], @"Short QSC should contain value");
 
     int intValue = 987654321;
     NSNumber *intNumber = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &intValue);
@@ -736,7 +736,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(intMessage.typeTagString.length, 2, @"Int message typeTagString should have 2 characters");
     XCTAssertEqualObjects([intMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"Int should be tagged as integer");
     XCTAssertNotNil([intMessage packetData], @"Int message should generate valid packet data");
-    XCTAssertTrue([[intMessage asQSC] containsString:@"987654321"], @"Int QSC should contain value");
+    XCTAssertTrue([[intMessage asQSC:nil] containsString:@"987654321"], @"Int QSC should contain value");
 
     long longValue = 1234567890L;
     NSNumber *longNumber = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberLongType, &longValue);
@@ -744,7 +744,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(longMessage.typeTagString.length, 2, @"Long message typeTagString should have 2 characters");
     XCTAssertEqualObjects([longMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"Long should be tagged as integer");
     XCTAssertNotNil([longMessage packetData], @"Long message should generate valid packet data");
-    XCTAssertTrue([[longMessage asQSC] containsString:@"1234567890"], @"Long QSC should contain value");
+    XCTAssertTrue([[longMessage asQSC:nil] containsString:@"1234567890"], @"Long QSC should contain value");
 
     long long longLongValue = 876543210987654321LL;
     NSNumber *longLongNumber = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberLongLongType, &longLongValue);
@@ -753,7 +753,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqualObjects([longLongMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"Long long should be tagged as integer");
     XCTAssertNotNil([longLongMessage packetData], @"Long long message should generate valid packet data");
     // QSC will show truncated 32-bit value.
-    NSString *longLongQSC = [longLongMessage asQSC];
+    NSString *longLongQSC = [longLongMessage asQSC:nil];
     XCTAssertNotNil(longLongQSC, @"Long long QSC should be generated");
 
     float floatValue = 1.414213f;
@@ -762,7 +762,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(floatMessage.typeTagString.length, 2, @"Float message typeTagString should have 2 characters");
     XCTAssertEqualObjects([floatMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"f", @"Float should be tagged as float");
     XCTAssertNotNil([floatMessage packetData], @"Float message should generate valid packet data");
-    XCTAssertTrue([[floatMessage asQSC] containsString:@"1.41"], @"Float QSC should contain value");
+    XCTAssertTrue([[floatMessage asQSC:nil] containsString:@"1.41"], @"Float QSC should contain value");
 
     double doubleValue = 1.732050808;
     NSNumber *doubleNumber = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberDoubleType, &doubleValue);
@@ -770,7 +770,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(doubleMessage.typeTagString.length, 2, @"Double message typeTagString should have 2 characters");
     XCTAssertEqualObjects([doubleMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"f", @"Double should be tagged as float");
     XCTAssertNotNil([doubleMessage packetData], @"Double message should generate valid packet data");
-    XCTAssertTrue([[doubleMessage asQSC] containsString:@"1.73"], @"Double QSC should contain truncated value");
+    XCTAssertTrue([[doubleMessage asQSC:nil] containsString:@"1.73"], @"Double QSC should contain truncated value");
 
     // Other types.
     CFIndex cfIndexValue = 54321;
@@ -779,7 +779,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(cfIndexMessage.typeTagString.length, 2, @"CFIndex message typeTagString should have 2 characters");
     XCTAssertEqualObjects([cfIndexMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"CFIndex should be tagged as integer");
     XCTAssertNotNil([cfIndexMessage packetData], @"CFIndex message should generate valid packet data");
-    XCTAssertTrue([[cfIndexMessage asQSC] containsString:@"54321"], @"CFIndex QSC should contain value");
+    XCTAssertTrue([[cfIndexMessage asQSC:nil] containsString:@"54321"], @"CFIndex QSC should contain value");
 
     NSInteger nsIntegerValue = 246810;
     NSNumber *nsIntegerNumber = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberNSIntegerType, &nsIntegerValue);
@@ -787,7 +787,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(nsIntegerMessage.typeTagString.length, 2, @"NSInteger message typeTagString should have 2 characters");
     XCTAssertEqualObjects([nsIntegerMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"i", @"NSInteger should be tagged as integer");
     XCTAssertNotNil([nsIntegerMessage packetData], @"NSInteger message should generate valid packet data");
-    XCTAssertTrue([[nsIntegerMessage asQSC] containsString:@"246810"], @"NSInteger QSC should contain value");
+    XCTAssertTrue([[nsIntegerMessage asQSC:nil] containsString:@"246810"], @"NSInteger QSC should contain value");
 
     CGFloat cgFloatValue = 1.61803398875;
     NSNumber *cgFloatNumber = (__bridge_transfer NSNumber *)CFNumberCreate(kCFAllocatorDefault, kCFNumberCGFloatType, &cgFloatValue);
@@ -795,7 +795,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(cgFloatMessage.typeTagString.length, 2, @"CGFloat message typeTagString should have 2 characters");
     XCTAssertEqualObjects([cgFloatMessage.typeTagString substringWithRange:NSMakeRange(1, 1)], @"f", @"CGFloat should be tagged as float");
     XCTAssertNotNil([cgFloatMessage packetData], @"CGFloat message should generate valid packet data");
-    XCTAssertTrue([[cgFloatMessage asQSC] containsString:@"1.61"], @"CGFloat QSC should contain value");
+    XCTAssertTrue([[cgFloatMessage asQSC:nil] containsString:@"1.61"], @"CGFloat QSC should contain value");
 }
 
 - (void)testThat_messageWithAddressPatternRoundTripsAllCFNumberTypesArguments
@@ -848,7 +848,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertEqual(packetData.length, expectedLength, @"Packet data should be expected length");
 
     // Verify QSC string format.
-    NSString *qscString = [mixedMessage asQSC];
+    NSString *qscString = [mixedMessage asQSC:nil];
     XCTAssertNotNil(qscString, @"Mixed message should generate QSC string");
     XCTAssertTrue([qscString hasPrefix:@"/mixed"], @"QSC should start with address pattern");
     XCTAssertTrue([qscString containsString:@"-53"], @"QSC should contain sint8 value");

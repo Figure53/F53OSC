@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Siobhán Dougall on 1/17/11.
-//  Copyright (c) 2011-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -110,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
     return result;
 }
 
-- (nullable NSString *) asQSC
+- (nullable NSString *) asQSC:(nullable NSLocale *)locale
 {
     NSLog( @"Error: F53OSCBundle does not yet support conversion of OSC bundles to/from a QSC form." );
     
@@ -121,6 +121,14 @@ NS_ASSUME_NONNULL_BEGIN
     // e.g. #bundle{ "some_arbitrary_name": ["/a/message", "/another/message with arguments 1 2 \"3\"", "another_arbitrary_name": ["/internal/bundle/message"]] }
     
     return nil;
+}
+
+#pragma mark - deprecated
+
+- (nullable NSString *) asQSC
+{
+    // never implemented, so nil `locale` is fine here.
+    return [self asQSC:nil];
 }
 
 @end

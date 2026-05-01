@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNotNil(packet, @"Packet should not be nil");
     XCTAssertNil(packet.replySocket, @"Default replySocket should be nil");
     XCTAssertNil([packet packetData], @"Default packetData should be nil");
-    XCTAssertNil([packet asQSC], @"Default asQSC should be nil");
+    XCTAssertNil([packet asQSC:nil], @"Default asQSC should be nil");
 }
 
 - (void)testThat_packetCanConfigureProperties
@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqualObjects(packet.replySocket, replySocket, @"Packet replySocket should be %@", replySocket);
 
     XCTAssertNil([packet packetData], @"Bundle packetData should be nil");
-    XCTAssertNil([packet asQSC], @"Bundle asQSC should be nil");
+    XCTAssertNil([packet asQSC:nil], @"Bundle asQSC should be nil");
 }
 
 - (void)testThat_packetCanBeCopied
@@ -103,7 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNotEqual(copy, original, @"Copy should be a different object");
     XCTAssertEqualObjects(copy.replySocket, original.replySocket, @"replySocket should be copied");
     XCTAssertNil([copy packetData], @"packetData should be nil");
-    XCTAssertNil([copy asQSC], @"asQSC should be nil");
+    XCTAssertNil([copy asQSC:nil], @"asQSC should be nil");
 }
 
 @end

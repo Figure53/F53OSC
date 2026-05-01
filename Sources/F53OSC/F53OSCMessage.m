@@ -88,6 +88,7 @@ static NSCharacterSet *LEGAL_ADDRESS_CHARACTERS = nil;
 static NSCharacterSet *LEGAL_METHOD_CHARACTERS = nil;
 static NSCharacterSet *QUOTATION_MARK_CHARACTERS = nil;
 static NSNumberFormatter *NUMBER_FORMATTER = nil;
+static NSNumberFormatter *STRING_FORMATTER = nil;
 
 + (void) initialize
 {
@@ -107,6 +108,20 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         NUMBER_FORMATTER.allowsFloats = YES;
         NUMBER_FORMATTER.locale = [NSLocale autoupdatingCurrentLocale];
         NUMBER_FORMATTER.roundingMode = NSNumberFormatterRoundHalfUp;
+    }
+    if ( !STRING_FORMATTER )
+    {
+        STRING_FORMATTER = [[NSNumberFormatter alloc] init];
+        STRING_FORMATTER.locale = [NSLocale autoupdatingCurrentLocale];
+        STRING_FORMATTER.roundingMode = NSNumberFormatterRoundHalfUp;
+        STRING_FORMATTER.allowsFloats = YES;
+        STRING_FORMATTER.minimumIntegerDigits = 1;
+        STRING_FORMATTER.minimumFractionDigits = 1; // ensure values are sent as floats, not ints
+        STRING_FORMATTER.maximumFractionDigits = 6;
+        STRING_FORMATTER.hasThousandSeparators = NO; // ensure this remains the default, see #4794
+        STRING_FORMATTER.thousandSeparator = @"";
+        STRING_FORMATTER.usesGroupingSeparator = NO;
+        STRING_FORMATTER.groupingSeparator = @"";
     }
 }
 
@@ -180,7 +195,7 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     return address;
 }
 
-+ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString
++ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString locale:(nullable NSLocale *)locale
 {
     NSString *qscArgString = nil;
     NSString *address = [self addressWithString:qscString argumentsString:&qscArgString];
@@ -191,14 +206,14 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         return nil;
     }
     
-    NSArray<id> *arguments = (qscArgString ? [self argumentsWithString:qscArgString] : @[]);
+    NSArray<id> *arguments = (qscArgString ? [self argumentsWithString:qscArgString locale:locale] : @[]);
     if (!arguments)
         return nil;
 
     return [F53OSCMessage messageWithAddressPattern:(NSString * _Nonnull)address arguments:arguments];
 }
 
-+ (nullable NSArray<id> *)argumentsWithString:(NSString *)argString
++ (nullable NSArray<id> *)argumentsWithString:(NSString *)argString locale:(nullable NSLocale *)locale
 {
     // Create a working copy.
     NSString *workingArguments = argString;
@@ -297,14 +312,24 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         }
         else
         {
-#ifdef TESTING
-            if ( [[NSUserDefaults standardUserDefaults] objectForKey:@"com.figure53.f53osc.testingLocaleIdentifier"] )
+            NSNumberFormatter *numberFormatter = NUMBER_FORMATTER;
+            if ( locale )
             {
-                NSString *identifier = [[NSUserDefaults standardUserDefaults] objectForKey:@"com.figure53.f53osc.testingLocaleIdentifier"];
-                NUMBER_FORMATTER.locale = [NSLocale localeWithLocaleIdentifier:identifier];
+                numberFormatter = [numberFormatter copy];
+                numberFormatter.locale = locale;
+            }
+#ifdef TESTING
+            else
+            {
+                NSString *testingLocaleIdentifier = [[NSUserDefaults standardUserDefaults] objectForKey:@"com.figure53.f53osc.testingLocaleIdentifier"];
+                if ( testingLocaleIdentifier )
+                {
+                    numberFormatter = [numberFormatter copy];
+                    numberFormatter.locale = [NSLocale localeWithLocaleIdentifier:testingLocaleIdentifier];
+                }
             }
 #endif
-            NSNumber *number = [NUMBER_FORMATTER numberFromString:arg];
+            NSNumber *number = [numberFormatter numberFromString:arg];
             if ( number != nil )
             {
                 // unquoted argument was successfully formatted as a number
@@ -389,23 +414,12 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
 
 - (NSString *) description
 {
-    NSMutableString *description = [NSMutableString stringWithString:self.addressPattern];
-    for ( id arg in self.arguments )
-    {
-        if ( [[arg class] isSubclassOfClass:[NSString class]] )
-            [description appendFormat:@" \"%@\"", [arg description]]; // make strings clear in debug logs
-        else if ( [arg isEqual:[F53OSCValue oscTrue]] )
-            [description appendString:@" \\T"];                       // make True clear in debug logs
-        else if ( [arg isEqual:[F53OSCValue oscFalse]] )
-            [description appendString:@" \\F"];                       // make False clear in debug logs
-        else if ( [arg isEqual:[F53OSCValue oscNull]] )
-            [description appendString:@" \\N"];                       // make Null clear in debug logs
-        else if ( [arg isEqual:[F53OSCValue oscImpulse]] )
-            [description appendString:@" \\I"];                       // make Impulse clear in debug logs
-        else
-            [description appendFormat:@" %@", [arg description]];
-    }
-    return [NSString stringWithString:description];
+    static NSLocale *posixLocale = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        posixLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    });
+    return [self asQSC:posixLocale];
 }
 
 - (BOOL) isEqual:(nullable id)object
@@ -589,8 +603,10 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
     return result;
 }
 
-- (NSString *) asQSC
+- (NSString *) asQSC:(nullable NSLocale *)locale
 {
+    NSNumberFormatter *floatFormatter = nil;
+
     NSMutableString *qscString = [NSMutableString stringWithString:self.addressPattern];
     for ( id arg in self.arguments )
     {
@@ -623,8 +639,29 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
                 case kCFNumberFloatType:
                 case kCFNumberDoubleType:
                 case kCFNumberCGFloatType:
-                    [qscString appendFormat:@" %@", arg]; // 'f'
-                    break;
+                {
+                    if (!floatFormatter)
+                    {
+                        floatFormatter = STRING_FORMATTER;
+                        if ( locale )
+                        {
+                            floatFormatter = [floatFormatter copy];
+                            floatFormatter.locale = locale;
+                        }
+#ifdef TESTING
+                        else
+                        {
+                            NSString *testingLocaleIdentifier = [[NSUserDefaults standardUserDefaults] objectForKey:@"com.figure53.f53osc.testingLocaleIdentifier"];
+                            if ( testingLocaleIdentifier )
+                            {
+                                floatFormatter = [floatFormatter copy];
+                                floatFormatter.locale = [NSLocale localeWithLocaleIdentifier:testingLocaleIdentifier];
+                            }
+                        }
+#endif
+                    }
+                    [qscString appendFormat:@" %@", [floatFormatter stringFromNumber:(NSNumber *)arg]]; // 'f'
+                } break;
 
 #if !F53OSC_EXHAUSTIVE_SWITCH_ENABLED // see F53OSC.h
                 default:
@@ -656,6 +693,23 @@ static NSNumberFormatter *NUMBER_FORMATTER = nil;
         }
     }
     return [NSString stringWithString:qscString];
+}
+
+#pragma mark - deprecated
+
++ (nullable F53OSCMessage *) messageWithString:(NSString *)qscString
+{
+    return [self messageWithString:qscString locale:nil]; // nil preserves legacy `currentLocale`
+}
+
+- (NSString *) asQSC
+{
+    static NSLocale *posixLocale = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        posixLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    });
+    return [self asQSC:posixLocale]; // POSIX locale preserves legacy behavior
 }
 
 @end

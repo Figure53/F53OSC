@@ -496,7 +496,7 @@ static UInt16 sPortOffset = 0;
     [self.messageExpectations addObject:expectation];
 
     // when
-    F53OSCMessage *message = [F53OSCMessage messageWithString:address];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:address locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -527,7 +527,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -570,7 +570,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -613,7 +613,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -656,7 +656,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -699,7 +699,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -742,7 +742,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -785,7 +785,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -828,7 +828,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -924,7 +924,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -1036,7 +1036,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
@@ -1148,7 +1148,7 @@ static UInt16 sPortOffset = 0;
 
     // when
     NSString *qsc = [NSString stringWithFormat:@"%@ %@", address, [arguments componentsJoinedByString:@" "]];
-    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc];
+    F53OSCMessage *message = [F53OSCMessage messageWithString:qsc locale:nil];
     [self.testClient sendPacket:message];
 
     // then
