@@ -26,14 +26,6 @@
 
 #import <Foundation/Foundation.h>
 
-#if F53OSC_BUILT_AS_FRAMEWORK
-#import <F53OSC/GCDAsyncSocket.h>
-#import <F53OSC/GCDAsyncUdpSocket.h>
-#else
-#import "GCDAsyncSocket.h"
-#import "GCDAsyncUdpSocket.h"
-#endif
-
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -41,15 +33,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class F53OSCPacket;
 @class F53OSCEncrypt;
+@class F53OSCSocket;
+@protocol F53OSCSocketDelegate;
 
 typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
     F53TCPDataFramingNone = -1,
     F53TCPDataFramingSLIP = 0, // Default, OSC 1.1
 };
 
-///
-///  F53OSCStats tracks socket behavior over time.
-///
+//
+//  F53OSCStats tracks socket behavior over time.
+//
 
 @interface F53OSCStats : NSObject
 
@@ -60,20 +54,53 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 @end
 
 
-///
-///  An F53OSCSocket object represents either a TCP socket or UDP socket, but never both at the same time.
-///
+//
+//  F53OSCSocketDelegate is the internal callback surface used by F53OSCClient
+//  and F53OSCServer to receive events from F53OSCSocket, which wraps the
+//  underlying Network.framework handles. All callbacks fire on the socket's
+//  callbackQueue.
+//
+
+@protocol F53OSCSocketDelegate <NSObject>
+@optional
+
+// outbound connection became ready
+- (void) socketDidConnect:(F53OSCSocket *)socket;
+
+// a chunk of raw bytes arrived on a TCP connection, or a complete UDP datagram arrived
+- (void) socket:(F53OSCSocket *)socket didReceiveData:(NSData *)data;
+
+// connection ended (graceful close, reset, or local cancel)
+- (void) socket:(F53OSCSocket *)socket didDisconnectWithError:(nullable NSError *)error;
+
+// a listener accepted a new connection. The new socket is already configured with the
+// listener's callbackQueue but has no delegate yet — caller is responsible for assigning
+// a delegate before returning
+- (void) socket:(F53OSCSocket *)socket didAcceptConnection:(F53OSCSocket *)connection;
+
+@end
+
+
+//
+//  An F53OSCSocket object wraps either a single Network.framework nw_connection_t
+//  (for outbound client TCP/UDP, or an accepted inbound TCP/UDP flow) or an
+//  nw_listener_t (for TCP/UDP listeners). The two roles are mutually exclusive
+//  on any given instance.
+//
 
 @interface F53OSCSocket : NSObject
 
-+ (F53OSCSocket *) socketWithTcpSocket:(GCDAsyncSocket *)socket;
-+ (F53OSCSocket *) socketWithUdpSocket:(GCDAsyncUdpSocket *)socket;
+// outbound client constructors
++ (instancetype) outboundTcpSocketWithCallbackQueue:(nullable dispatch_queue_t)queue;
++ (instancetype) outboundUdpSocketWithCallbackQueue:(nullable dispatch_queue_t)queue;
 
-- (instancetype) initWithTcpSocket:(GCDAsyncSocket *)socket;
-- (instancetype) initWithUdpSocket:(GCDAsyncUdpSocket *)socket;
+// listener constructors. Server uses these to bind a listening port
++ (instancetype) tcpListenerWithCallbackQueue:(nullable dispatch_queue_t)queue;
++ (instancetype) udpListenerWithCallbackQueue:(nullable dispatch_queue_t)queue;
 
-@property (strong, readonly, nullable) GCDAsyncSocket *tcpSocket;
-@property (strong, readonly, nullable) GCDAsyncUdpSocket *udpSocket;
+@property (nonatomic, weak, nullable)           id<F53OSCSocketDelegate> delegate;
+@property (nonatomic, strong, readonly)         dispatch_queue_t callbackQueue;
+
 @property (nonatomic, readonly) BOOL isTcpSocket;
 @property (nonatomic, readonly) BOOL isUdpSocket;
 @property (nonatomic, assign) F53TCPDataFraming tcpDataFraming; // Default SLIP
@@ -85,7 +112,16 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 
 @property (nonatomic, readonly) BOOL hostIsLocal;
 
+// Seconds the TCP connect attempt is allowed to sit in nw_connection_state_waiting
+// before we cancel it and deliver a disconnect. Default 30.0, set to 0 to disable
+// (lets nw_connection retry indefinitely). UDP ignores this — there's no handshake.
+// Matches Swift's OSCClient.Configuration.connectionTimeout.
+@property (nonatomic, assign)                   NSTimeInterval connectTimeout;
+
 @property (strong, readonly, nullable) F53OSCStats *stats;
+
+// updated on every receive. Nil until first data arrives. Used by F53OSCServer to sweep idle UDP flows
+@property (atomic, strong, readonly, nullable)  NSDate *lastActivityDate;
 
 @property (strong, nullable) F53OSCEncrypt *encrypter;
 @property (assign) BOOL isEncrypting;
@@ -106,7 +142,7 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 
 
 @interface F53OSCSocket (DisallowedInits)
-- (instancetype)init __attribute__((unavailable("Use -initWithTcpSocket: or -initWithUdpSocket: instead.")));
+- (instancetype)init __attribute__((unavailable("Use one of the +outbound... or +...Listener... factories instead.")));
 @end
 
 NS_ASSUME_NONNULL_END

@@ -22,27 +22,21 @@ let package = Package(
         .target(
             name: "F53OSC",
             dependencies: [
-                "CocoaAsyncSocket",
                 "F53OSCEncrypt",
             ],
-            publicHeadersPath: "."
+            publicHeadersPath: ".",
+            linkerSettings: [
+                .linkedFramework("Network"),
+            ]
         ),
         .target(
             name: "F53OSCEncrypt"
-        ),
-        .target(
-            name: "CocoaAsyncSocket",
-            path: "Sources/Vendor/CocoaAsyncSocket",
-            publicHeadersPath: ".",
-            linkerSettings: [
-                .linkedFramework("Security"),
-                .linkedFramework("CFNetwork"),
-            ]
         ),
         .testTarget(
             name: "F53OSCTests",
             dependencies: [
                 "F53OSC",
+                "F53OSCEncrypt",
             ]
         ),
     ]

@@ -1,9 +1,9 @@
 //
-//  F53OSCParser.h
-//  F53OSC
+//  F53OSCTestCounter.h
+//  F53OSC Tests
 //
-//  Created by Christopher Ashworth on 1/30/13.
-//  Copyright (c) 2013-2025 Figure 53 LLC, https://figure53.com
+//  Created by Christopher Cahoon on 5/24/26.
+//  Copyright (c) 2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,30 +23,33 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
+//  A combined server + client delegate that counts delivered messages and
+//  signals a semaphore when the running total reaches `targetCount`. Used by
+//  the throughput and performance test suites. Thread-safe: `receivedCount` is
+//  updated under a lock so the doneSemaphore fires exactly once per reset
+//  cycle. waitForCount:timeout: spins the run loop instead of blocking so
+//  delegate callbacks dispatched to main aren't starved.
+//
 
 #import <Foundation/Foundation.h>
 
-@class F53OSCMessage;
-@class F53OSCSocket;
-@protocol F53OSCPacketDestination;
-@protocol F53OSCControlHandler;
-
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSC.h>
+#else
+#import "F53OSC.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface F53OSCParser : NSObject
+@interface F53OSCTestCounter : NSObject <F53OSCServerDelegate, F53OSCClientDelegate>
 
-+ (nullable F53OSCMessage *) parseOscMessageData:(NSData *)data;
+@property (atomic) NSInteger receivedCount;
+@property (atomic) NSInteger targetCount;
+@property (strong, nonatomic) dispatch_semaphore_t doneSemaphore;
+@property (strong, nonatomic) dispatch_semaphore_t connectSemaphore;
 
-+ (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket controlHandler:(nullable id<F53OSCControlHandler>)controlHandler wasEncrypted:(BOOL)wasEncrypted;
-
-+ (void) translateSlipData:(NSData *)slipData toData:(NSMutableData *)data withState:(NSMutableDictionary<NSString *, id> *)state destination:(id<F53OSCPacketDestination>)destination
-    controlHandler:(nullable id<F53OSCControlHandler>)controlHandler;
-
-// Frame an arbitrary payload as a double-END SLIP packet. Pure transformation, no
-// network. Exposed for benchmarks and integration tests. Production also uses this
-// via F53OSCSocket -sendPacket:.
-+ (NSData *) slipFrameData:(NSData *)data;
+- (void) reset;
+- (void) waitForCount:(NSInteger)count timeout:(NSTimeInterval)timeout;
 
 @end
 

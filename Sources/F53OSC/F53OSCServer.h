@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define F53_OSC_SERVER_DEBUG 0
 
-@interface F53OSCServer : NSObject <GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate, F53OSCControlHandler>
+@interface F53OSCServer : NSObject <F53OSCSocketDelegate, F53OSCControlHandler>
 
 + (NSString *) validCharsForOSCMethod;
 + (NSPredicate *) predicateForAttribute:(NSString *)attributeName
@@ -52,6 +52,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign)               UInt16 udpReplyPort; // default 0
 @property (nonatomic, getter=isIPv6Enabled) BOOL IPv6Enabled;    // default NO
 @property (strong, nullable)                NSData *keyPair;
+
+// Seconds of inactivity before an accepted UDP flow is swept from activeTcpSockets and cancelled.
+// The server runs a timer that checks flows against this threshold.
+// Default is 30.0 seconds.  Set to 0 to disable sweeping.
+@property (nonatomic, assign)               NSTimeInterval udpFlowIdleTimeout;
+
+// Interval between idle-flow sweep ticks. Default 5.0 seconds. Drives both
+// UDP-flow expiry and TCP idle-disconnect.
+@property (nonatomic, assign)               NSTimeInterval udpFlowSweepInterval;
+
+// Seconds of inactivity before an accepted TCP connection is force-cancelled
+// and removed from activeTcpSockets. Default is 0 (disabled — TCP connections
+// stay open indefinitely until the client disconnects). Set to a positive
+// value to enable. Idle is measured against F53OSCSocket.lastActivityDate,
+// which is updated on every receive.
+@property (nonatomic, assign)               NSTimeInterval tcpIdleTimeout;
 
 - (instancetype) initWithDelegateQueue:(nullable dispatch_queue_t)queue;
 

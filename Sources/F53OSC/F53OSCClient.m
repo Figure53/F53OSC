@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Siobhán Dougall on 1/20/11.
-//  Copyright (c) 2011-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,15 @@
 
 #import "F53OSCClient.h"
 
+#import "F53OSCSocket.h"
 #import "F53OSCParser.h"
 #import "F53OSCEncryptHandshake.h"
+
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSC-Swift.h>
+#elif SWIFT_PACKAGE
+@import F53OSCEncrypt;
+#endif
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -67,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.IPv6Enabled = NO;
         self.useTcp = NO;
         self.tcpTimeout = -1;   // no timeout
-        self.readChunkSize = 0; // no partial reads
+        self.connectTimeout = 30.0; // matches Swift OSCClient.Configuration.connectionTimeout default
         self.userData = nil;
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -91,7 +98,6 @@ NS_ASSUME_NONNULL_BEGIN
     [coder encodeObject:[NSNumber numberWithBool:self.isIPv6Enabled] forKey:@"IPv6Enabled"];
     [coder encodeObject:[NSNumber numberWithBool:self.useTcp] forKey:@"useTcp"];
     [coder encodeObject:[NSNumber numberWithDouble:self.tcpTimeout] forKey:@"tcpTimeout"];
-    [coder encodeObject:[NSNumber numberWithUnsignedInteger:self.readChunkSize] forKey:@"readChunkSize"];
     [coder encodeObject:self.userData forKey:@"userData"];
 }
 
@@ -108,7 +114,6 @@ NS_ASSUME_NONNULL_BEGIN
         self.IPv6Enabled = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"IPv6Enabled"] boolValue];
         self.useTcp = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"useTcp"] boolValue];
         self.tcpTimeout = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"tcpTimeout"] doubleValue];
-        self.readChunkSize = [[coder decodeObjectOfClass:[NSNumber class] forKey:@"readChunkSize"] unsignedIntegerValue];
         self.userData = [coder decodeObjectOfClass:[NSObject class] forKey:@"userData"];
         self.socket = nil;
         self.readData = [NSMutableData data];
@@ -145,10 +150,6 @@ NS_ASSUME_NONNULL_BEGIN
     self.readState[@"socket"] = nil;
     
     [self.socket disconnect];
-    if ( self.useTcp )
-        [self.socket.tcpSocket synchronouslySetDelegate:nil delegateQueue:nil];
-    else
-        [self.socket.udpSocket synchronouslySetDelegate:nil delegateQueue:nil];
     _socket = nil;
 }
 
@@ -158,26 +159,26 @@ NS_ASSUME_NONNULL_BEGIN
 
     if ( self.useTcp )
     {
-        GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
-        socket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+        socket = [F53OSCSocket outboundTcpSocketWithCallbackQueue:self.socketDelegateQueue];
         self.readState[@"socket"] = socket;
     }
     else // use UDP
     {
-        GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.socketDelegateQueue];
-        socket = [F53OSCSocket socketWithUdpSocket:udpSocket];
+        socket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:self.socketDelegateQueue];
     }
+    socket.delegate = self;
     socket.interface = self.interface;
     socket.IPv6Enabled = self.isIPv6Enabled;
     socket.host = self.host;
     socket.port = self.port;
+    socket.connectTimeout = self.connectTimeout;
 
     self.socket = socket;
 }
 
 - (void) setInterface:(nullable NSString *)interface
 {
-    // GCDAsyncSocket interprets "nil" as "allow the OS to decide what interface to use".
+    // F53OSCSocket interprets nil as "allow the OS to decide what interface to use".
     // So here we additionally interpret "" as nil.
     if ( [interface isEqualToString:@""] )
         interface = nil;
@@ -283,7 +284,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) connect
 {
     if ( !self.socket )
-        [self createSocket]; // should always create a socket
+        [self createSocket];
     if ( !self.socket )
         return NO;
 
@@ -293,7 +294,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL) connectEncryptedWithKeyPair:(NSData *)keyPair
 {
     if ( !self.socket )
-        [self createSocket]; // should always create a socket
+        [self createSocket];
     [self.socket setKeyPair:keyPair];
     if ( !self.socket )
         return NO;
@@ -352,29 +353,16 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-#pragma mark - GCDAsyncSocketDelegate
+#pragma mark - F53OSCSocketDelegate
 
-- (nullable dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
-{
-    return self.socketDelegateQueue;
-}
-
-- (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
-{
-    // Client objects do not accept new incoming connections.
-}
-
-- (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
+- (void) socketDidConnect:(F53OSCSocket *)socket
 {
 #if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didConnectToHost %@:%hu", sock, host, port );
+    NSLog( @"client socket %p socketDidConnect", socket );
 #endif
 
-    if ( self.readChunkSize )
-        [sock readDataWithTimeout:self.tcpTimeout buffer:nil bufferOffset:0 maxLength:self.readChunkSize tag:0];
-    else
-        [sock readDataWithTimeout:self.tcpTimeout tag:0];
-
+    // if encryption is requested, send the handshake request and defer
+    // tellDelegateDidConnect until the handshake completes.
     if ( self.socket.encrypter )
     {
         F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
@@ -386,7 +374,6 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 
-    // else
     [self tellDelegateDidConnect];
 }
 
@@ -405,30 +392,33 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+- (void) socket:(F53OSCSocket *)socket didReceiveData:(NSData *)data
 {
 #if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
+    NSLog( @"client socket %p didReceiveData of length %lu", socket, [data length] );
 #endif
 
-    [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate controlHandler:self];
-
-    if ( self.readChunkSize )
+    if ( socket.isTcpSocket )
     {
-        [self tellDelegateDidRead];
-        [sock readDataWithTimeout:self.tcpTimeout buffer:nil bufferOffset:0 maxLength:self.readChunkSize tag:tag];
+    [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate controlHandler:self];
+        [self tellDelegateDidReadDataOfLength:self.readData.length];
     }
     else
     {
-        [sock readDataWithTimeout:self.tcpTimeout tag:tag];
+        // UDP — single datagram, no SLIP framing.
+        [F53OSCParser processOscData:data
+                      forDestination:self.delegate
+                       replyToSocket:socket
+                      controlHandler:nil
+                        wasEncrypted:NO];
     }
 }
 
-- (void) tellDelegateDidRead
+- (void) tellDelegateDidReadDataOfLength:(NSUInteger)length
 {
     if ( [self.delegate respondsToSelector:@selector(client:didReadData:)] )
     {
-        NSUInteger lengthOfCurrentRead = self.readData.length;
+        NSUInteger lengthOfCurrentRead = length;
         dispatch_block_t block = ^{
             [self.delegate client:self didReadData:lengthOfCurrentRead];
         };
@@ -439,60 +429,10 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
+- (void) socket:(F53OSCSocket *)socket didDisconnectWithError:(nullable NSError *)error
 {
 #if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didReadPartialDataOfLength %lu. tag: %li", sock, partialLength, tag );
-#endif
-}
-
-- (void) socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
-{
-#if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didWriteDataWithTag %li", sock, tag );
-#endif
-}
-
-- (void) socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
-{
-#if F53_OSC_CLIENT_DEBUG
-    NSLog( @"server socket %p didWritePartialDataOfLength %lu. tag: %li", sock, partialLength, tag );
-#endif
-}
-
-- (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
-{
-    NSLog( @"Warning: F53OSCClient timed out when reading data." );
-    return 0;
-}
-
-- (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutWriteWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
-{
-    NSLog( @"Warning: F53OSCClient timed out when sending data." );
-    return 0;
-}
-
-- (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
-{
-#if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didCloseReadStream", sock );
-#endif
-    
-    dispatch_block_t block = ^{
-        [self.readData setData:[NSData data]];
-        self.readState[@"dangling_ESC"] = @NO;
-    };
-    
-    if ( [NSThread isMainThread] )
-        block();
-    else
-        dispatch_async( dispatch_get_main_queue(), block );
-}
-
-- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
-{
-#if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didDisconnect", sock );
+    NSLog( @"client socket %p didDisconnectWithError: %@", socket, error );
 #endif
 
     self.socket.isEncrypting = NO;
@@ -500,9 +440,7 @@ NS_ASSUME_NONNULL_BEGIN
     dispatch_block_t block = ^{
         [self.readData setData:[NSData data]];
         self.readState[@"dangling_ESC"] = @NO;
-        
-        if ( [self.delegate respondsToSelector:@selector(clientDidDisconnect:)] )
-            [self.delegate clientDidDisconnect:self];
+        [self tellDelegateDidDisconnect];
     };
     
     if ( [NSThread isMainThread] )
@@ -511,40 +449,10 @@ NS_ASSUME_NONNULL_BEGIN
         dispatch_async( dispatch_get_main_queue(), block );
 }
 
-- (void) socketDidSecure:(GCDAsyncSocket *)sock
+- (void) tellDelegateDidDisconnect
 {
-}
-
-#pragma mark - GCDAsyncUdpSocketDelegate
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didConnectToAddress:(NSData *)address
-{
-}
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(nullable NSError *)error
-{
-}
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
-{
-#if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didSendDataWithTag: %ld", sock, tag );
-#endif
-}
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(nullable NSError *)error
-{
-#if F53_OSC_CLIENT_DEBUG
-    NSLog( @"client socket %p didNotSendDataWithTag: %ld dueToError: %@", sock, tag, [error localizedDescription] );
-#endif
-}
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(nullable id)filterContext
-{
-}
-
-- (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(nullable NSError *)error
-{
+        if ( [self.delegate respondsToSelector:@selector(clientDidDisconnect:)] )
+            [self.delegate clientDidDisconnect:self];
 }
 
 @end

@@ -38,6 +38,7 @@
 #import <F53OSC/F53OSCBrowser.h>
 #import <F53OSC/F53OSCEncryptHandshake.h>
 #import <F53OSC/F53OSCParser.h>
+#import <F53OSC/F53OSCServiceRef.h>
 #import <F53OSC/F53OSCSocket.h>
 #import <F53OSC/F53OSCPacket.h>
 #import <F53OSC/F53OSCMessage.h>
@@ -49,6 +50,7 @@
 #import "F53OSCBrowser.h"
 #import "F53OSCEncryptHandshake.h"
 #import "F53OSCParser.h"
+#import "F53OSCServiceRef.h"
 #import "F53OSCSocket.h"
 #import "F53OSCPacket.h"
 #import "F53OSCMessage.h"
@@ -57,3 +59,4 @@
 #import "F53OSCServer.h"
 #import "F53OSCTimeTag.h"
 #endif
+

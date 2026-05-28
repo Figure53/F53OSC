@@ -4,7 +4,7 @@
 //
 //  Created by Brent Lord on 8/27/20.
 //  Adapted from QLKBrowser by Zach Waugh.
-//  Copyright (c) 2013-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -29,22 +29,23 @@
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
+#import <Network/Network.h>
+
 #import "F53OSCBrowser.h"
-
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#import "F53OSCServiceRef.h"
 
 
-#ifndef RELEASE
-#define DEBUG_BROWSER 0
-#endif
+#define F53_OSC_BROWSER_DEBUG 0
 
 
 NS_ASSUME_NONNULL_BEGIN
 
+
+#pragma mark - F53OSCClientRecord
+
 @implementation F53OSCClientRecord
 
-- (instancetype)init
+- (instancetype) init
 {
     self = [super init];
     if ( self )
@@ -52,47 +53,59 @@ NS_ASSUME_NONNULL_BEGIN
         self.port = 0;
         self.useTCP = NO;
         self.hostAddresses = @[];
+        self.service = nil;
     }
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id) copyWithZone:(nullable NSZone *)zone
 {
     F53OSCClientRecord *copy = [[F53OSCClientRecord allocWithZone:zone] init];
     copy.port = self.port;
     copy.useTCP = self.useTCP;
     copy.hostAddresses = [self.hostAddresses copyWithZone:zone];
-    copy.netService = self.netService;
+    copy.service = self.service;
     return copy;
 }
 
 @end
 
 
-@interface F53OSCBrowser () <NSNetServiceBrowserDelegate, NSNetServiceDelegate>
+#pragma mark - F53OSCBrowser private interface
+
+@interface F53OSCBrowser ()
 
 @property (assign, readwrite)                   BOOL running;
 
-@property (nonatomic, strong, nullable)         NSNetServiceBrowser *netServiceDomainsBrowser;
-@property (nonatomic, strong, nullable)         NSNetServiceBrowser *netServiceBrowser;
-@property (nonatomic, strong)                   NSMutableArray<NSNetService *> *unresolvedNetServices;
+// Private serial queue; all nw_browser / nw_connection callbacks land here.
+@property (nonatomic, strong)               dispatch_queue_t callbackQueue;
 
+// The live nw_browser. ARC retains via property storage.
+@property (nonatomic, strong, nullable)     nw_browser_t nwBrowser;
+
+// Endpoints that have been discovered but not yet handed to resolve operations.
+// Keyed by a stable service-identity string ("name.type.domain.").
+// Value is an NSArray of two elements: [nw_endpoint_t, NSDictionary txtRecord (or NSNull)].
+@property (nonatomic, strong)               NSMutableDictionary<NSString *, NSArray *> *pendingResolveEndpoints;
+
+// Whether a resolve-coalesce timer is already scheduled.
+@property (nonatomic, assign)               BOOL resolveScheduled;
+
+// Short-lived nw_connection_t objects used to resolve host/port.
+// Keyed by the same service-identity string used in pendingResolveEndpoints.
+@property (nonatomic, strong)               NSMutableDictionary<NSString *, nw_connection_t> *resolvingConnections;
+
+// The resolved client records.
 @property (nonatomic, strong)                   NSMutableArray<F53OSCClientRecord *> *mutableClientRecords;
-
-- (void)setNeedsBeginResolvingNetServices;
-- (void)beginResolvingNetServices;
-
-- (nullable F53OSCClientRecord *)clientRecordForHost:(NSString *)host port:(UInt16)port;
-- (nullable F53OSCClientRecord *)clientRecordForNetService:(NSNetService *)netService;
-
-+ (nullable NSString *)IPAddressFromData:(NSData *)data resolveIPv6Addresses:(BOOL)resolveIPv6Addresses;
 
 @end
 
 
+#pragma mark - F53OSCBrowser implementation
+
 @implementation F53OSCBrowser
 
-- (instancetype)init
+- (instancetype) init
 {
     self = [super init];
     if ( self )
@@ -103,27 +116,32 @@ NS_ASSUME_NONNULL_BEGIN
         self.resolveIPv6Addresses = NO;
         
         self.running = NO;
-        self.netServiceBrowser = nil;
         
-        self.unresolvedNetServices = [NSMutableArray array];
+        self.callbackQueue = dispatch_queue_create( "com.figure53.F53OSCBrowser", DISPATCH_QUEUE_SERIAL );
+
+        self.nwBrowser = nil;
+        self.pendingResolveEndpoints = [NSMutableDictionary dictionary];
+        self.resolveScheduled = NO;
+        self.resolvingConnections = [NSMutableDictionary dictionary];
         self.mutableClientRecords = [NSMutableArray array];
     }
     return self;
 }
 
-- (void)dealloc
+- (void) dealloc
 {
     [self stop];
 }
 
-#pragma mark - custom getters/setters
 
-- (NSArray<F53OSCClientRecord *> *)clientRecords
+#pragma mark - Custom getters/setters
+
+- (NSArray<F53OSCClientRecord *> *) clientRecords
 {
     return self.mutableClientRecords.copy;
 }
 
-- (void)setDomain:(NSString *)domain
+- (void) setDomain:(NSString *)domain
 {
     if ( !domain )
         return;
@@ -141,7 +159,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)setServiceType:(NSString *)serviceType
+- (void) setServiceType:(NSString *)serviceType
 {
     if ( !serviceType )
         return;
@@ -159,7 +177,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)setUseTCP:(BOOL)useTCP
+- (void) setUseTCP:(BOOL)useTCP
 {
     if ( _useTCP != useTCP )
     {
@@ -174,321 +192,578 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-#pragma mark -
 
-- (void)start
+#pragma mark - Start / Stop
+
+- (void) start
 {
-#if DEBUG_BROWSER
+#if F53_OSC_BROWSER_DEBUG
     if ( self.running )
-        NSLog( @"[browser] starting browser - already running" );
+        NSLog( @"[browser] start - already running" );
     else
-        NSLog( @"[browser] starting browser" );
+        NSLog( @"[browser] start" );
 #endif
     
     if ( self.running )
         return;
     
+    if ( self.serviceType.length == 0 )
+    {
+        NSLog( @"[browser] start - serviceType is empty; not starting" );
+        return;
+    }
+
     if ( self.domain.length == 0 )
         return;
-    if ( self.serviceType.length == 0 )
-        return;
     
-    // Create Bonjour browser to find available domains
-    self.netServiceDomainsBrowser = [[NSNetServiceBrowser alloc] init];
-    self.netServiceDomainsBrowser.delegate = self;
+    // Strip the trailing "." from domain if present — nw_browse_descriptor
+    // accepts it either way but the Swift layer normalises it so we follow suit.
+    NSString *browseType   = self.serviceType;
+    NSString *browseDomain = self.domain;
     
-    [self.netServiceDomainsBrowser searchForBrowsableDomains];
+    nw_browse_descriptor_t descriptor = nw_browse_descriptor_create_bonjour_service(
+        [browseType   cStringUsingEncoding:NSUTF8StringEncoding],
+        [browseDomain cStringUsingEncoding:NSUTF8StringEncoding]
+    );
+    nw_parameters_t params = nw_parameters_create();
+    nw_browser_t browser = nw_browser_create( descriptor, params );
 
-    // NOTE: `running` is set to YES once `netServiceBrowserWillSearch:` is notified the `netServiceDomainsBrowser` has started.
+    nw_browser_set_queue( browser, self.callbackQueue );
+
+    __weak typeof(self) weakSelf = self;
+
+    nw_browser_set_state_changed_handler( browser, ^( nw_browser_state_t state, nw_error_t _Nullable error ) {
+        [weakSelf handleBrowserStateChange:state error:error];
+    });
+
+    nw_browser_set_browse_results_changed_handler( browser, ^( nw_browse_result_t _Nullable old_result, nw_browse_result_t _Nullable new_result, bool batch_complete ) {
+        [weakSelf handleBrowseResultChangedFrom:old_result to:new_result batchComplete:batch_complete];
+    });
+
+    self.nwBrowser = browser;
+
+    nw_browser_start( browser );
+
+    // `running` is set to YES in the state-changed handler when nw_browser_state_ready fires,
+    // not here, so `running` reflects actual readiness rather than intent.
 }
 
-- (void)stop
+- (void) stop
 {
-#if DEBUG_BROWSER
-    NSLog( @"[browser] stopping browser" );
+#if F53_OSC_BROWSER_DEBUG
+    NSLog( @"[browser] stop" );
 #endif
 
-    // Update `running` to NO immediately, in case we are starting again very quickly with a new browser.
+    // Set running = NO immediately so that restart-on-property-change is safe.
     self.running = NO;
 
+    // Nil the delegate before tearing down so removal callbacks don't fire.
     self.delegate = nil;
     
-    // Stop bonjour browsers and immediately cleanup
-    [self.netServiceDomainsBrowser stop];
-    self.netServiceDomainsBrowser.delegate = nil;
-    self.netServiceDomainsBrowser = nil;
-
-    [self.netServiceBrowser stop];
-    self.netServiceBrowser.delegate = nil;
-    self.netServiceBrowser = nil;
-
-    // Stop/remove all clients
-    NSArray<F53OSCClientRecord *> *clientRecords = self.mutableClientRecords.copy;
-    for ( F53OSCClientRecord *aClientRecord in clientRecords )
+    // Cancel and release the browser.
+    if ( self.nwBrowser )
     {
-        aClientRecord.netService = nil;
-        
-        [self.mutableClientRecords removeObject:aClientRecord];
-        [self.delegate browser:self didRemoveClientRecord:aClientRecord];
+        nw_browser_cancel( self.nwBrowser );
+        self.nwBrowser = nil;
     }
-}
 
-#pragma mark -
-
-- (void)setNeedsBeginResolvingNetServices
-{
-    // this method may be called many times in rapid succession by an NSNetService delegate callback (e.g. if `moreComing` is YES)
-    // - so we cancel previous perform requests to ensure each service begins resolving only once
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(beginResolvingNetServices) object:nil];
-    [self performSelector:@selector(beginResolvingNetServices) withObject:nil afterDelay:0.5];
-}
-
-- (void)beginResolvingNetServices
-{
-    NSArray<NSNetService *> *netServices = [self.unresolvedNetServices copy];
-    for ( NSNetService *aService in netServices )
+    // Cancel all in-flight resolve connections.
+    NSDictionary *resolving = [self.resolvingConnections copy];
+    for ( NSString *key in resolving )
     {
-        if ( aService.addresses.count )
-            continue;
-        
-        [aService resolveWithTimeout:5.0];
+        nw_connection_cancel( resolving[key] );
     }
+    [self.resolvingConnections removeAllObjects];
+
+    // Clear pending-resolve queue.
+    [self.pendingResolveEndpoints removeAllObjects];
+    self.resolveScheduled = NO;
+
+    // Remove all client records (delegate is already nil, so no callbacks fire).
+    [self.mutableClientRecords removeAllObjects];
 }
 
-#pragma mark - Clients
 
-- (nullable F53OSCClientRecord *)clientRecordForHost:(NSString *)host port:(UInt16)port
-{
-    for ( F53OSCClientRecord *aClientRecord in self.mutableClientRecords )
+#pragma mark - nw_browser state handler
+
+- (void) handleBrowserStateChange:(nw_browser_state_t)state error:(nullable nw_error_t)error
     {
-        if ( aClientRecord.port != port )
-            continue;
-        
-        for ( NSString *aHostAddress in aClientRecord.hostAddresses )
+    // Runs on callbackQueue.
+    switch ( state )
+    {
+        case nw_browser_state_ready:
         {
-            if ( [aHostAddress isEqualToString:host] && aClientRecord.port == port )
-                return aClientRecord;
+#if F53_OSC_BROWSER_DEBUG
+            NSLog( @"[browser] nw_browser state: ready" );
+#endif
+            dispatch_async( dispatch_get_main_queue(), ^{
+                self.running = YES;
+            });
+            break;
+        }
+        
+        case nw_browser_state_failed:
+        {
+            if ( error )
+            {
+                CFStringRef desc = CFCopyDescription( (CFTypeRef)error );
+                NSLog( @"[browser] nw_browser failed: %@", (__bridge NSString *)desc );
+                CFRelease( desc );
+            }
+            dispatch_async( dispatch_get_main_queue(), ^{
+                self.running = NO;
+            });
+            break;
+        }
+
+        case nw_browser_state_cancelled:
+        {
+#if F53_OSC_BROWSER_DEBUG
+            NSLog( @"[browser] nw_browser state: cancelled" );
+#endif
+            dispatch_async( dispatch_get_main_queue(), ^{
+                self.running = NO;
+            });
+            break;
+        }
+
+        case nw_browser_state_waiting:
+        {
+#if F53_OSC_BROWSER_DEBUG
+            NSLog( @"[browser] nw_browser state: waiting" );
+#endif
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+
+#pragma mark - nw_browser results handler
+
+- (void) handleBrowseResultChangedFrom:(nullable nw_browse_result_t)old_result
+                                    to:(nullable nw_browse_result_t)new_result
+                         batchComplete:(BOOL)batchComplete
+{
+    // Runs on callbackQueue.
+
+    if ( old_result == NULL && new_result != NULL )
+    {
+        // Added
+        nw_endpoint_t endpoint = nw_browse_result_copy_endpoint( new_result );
+        if ( endpoint )
+            [self handleAddedEndpoint:endpoint result:new_result];
+}
+    else if ( old_result != NULL && new_result == NULL )
+{
+        // Removed
+        nw_endpoint_t endpoint = nw_browse_result_copy_endpoint( old_result );
+        if ( endpoint )
+            [self handleRemovedEndpoint:endpoint];
+    }
+    else if ( old_result != NULL && new_result != NULL )
+    {
+        // Changed — treat as remove + re-add so we get a fresh resolution.
+        nw_endpoint_t oldEndpoint = nw_browse_result_copy_endpoint( old_result );
+        nw_endpoint_t newEndpoint = nw_browse_result_copy_endpoint( new_result );
+        if ( oldEndpoint )
+            [self handleRemovedEndpoint:oldEndpoint];
+        if ( newEndpoint )
+            [self handleAddedEndpoint:newEndpoint result:new_result];
+    }
+}
+
+// Returns a stable string identity for a Bonjour service endpoint:
+// "name.type.domain." — used as dictionary keys.
+- (nullable NSString *) serviceIdentityForEndpoint:(nw_endpoint_t)endpoint
+{
+    if ( nw_endpoint_get_type( endpoint ) != nw_endpoint_type_bonjour_service )
+        return nil;
+
+    const char *name   = nw_endpoint_get_bonjour_service_name( endpoint );
+    const char *type   = nw_endpoint_get_bonjour_service_type( endpoint );
+    const char *domain = nw_endpoint_get_bonjour_service_domain( endpoint );
+
+    if ( !name || !type || !domain )
+        return nil;
+
+    return [NSString stringWithFormat:@"%s.%s.%s",
+            name, type, domain[0] ? domain : "local."];
+}
+
+- (void) handleAddedEndpoint:(nw_endpoint_t)endpoint result:(nw_browse_result_t)result
+{
+    // Runs on callbackQueue.
+    if ( nw_endpoint_get_type( endpoint ) != nw_endpoint_type_bonjour_service )
+        return;
+
+    NSString *identity = [self serviceIdentityForEndpoint:endpoint];
+    if ( !identity )
+        return;
+
+#if F53_OSC_BROWSER_DEBUG
+    NSLog( @"[browser] added endpoint: %@", identity );
+#endif
+
+    // Extract TXT record from the browse result.
+    NSDictionary<NSString *, NSString *> *txtRecord = nil;
+    nw_txt_record_t txt = nw_browse_result_copy_txt_record_object( result );
+    if ( txt != NULL )
+    {
+        NSMutableDictionary<NSString *, NSString *> *dict = [NSMutableDictionary dictionary];
+        nw_txt_record_apply( txt, ^bool( const char *key, nw_txt_record_find_key_t found, const uint8_t *value, size_t value_len ) {
+            NSString *k = key ? [NSString stringWithUTF8String:key] : nil;
+            if ( !k )
+                return true;
+            NSString *v = @"";
+            if ( found == nw_txt_record_find_key_non_empty_value && value != NULL && value_len > 0 )
+                v = [[NSString alloc] initWithBytes:value length:value_len encoding:NSUTF8StringEncoding] ?: @"";
+            dict[k] = v;
+            return true; // continue iteration
+        });
+        txtRecord = [dict copy];
+    }
+        
+    self.pendingResolveEndpoints[identity] = @[ endpoint, txtRecord ?: [NSNull null] ];
+
+    if ( !self.resolveScheduled )
+        {
+        self.resolveScheduled = YES;
+        dispatch_after( dispatch_time( DISPATCH_TIME_NOW, 500 * NSEC_PER_MSEC ),
+                        self.callbackQueue, ^{
+            [self resolvePendingEndpoints];
+        });
         }
     }
     
-    return nil;
+- (void) handleRemovedEndpoint:(nw_endpoint_t)endpoint
+{
+    // Runs on callbackQueue.
+    if ( nw_endpoint_get_type( endpoint ) != nw_endpoint_type_bonjour_service )
+        return;
+
+    NSString *identity = [self serviceIdentityForEndpoint:endpoint];
+    if ( !identity )
+        return;
+
+#if F53_OSC_BROWSER_DEBUG
+    NSLog( @"[browser] removed endpoint: %@", identity );
+#endif
+
+    // Remove from pending queue if not yet resolved.
+    [self.pendingResolveEndpoints removeObjectForKey:identity];
+
+    // Cancel in-flight resolution if any.
+    nw_connection_t connObj = self.resolvingConnections[identity];
+    if ( connObj )
+    {
+        nw_connection_cancel( connObj );
+        [self.resolvingConnections removeObjectForKey:identity];
 }
 
-- (nullable F53OSCClientRecord *)clientRecordForNetService:(NSNetService *)netService
-{
-    for ( F53OSCClientRecord *aClientRecord in self.mutableClientRecords )
-    {
-        if ( [aClientRecord.netService isEqual:netService] )
-            return aClientRecord;
+    // Find and remove the client record, then notify the delegate on main.
+    // We need to find the record by service name/type/domain.
+    const char *nameCStr   = nw_endpoint_get_bonjour_service_name( endpoint );
+    const char *typeCStr   = nw_endpoint_get_bonjour_service_type( endpoint );
+    const char *domainCStr = nw_endpoint_get_bonjour_service_domain( endpoint );
+
+    NSString *name   = nameCStr   ? @(nameCStr)   : nil;
+    NSString *type   = typeCStr   ? @(typeCStr)   : nil;
+    NSString *domain = domainCStr ? @(domainCStr) : nil;
+
+    if ( !name || !type )
+        return;
+
+    dispatch_async( dispatch_get_main_queue(), ^{
+        F53OSCClientRecord *record = [self clientRecordForServiceName:name type:type domain:domain];
+        if ( !record )
+            return;
+
+        [self.mutableClientRecords removeObject:record];
+        [self.delegate browser:self didRemoveClientRecord:record];
+    });
     }
     
-    return nil;
+
+#pragma mark - Resolve coalescing
+
+- (void) resolvePendingEndpoints
+{
+    // Runs on callbackQueue.
+    self.resolveScheduled = NO;
+
+    NSDictionary<NSString *, NSArray *> *toResolve = [self.pendingResolveEndpoints copy];
+    [self.pendingResolveEndpoints removeAllObjects];
+
+#if F53_OSC_BROWSER_DEBUG
+    NSLog( @"[browser] resolving %lu pending endpoint(s)", (unsigned long)toResolve.count );
+#endif
+    
+    for ( NSString *identity in toResolve )
+{
+        NSArray *pair = toResolve[identity];
+        nw_endpoint_t endpoint = pair[0];
+        NSDictionary<NSString *, NSString *> *txtRecord = [pair[1] isKindOfClass:[NSDictionary class]] ? pair[1] : nil;
+        [self resolveEndpoint:endpoint identity:identity txtRecord:txtRecord];
+    }
 }
 
-#pragma mark - NSNetServiceBrowserDelegate
 
-- (void)netServiceBrowserWillSearch:(NSNetServiceBrowser *)browser
+#pragma mark - Resolve via nw_connection
+
+- (void) resolveEndpoint:(nw_endpoint_t)endpoint
+                identity:(NSString *)identity
+               txtRecord:(nullable NSDictionary<NSString *, NSString *> *)txtRecord
 {
-#if DEBUG_BROWSER
-    if ( browser == self.netServiceDomainsBrowser )
-        NSLog( @"[browser] starting bonjour - browsable domains search" );
-    else if ( browser == self.netServiceBrowser )
-        NSLog( @"[browser] starting bonjour browser - \"%@\"", self.domain );
+    // Runs on callbackQueue.
+
+    // Build parameters matching useTCP; disable any heavyweight protocol framing
+    // since we only want the connection to reach .ready to extract the remote address.
+    nw_parameters_t resolveParams;
+    if ( self.useTCP )
+    {
+        resolveParams = nw_parameters_create_secure_tcp(
+            NW_PARAMETERS_DISABLE_PROTOCOL,   // no TLS
+            NW_PARAMETERS_DEFAULT_CONFIGURATION
+        );
+    }
     else
-        NSLog( @"[browser] netServiceBrowserWillSearch: %@", browser );
-#endif
-    
-    if ( browser == self.netServiceDomainsBrowser )
-        self.running = YES;
-}
-
-- (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)browser
-{
-#if DEBUG_BROWSER
-    if ( browser == self.netServiceDomainsBrowser )
-        NSLog( @"[browser] stopping bonjour - browsable domains search" );
-    else if ( browser == self.netServiceBrowser )
-        NSLog( @"[browser] stopping bonjour (TCP) - \"%@\"", self.domain );
-    else
-        NSLog( @"[browser] netServiceBrowserDidStopSearch: %@", browser );
-#endif
-    
-    if ( browser == self.netServiceDomainsBrowser )
     {
-        self.running = NO;
-        
-        self.netServiceDomainsBrowser.delegate = nil;
-        self.netServiceDomainsBrowser = nil;
+        resolveParams = nw_parameters_create_secure_udp(
+            NW_PARAMETERS_DISABLE_PROTOCOL,   // no DTLS
+            NW_PARAMETERS_DEFAULT_CONFIGURATION
+        );
     }
-    else if ( browser == self.netServiceBrowser )
+
+    if ( !self.resolveIPv6Addresses )
     {
-        self.netServiceBrowser.delegate = nil;
-        self.netServiceBrowser = nil;
+        // Constrain to IPv4 via nw_ip_options_set_version so Network.framework
+        // only resolves and uses IPv4 addresses for this connection.
+        nw_protocol_stack_t stack = nw_parameters_copy_default_protocol_stack( resolveParams );
+        nw_protocol_options_t ip_options = nw_protocol_stack_copy_internet_protocol( stack );
+        nw_ip_options_set_version( ip_options, nw_ip_version_4 );
     }
-}
+    // when resolveIPv6Addresses == YES, leave the default (dual-stack)
 
-- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didNotSearch:(NSDictionary<NSString *, NSNumber *> *)errorDict
-{
-#if DEBUG_BROWSER
-    NSLog( @"[browser] netServiceBrowser:didNotSearch:" );
-    for ( NSString *aError in errorDict )
+    nw_connection_t conn = nw_connection_create( endpoint, resolveParams );
+
+    if ( !conn )
     {
-        NSLog( @"[browser] search error %@: %@, ", (NSNumber *)errorDict[aError], aError );
-    }
-#endif
-}
-
-- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didFindDomain:(NSString *)domainString moreComing:(BOOL)moreComing
-{
-#if DEBUG_BROWSER
-    NSLog( @"[browser] netServiceBrowser:didFindDomain: \"%@\" moreComing: %@", domainString, ( moreComing ? @"YES" : @"NO" ) );
-#endif
-    
-    if ( !self.netServiceBrowser && [domainString isEqualToString:self.domain] )
-    {
-        self.netServiceBrowser = [[NSNetServiceBrowser alloc] init];
-        self.netServiceBrowser.delegate = self;
-        
-        [self.netServiceBrowser searchForServicesOfType:self.serviceType inDomain:self.domain];
-    }
-}
-
-- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindService:(NSNetService *)netService moreComing:(BOOL)moreComing
-{
-#if DEBUG_BROWSER
-    NSLog( @"[browser] netServiceBrowser:didFindService: \"%@\" moreComing: %@", netService, ( moreComing ? @"YES" : @"NO" ) );
-#endif
-    
-    netService.delegate = self;
-    [self.unresolvedNetServices addObject:netService];
-    
-    // this may be called many times, especially when `moreComing` is YES
-    // - so we coalesce delegate callbacks using our "setNeedsNotify..." method
-    [self setNeedsBeginResolvingNetServices];
-}
-
-- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didRemoveService:(NSNetService *)netService moreComing:(BOOL)moreComing
-{
-#if DEBUG_BROWSER
-    NSLog( @"[browser] netServiceBrowser:didRemoveService: %@ moreComing: %@", netService, ( moreComing ? @"YES" : @"NO" ) );
-#endif
-    
-    F53OSCClientRecord *clientRecord = [self clientRecordForNetService:netService];
-    if ( !clientRecord )
+        NSLog( @"[browser] failed to create nw_connection for %@", identity );
         return;
-    
-    [self.mutableClientRecords removeObject:clientRecord];
-    [self.delegate browser:self didRemoveClientRecord:clientRecord];
-}
-
-#pragma mark - NSNetServiceDelegate
-
-- (void)netServiceDidResolveAddress:(NSNetService *)netService
-{
-#if DEBUG_BROWSER
-    NSLog( @"[browser] netServiceDidResolveAddress: %@", netService );
-#endif
-#if !RELEASE
-    NSAssert( [NSThread isMainThread], @"[browser] netServiceDidResolveAddress: is not thread-safe and expects to be called on the main thread." );
-#endif
-    
-    // Allow delegate to deny connecting to this service
-    if ( [self.delegate respondsToSelector:@selector(browser:shouldAcceptNetService:)] &&
-        [self.delegate browser:self shouldAcceptNetService:netService] == NO )
-        return;
-    
-    NSInteger port = netService.port;
-    if ( port < 0 ) // -1 = not resolved
-        return;
-    
-    NSMutableArray<NSString *> *hostAddresses = [NSMutableArray arrayWithCapacity:netService.addresses.count];
-    for ( NSData *aAddress in netService.addresses )
-    {
-        NSString *host = [F53OSCBrowser IPAddressFromData:aAddress resolveIPv6Addresses:self.resolveIPv6Addresses];
-        if ( host )
-            [hostAddresses addObject:host];
     }
-    if ( !hostAddresses.count )
-        return;
-    
-    F53OSCClientRecord *clientRecord = [F53OSCClientRecord new];
-    clientRecord.port = port;
-    clientRecord.useTCP = self.useTCP;
-    clientRecord.hostAddresses = hostAddresses.copy;
-    clientRecord.netService = netService;
-    
-    // Once resolved, we can remove the net service from our local records.
-    // (The client record will still hold on to it, though.)
-    netService.delegate = nil;
-    [self.unresolvedNetServices removeObject:netService];
-    
-#if DEBUG_BROWSER
-    NSLog( @"[browser] adding client: %@", client );
+
+    self.resolvingConnections[identity] = conn;
+
+    // Snapshot the endpoint C strings before entering the block.
+    const char *nameCStr   = nw_endpoint_get_bonjour_service_name( endpoint );
+    const char *typeCStr   = nw_endpoint_get_bonjour_service_type( endpoint );
+    const char *domainCStr = nw_endpoint_get_bonjour_service_domain( endpoint );
+
+    NSString *serviceName   = nameCStr   ? @(nameCStr)   : @"";
+    NSString *serviceType   = typeCStr   ? @(typeCStr)   : @"";
+    NSString *serviceDomain = domainCStr ? @(domainCStr) : @"local.";
+
+    __weak typeof(self) weakSelf = self;
+
+    // 5-second watchdog: cancel the resolve connection if it hasn't completed.
+    __block BOOL completed = NO;
+    dispatch_after( dispatch_time( DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC ), self.callbackQueue, ^{
+        if ( completed )
+            return;
+        typeof(self) strongSelf = weakSelf;
+        if ( !strongSelf )
+            return;
+#if F53_OSC_BROWSER_DEBUG
+        NSLog( @"[browser] resolve timeout for endpoint %s", nw_endpoint_get_hostname( endpoint ) );
 #endif
-    
-    [self.mutableClientRecords addObject:clientRecord];
-    [self.delegate browser:self didAddClientRecord:clientRecord];
+        nw_connection_cancel( conn );
+    });
+
+    nw_connection_set_queue( conn, self.callbackQueue );
+    nw_connection_set_state_changed_handler( conn, ^( nw_connection_state_t state, nw_error_t _Nullable error ) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if ( !strongSelf )
+            return;
+
+        if ( state == nw_connection_state_ready )
+        {
+            completed = YES;
+
+            nw_path_t path = nw_connection_copy_current_path( conn );
+            if ( path )
+            {
+                nw_endpoint_t remote = nw_path_copy_effective_remote_endpoint( path );
+                if ( remote )
+                {
+                    const char *hostname = nw_endpoint_get_hostname( remote );
+                    uint16_t port        = nw_endpoint_get_port( remote );
+
+                    NSString *host = hostname ? @(hostname) : nil;
+
+#if F53_OSC_BROWSER_DEBUG
+                    NSLog( @"[browser] resolved %@ → %@:%u", identity, host ?: @"(nil)", port );
+#endif
+
+                    if ( host && port > 0 )
+                    {
+                        // belt-and-suspenders: discard IPv6 if resolveIPv6Addresses is NO
+                        // (nw_ip_version_4 constraint above should already prevent this).
+                        BOOL isIPv6 = [host containsString:@":"];
+                        if ( isIPv6 && !strongSelf.resolveIPv6Addresses )
+                        {
+#if F53_OSC_BROWSER_DEBUG
+                            NSLog( @"[browser] discarding IPv6 address for %@ (resolveIPv6Addresses=NO)", identity );
+#endif
+}
+                        else
+                        {
+                            NSArray<NSString *> *hostAddresses = @[host];
+                            F53OSCServiceRef *serviceRef = [[F53OSCServiceRef alloc]
+                                initWithName:serviceName
+                                        type:serviceType
+                                      domain:serviceDomain
+                                        host:host
+                                        port:port
+                               hostAddresses:hostAddresses
+                                   txtRecord:txtRecord];
+
+                            // Deliver on main thread.
+                            dispatch_async( dispatch_get_main_queue(), ^{
+                                [strongSelf _addDiscoveredService:serviceRef];
+                            });
+    }
 }
 
-- (void)netService:(NSNetService *)netService didNotResolve:(NSDictionary<NSString *, NSNumber *> *)error
+                }
+            }
+
+            nw_connection_cancel( conn );
+        }
+        else if ( state == nw_connection_state_failed )
 {
-#if !RELEASE
-    NSAssert( [NSThread isMainThread], @"[browser] netService:didNotResolve: is not thread-safe and expects to be called on the main thread." );
+            completed = YES;
+#if F53_OSC_BROWSER_DEBUG
+            if ( error )
+            {
+                CFStringRef desc = CFCopyDescription( (CFTypeRef)error );
+                NSLog( @"[browser] resolve connection failed for %@: %@", identity, (__bridge NSString *)desc );
+                CFRelease( desc );
+            }
 #endif
-    
-    [netService stop];
-    netService.delegate = nil;
-    [self.unresolvedNetServices removeObject:netService];
-    
-    NSLog( @"[browser] Error: Failed to resolve service: %@ - %@", netService, error );
+            // Remove our retained reference; nw_connection_cancel is not
+            // needed — the connection is already failed.
+            [strongSelf.resolvingConnections removeObjectForKey:identity];
+        }
+        else if ( state == nw_connection_state_cancelled )
+        {
+            completed = YES;
+            // Remove our retained reference.
+            [strongSelf.resolvingConnections removeObjectForKey:identity];
+        }
+    });
+
+    nw_connection_start( conn );
 }
 
-#pragma mark - Utility
 
-+ (nullable NSString *)IPAddressFromData:(NSData *)data resolveIPv6Addresses:(BOOL)resolveIPv6Addresses
+#pragma mark - F53OSCBrowser (Internal) — testability seams
+
+- (void) _addDiscoveredService:(F53OSCServiceRef *)service
 {
-    typedef union {
-        struct sockaddr sa;
-        struct sockaddr_in ipv4;
-        struct sockaddr_in6 ipv6;
-    } ip_socket_address;
-    
-    ip_socket_address *socketAddress = (ip_socket_address *)data.bytes;
-    
-    if ( socketAddress && AF_INET == socketAddress->sa.sa_family )
+    // Must be called on the main thread (or internally dispatches to main).
+
+    // check delegate filter
+    BOOL accepted = YES;
+    if ( [self.delegate respondsToSelector:@selector(browser:shouldAcceptService:)] )
+        accepted = [self.delegate browser:self shouldAcceptService:service];
+
+    if ( !accepted )
     {
-        char buffer[INET_ADDRSTRLEN];
-        memset( buffer, 0, INET_ADDRSTRLEN );
-        
-        const char *formatted = inet_ntop( AF_INET,
-                                          (void *)&(socketAddress->ipv4.sin_addr),
-                                          buffer,
-                                          (socklen_t)sizeof( buffer ) );
-        if ( formatted == NULL )
+#if F53_OSC_BROWSER_DEBUG
+        NSLog( @"[browser] delegate rejected service: %@", service.name );
+#endif
+        return;
+    }
+
+    // check for duplicate (can happen if a service is re-resolved)
+    F53OSCClientRecord *existing = [self clientRecordForServiceName:service.name
+                                                               type:service.type
+                                                             domain:service.domain];
+    if ( existing )
+    {
+        // update in place rather than adding a duplicate
+        existing.port = service.port;
+        existing.hostAddresses = service.hostAddresses;
+        existing.service = service;
+        return;
+    }
+
+    F53OSCClientRecord *record = [F53OSCClientRecord new];
+    record.port = service.port;
+    record.useTCP = self.useTCP;
+    record.hostAddresses = service.hostAddresses;
+    record.service = service;
+
+#if F53_OSC_BROWSER_DEBUG
+    NSLog( @"[browser] adding client record: %@ → %@:%u",
+           service.name, service.host, service.port );
+#endif
+    
+    [self.mutableClientRecords addObject:record];
+    [self.delegate browser:self didAddClientRecord:record];
+}
+
+- (void) _removeDiscoveredService:(F53OSCServiceRef *)service
+{
+    F53OSCClientRecord *record = [self clientRecordForServiceName:service.name
+                                                             type:service.type
+                                                           domain:service.domain];
+    if ( !record )
+        return;
+
+#if F53_OSC_BROWSER_DEBUG
+    NSLog( @"[browser] removing client record: %@", service.name );
+#endif
+    
+    [self.mutableClientRecords removeObject:record];
+    [self.delegate browser:self didRemoveClientRecord:record];
+}
+
+
+#pragma mark - Private helpers
+
+- (nullable F53OSCClientRecord *) clientRecordForServiceName:(NSString *)name
+                                                        type:(nullable NSString *)type
+                                                      domain:(nullable NSString *)domain
+{
+    for ( F53OSCClientRecord *record in self.mutableClientRecords )
+    {
+        F53OSCServiceRef *svc = record.service;
+        if ( !svc )
+            continue;
+    
+        if ( ![svc.name isEqualToString:name] )
+            continue;
+        if ( type && ![svc.type isEqualToString:type] )
+            continue;
+        // domain comparison is lenient — ignore trailing dot differences.
+        if ( domain )
+    {
+            NSString *a = [svc.domain hasSuffix:@"."] ? svc.domain : [svc.domain stringByAppendingString:@"."];
+            NSString *b = [domain    hasSuffix:@"."] ? domain    : [domain    stringByAppendingString:@"."];
+            if ( ![a isEqualToString:b] )
+                continue;
+}
+
+        return record;
+}
             return nil;
-        
-        return [NSString stringWithCString:formatted encoding:NSASCIIStringEncoding];
-    }
-    else if ( resolveIPv6Addresses && socketAddress && AF_INET6 == socketAddress->sa.sa_family )
-    {
-        char buffer[INET6_ADDRSTRLEN];
-        memset( buffer, 0, INET6_ADDRSTRLEN );
-        
-        const char *formatted = inet_ntop( AF_INET6,
-                                          (void *)&(socketAddress->ipv6.sin6_addr),
-                                          buffer,
-                                          (socklen_t)sizeof( buffer ) );
-        if ( formatted == NULL )
-            return nil;
-        
-        return [NSString stringWithCString:formatted encoding:NSASCIIStringEncoding];
-    }
-    else
-    {
-        return nil;
-    }
 }
 
 @end
+
 
 NS_ASSUME_NONNULL_END

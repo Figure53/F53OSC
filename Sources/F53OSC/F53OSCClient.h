@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #define F53_OSC_CLIENT_DEBUG 0
 
-@interface F53OSCClient : NSObject <NSSecureCoding, GCDAsyncSocketDelegate, GCDAsyncUdpSocketDelegate, F53OSCControlHandler>
+@interface F53OSCClient : NSObject <NSSecureCoding, F53OSCSocketDelegate, F53OSCControlHandler>
 
 @property (nonatomic, weak)                     id<F53OSCClientDelegate> delegate;
 @property (nonatomic, strong, null_resettable)  dispatch_queue_t socketDelegateQueue; // defaults to main queue
@@ -53,8 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign)                   UInt16 port;        // default 53000
 @property (nonatomic, getter=isIPv6Enabled)     BOOL IPv6Enabled;   // default NO
 @property (nonatomic, assign)                   BOOL useTcp;        // default NO
-@property (nonatomic, assign)                   NSTimeInterval tcpTimeout; // default -1 (no timeout)
-@property (nonatomic, assign)                   NSUInteger readChunkSize;  // default 0 (no partial reads)
+@property (nonatomic, assign)                   NSTimeInterval tcpTimeout;     // default -1 (no timeout)
+@property (nonatomic, assign)                   NSTimeInterval connectTimeout; // default 30s, 0 disables
 @property (nonatomic, strong, nullable)         id userData;
 @property (nonatomic, copy)                     NSDictionary<NSString *, id> *state;
 @property (nonatomic, readonly)                 NSString *title;

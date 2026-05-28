@@ -81,8 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCPacket *packet = [[F53OSCPacket alloc] init];
 
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:nil];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    F53OSCSocket *replySocket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:nil];
     packet.replySocket = replySocket;
     XCTAssertEqualObjects(packet.replySocket, replySocket, @"Packet replySocket should be %@", replySocket);
 
@@ -93,8 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testThat_packetCanBeCopied
 {
     F53OSCPacket *original = [[F53OSCPacket alloc] init];
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:nil];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    F53OSCSocket *replySocket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:nil];
     original.replySocket = replySocket;
 
     F53OSCPacket *copy = [original copy];

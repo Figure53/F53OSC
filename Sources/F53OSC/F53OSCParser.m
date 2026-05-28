@@ -369,6 +369,10 @@ NS_ASSUME_NONNULL_BEGIN
             controlHandler:(nullable id<F53OSCControlHandler>)controlHandler
 {
     // Incoming OSC messages are framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
+    // Hard cap on frame size guards against a misbehaving peer streaming non-END bytes forever.
+    // 16 MB matches Swift's SLIPDecoder default. Overflow resets the accumulator and continues
+    // scanning, so the next valid END boundary recovers cleanly.
+    static const NSUInteger kF53OSCSlipMaxFrameBytes = 16 * 1024 * 1024;
     
     F53OSCSocket *socket = [state objectForKey:@"socket"];
     if ( socket == nil )
@@ -377,56 +381,137 @@ NS_ASSUME_NONNULL_BEGIN
         return;
     }
     
-    BOOL dangling_ESC = [[state objectForKey:@"dangling_ESC"] boolValue];
-    
-    Byte end[1] = {END};
-    Byte esc[1] = {ESC};
-    
     NSUInteger length = [slipData length];
     const Byte *buffer = [slipData bytes];
-    for ( NSUInteger index = 0; index < length; index++ )
+    NSUInteger i = 0;
+    BOOL danglingESC = [[state objectForKey:@"dangling_ESC"] boolValue];
+
+    // Early guard: if a prior chunk has already pushed `data` past the cap, discard it now.
+    if ( data.length > kF53OSCSlipMaxFrameBytes )
     {
-        if ( dangling_ESC )
+        NSLog( @"Error: F53OSCParser SLIP frame exceeded %lu bytes; discarding accumulator.",
+               (unsigned long)kF53OSCSlipMaxFrameBytes );
+        [data setData:[NSData data]];
+    }
+
+    // 1. If we had a dangling ESC from the prior chunk, consume the first byte specially.
+    if ( danglingESC && length > 0 )
         {
-            dangling_ESC = NO;
+        Byte b = buffer[0];
+        Byte out;
+        if ( b == ESC_END )
+            out = END;
+        else if ( b == ESC_ESC )
+            out = ESC;
+        else // protocol violation. pass the byte along and hope for the best.
+            out = b;
+        [data appendBytes:&out length:1];
+        danglingESC = NO;
             [state setObject:@NO forKey:@"dangling_ESC"];
-            if ( buffer[index] == ESC_END )
-                [data appendBytes:end length:1];
-            else if ( buffer[index] == ESC_ESC )
-                [data appendBytes:esc length:1];
-            else // Protocol violation. Pass the byte along and hope for the best.
-                [data appendBytes:&(buffer[index]) length:1];
+        i = 1;
         }
-        else if ( buffer[index] == END )
+
+    // 2. Scan the rest, finding runs of ordinary bytes between END/ESC.
+    NSUInteger runStart = i;
+    while ( i < length )
         {
-            // The data is now a complete message.
-            //NSLog( @"socket %p dispatching OSC data of length %lu", sock, [data length] );
+        Byte b = buffer[i];
+        if ( b == END )
+        {
+            // emit the run, then dispatch the completed message.
+            if ( i > runStart )
+                [data appendBytes:(buffer + runStart) length:(i - runStart)];
+            //NSLog( @"socket %p dispatching OSC data of length %lu", socket, [data length] );
             [F53OSCParser processOscData:[NSData dataWithData:data] forDestination:destination replyToSocket:socket controlHandler:controlHandler wasEncrypted:NO];
             [data setData:[NSData data]];
+            i++;
+            runStart = i;
         }
-        else if ( buffer[index] == ESC )
+        else if ( b == ESC )
         {
-            if ( index + 1 < length )
+            // emit the run, then handle the escape sequence.
+            if ( i > runStart )
+                [data appendBytes:(buffer + runStart) length:(i - runStart)];
+            if ( i + 1 < length )
             {
-                index++;
-                if ( buffer[index] == ESC_END )
-                    [data appendBytes:end length:1];
-                else if ( buffer[index] == ESC_ESC )
-                    [data appendBytes:esc length:1];
-                else // Protocol violation. Pass the byte along and hope for the best.
-                    [data appendBytes:&(buffer[index]) length:1];
+                Byte next = buffer[i + 1];
+                Byte out;
+                if ( next == ESC_END )
+                    out = END;
+                else if ( next == ESC_ESC )
+                    out = ESC;
+                else // protocol violation. pass the byte along and hope for the best.
+                    out = next;
+                [data appendBytes:&out length:1];
+                i += 2;
+                runStart = i;
             }
             else
             {
-                // The incoming raw data stopped in the middle of an escape sequence.
+                // ESC at chunk boundary — set dangling state and exit.
                 [state setObject:@YES forKey:@"dangling_ESC"];
+                i++;
+                runStart = i;
+                break;
             }
         }
         else
         {
-            [data appendBytes:&(buffer[index]) length:1];
+            i++;
         }
     }
+
+    // 3. Emit any trailing run of ordinary bytes (capped).
+    if ( runStart < length )
+    {
+        NSUInteger runLen = length - runStart;
+        NSUInteger room = ( data.length < kF53OSCSlipMaxFrameBytes
+                            ? kF53OSCSlipMaxFrameBytes - data.length : 0 );
+        if ( runLen > room )
+        {
+            NSLog( @"Error: F53OSCParser SLIP frame would exceed %lu bytes; discarding accumulator.",
+                   (unsigned long)kF53OSCSlipMaxFrameBytes );
+            [data setData:[NSData data]];
+        }
+        else
+        {
+            [data appendBytes:(buffer + runStart) length:runLen];
+        }
+    }
+}
+
++ (NSData *) slipFrameData:(NSData *)data
+{
+    // double-END SLIP framing: RFC 1055. Scan-for-runs: emit ordinary byte runs in
+    // one appendBytes:length:, branch only on END/ESC.
+    NSUInteger length  = data.length;
+    const Byte *buffer = data.bytes;
+
+    NSMutableData *slipData = [NSMutableData dataWithCapacity:length + 2 + (length / 16)];
+
+    Byte end[1]     = { END };
+    Byte esc_end[2] = { ESC, ESC_END };
+    Byte esc_esc[2] = { ESC, ESC_ESC };
+
+    [slipData appendBytes:end length:1]; // leading END
+
+    NSUInteger runStart = 0;
+    for ( NSUInteger i = 0; i < length; i++ )
+    {
+        Byte b = buffer[i];
+        if ( b == END || b == ESC )
+        {
+            if ( i > runStart )
+                [slipData appendBytes:(buffer + runStart) length:(i - runStart)];
+            [slipData appendBytes:(b == END ? esc_end : esc_esc) length:2];
+            runStart = i + 1;
+        }
+    }
+    if ( runStart < length )
+        [slipData appendBytes:(buffer + runStart) length:(length - runStart)];
+
+    [slipData appendBytes:end length:1]; // trailing END
+    return slipData;
 }
 
 @end

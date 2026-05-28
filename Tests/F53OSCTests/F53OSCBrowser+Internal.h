@@ -1,9 +1,9 @@
 //
-//  F53OSCParser.h
-//  F53OSC
+//  F53OSCBrowser+Internal.h
+//  F53OSC Tests
 //
-//  Created by Christopher Ashworth on 1/30/13.
-//  Copyright (c) 2013-2025 Figure 53 LLC, https://figure53.com
+//  Created by Christopher Cahoon on 5/23/26.
+//  Copyright (c) 2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,29 +24,30 @@
 //  THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
+//  Internal category exposing seam methods for testing. Tests call
+//  _addDiscoveredService: / _removeDiscoveredService: directly with synthetic
+//  F53OSCServiceRef inputs. Production callers are inside F53OSCBrowser.m.
 
-@class F53OSCMessage;
-@class F53OSCSocket;
-@protocol F53OSCPacketDestination;
-@protocol F53OSCControlHandler;
-
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSCBrowser.h>
+#import <F53OSC/F53OSCServiceRef.h>
+#else
+#import "F53OSCBrowser.h"
+#import "F53OSCServiceRef.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface F53OSCParser : NSObject
+@interface F53OSCBrowser (Internal)
 
-+ (nullable F53OSCMessage *) parseOscMessageData:(NSData *)data;
+// Filters the service through the delegate and, if accepted, adds an F53OSCClientRecord
+// to clientRecords and calls `browser:didAddClientRecord:`.
+// Must be on the main thread (or dispatches there internally). Tests may call directly.
+- (void) _addDiscoveredService:(F53OSCServiceRef *)service;
 
-+ (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket controlHandler:(nullable id<F53OSCControlHandler>)controlHandler wasEncrypted:(BOOL)wasEncrypted;
-
-+ (void) translateSlipData:(NSData *)slipData toData:(NSMutableData *)data withState:(NSMutableDictionary<NSString *, id> *)state destination:(id<F53OSCPacketDestination>)destination
-    controlHandler:(nullable id<F53OSCControlHandler>)controlHandler;
-
-// Frame an arbitrary payload as a double-END SLIP packet. Pure transformation, no
-// network. Exposed for benchmarks and integration tests. Production also uses this
-// via F53OSCSocket -sendPacket:.
-+ (NSData *) slipFrameData:(NSData *)data;
+// Removes the F53OSCClientRecord for the given service and calls `browser:didRemoveClientRecord:`.
+// Must be on the main thread (or dispatches there internally). Tests may call directly.
+- (void) _removeDiscoveredService:(F53OSCServiceRef *)service;
 
 @end
 

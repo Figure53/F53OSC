@@ -31,11 +31,14 @@
 #import <XCTest/XCTest.h>
 
 #import "F53OSCServer.h"
+#import "F53OSCSocket+Internal.h"
 
 #if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSC-Swift.h>
 #elif __has_include("F53OSC-Swift.h")
 #import "F53OSC-Swift.h"
+#elif SWIFT_PACKAGE
+@import F53OSCEncrypt;
 #endif
 
 
@@ -210,8 +213,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:encrypter];
 
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:nil];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    F53OSCSocket *replySocket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:nil];
 
     F53OSCMessage *message;
 
@@ -1587,119 +1589,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 
-#pragma mark - Socket delegate tests
-
-- (void)testThat_serverHandlesSocketDelegateMethods
-{
-    F53OSCServer *server = [[F53OSCServer alloc] init];
-    server.port = PORT_BASE + 20;
-
-    GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    XCTAssertNoThrow([server socket:tcpSocket didConnectToHost:@"localhost" port:9500], @"Should handle didConnectToHost gracefully");
-    XCTAssertNoThrow([server socket:tcpSocket didReadPartialDataOfLength:100 tag:0], @"Should handle didReadPartialDataOfLength gracefully");
-    XCTAssertNoThrow([server socket:tcpSocket didWriteDataWithTag:0], @"Should handle didWriteDataWithTag gracefully");
-    XCTAssertNoThrow([server socket:tcpSocket didWritePartialDataOfLength:50 tag:0], @"Should handle didWritePartialDataOfLength gracefully");
-
-    // Test timeout methods
-    BOOL shouldTimeoutRead = [server socket:tcpSocket shouldTimeoutReadWithTag:0 elapsed:5.0 bytesDone:100];
-    XCTAssertFalse(shouldTimeoutRead, @"Should not timeout read operations by default");
-
-    BOOL shouldTimeoutWrite = [server socket:tcpSocket shouldTimeoutWriteWithTag:0 elapsed:5.0 bytesDone:50];
-    XCTAssertFalse(shouldTimeoutWrite, @"Should not timeout write operations by default");
-
-    XCTAssertNoThrow([server socketDidCloseReadStream:tcpSocket], @"Should handle socketDidCloseReadStream gracefully");
-
-    XCTAssertNoThrow([server socketDidSecure:tcpSocket], @"Should handle socketDidSecure gracefully");
-
-    // Test UDP socket delegate methods
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    addr.sin_port = htons(9500);
-    NSData *addressData = [NSData dataWithBytes:&addr length:sizeof(addr)];
-
-    XCTAssertNoThrow([server udpSocket:udpSocket didConnectToAddress:addressData], @"Should handle UDP didConnectToAddress gracefully");
-
-    NSError *mockError = [NSError errorWithDomain:@"TestErrorDomain" code:100 userInfo:@{NSLocalizedDescriptionKey: @"Test error"}];
-    XCTAssertNoThrow([server udpSocket:udpSocket didNotConnect:mockError], @"Should handle UDP didNotConnect gracefully");
-
-    XCTAssertNoThrow([server udpSocket:udpSocket didSendDataWithTag:0], @"Should handle UDP didSendDataWithTag gracefully");
-
-    XCTAssertNoThrow([server udpSocket:udpSocket didNotSendDataWithTag:0 dueToError:mockError], @"Should handle UDP didNotSendDataWithTag gracefully");
-}
-
-- (void)testThat_serverHandlesSocketAcceptance
-{
-    F53OSCServer *server = [[F53OSCServer alloc] init];
-    server.port = PORT_BASE + 30;
-
-    [self addTeardownBlock:^{
-        [server stopListening];
-    }];
-
-    // Start listening to initialize socket infrastructure
-    NSError *error = nil;
-    BOOL started = [server startListening:&error];
-    XCTAssertTrue(started, @"Server should start listening on custom port");
-    XCTAssertNil(error, @"Server should start listening without error");
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-    GCDAsyncSocket *newSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    XCTAssertNoThrow([server socket:socket didAcceptNewSocket:newSocket], @"Should handle socket acceptance gracefully");
-}
-
-- (void)testThat_serverHandlesSocketDisconnect
-{
-    F53OSCServer *server = [[F53OSCServer alloc] init];
-    server.port = PORT_BASE + 40;
-
-    [self addTeardownBlock:^{
-        [server stopListening];
-    }];
-
-    // Start listening to initialize socket infrastructure
-    NSError *error = nil;
-    BOOL started = [server startListening:&error];
-    XCTAssertTrue(started, @"Server should start listening");
-    XCTAssertNil(error, @"Server should start listening without error");
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Test disconnection without error
-    XCTAssertNoThrow([server socketDidDisconnect:socket withError:nil], @"Should handle disconnection without error gracefully");
-
-    // Test disconnection with error
-    NSError *disconnectError = [NSError errorWithDomain:@"TestErrorDomain" code:200 userInfo:@{NSLocalizedDescriptionKey: @"Test disconnect error"}];
-    XCTAssertNoThrow([server socketDidDisconnect:socket withError:disconnectError], @"Should handle disconnection with error gracefully");
-}
-
-- (void)testThat_serverNewSocketQueueMethod
-{
-    F53OSCServer *server = [[F53OSCServer alloc] init];
-
-    GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Create an address
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    addr.sin_port = htons(9503);
-    NSData *addressData = [NSData dataWithBytes:&addr length:sizeof(addr)];
-
-    // Test new socket queue method
-    dispatch_queue_t resultQueue = [server newSocketQueueForConnectionFromAddress:addressData onSocket:tcpSocket];
-
-    XCTAssertNotNil(resultQueue, @"Should return a dispatch queue");
-    // The method should return the server's delegate queue
-    XCTAssertEqual(resultQueue, server.queue, @"Should return the server's delegate queue");
-}
-
-
 #pragma mark - Encryption rejection tests
 
 - (void)testThat_serverRejectsMessageEncryptedWithDifferentKeyPair
@@ -1792,8 +1681,8 @@ NS_ASSUME_NONNULL_BEGIN
     }
     [slipData appendBytes:&slipEnd length:1];
 
-    // Inject the other-encrypted data directly onto the TCP socket.
-    [client.socket.tcpSocket writeData:slipData withTimeout:-1 tag:slipData.length];
+    // Inject the other-encrypted data directly via the test-only raw-bytes path.
+    [client.socket sendRawBytes:slipData];
 
     // The server should silently drop the message because decryption fails.
     XCTestExpectation *encryptedMessageExpectation = [[XCTestExpectation alloc] initWithDescription:@"Other encrypted message received"];
@@ -1896,8 +1785,8 @@ NS_ASSUME_NONNULL_BEGIN
     }
     [slipData appendBytes:&slipEnd length:1];
 
-    // Inject the other-encrypted data directly onto the TCP socket.
-    [client.socket.tcpSocket writeData:slipData withTimeout:-1 tag:slipData.length];
+    // Inject the other-encrypted data directly via the test-only raw-bytes path.
+    [client.socket sendRawBytes:slipData];
 
     // The server should silently drop the message because decryption fails.
     XCTestExpectation *encryptedMessageExpectation = [[XCTestExpectation alloc] initWithDescription:@"Other salt encrypted message received"];

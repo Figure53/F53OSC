@@ -38,8 +38,9 @@
 #import <F53OSC/F53OSC-Swift.h>
 #elif __has_include("F53OSC-Swift.h")
 #import "F53OSC-Swift.h"
+#elif SWIFT_PACKAGE
+@import F53OSCEncrypt;
 #endif
-
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -104,7 +105,6 @@ NS_ASSUME_NONNULL_BEGIN
     return client;
 }
 
-
 #pragma mark - Basic configuration tests
 
 - (void)testThat__setupWorks
@@ -141,7 +141,6 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse(client.IPv6Enabled, @"Default IPv6Enabled should be NO");
     XCTAssertFalse(client.useTcp, @"Default useTcp should be NO");
     XCTAssertEqual(client.tcpTimeout, -1, @"Default tcpTimeout should be -1");
-    XCTAssertEqual(client.readChunkSize, 0, @"Default readChunkSize should be 0");
     XCTAssertNil(client.userData, @"Default userData should be nil");
     XCTAssertNotNil(client.state, @"Default state should not be nil");
     XCTAssertGreaterThan(client.state.count, 0, @"Default state should not be empty");
@@ -186,9 +185,6 @@ NS_ASSUME_NONNULL_BEGIN
     client.tcpTimeout = 3;
     XCTAssertEqual(client.tcpTimeout, 3, @"Client tcpTimeout should be 3");
 
-    client.readChunkSize = 1024;
-    XCTAssertEqual(client.readChunkSize, 1024, @"Client readChunkSize should be 1024");
-
     client.userData = @"some user data";
     XCTAssertEqualObjects(client.userData, @"some user data", @"Client userData should be 'some user data'");
 
@@ -215,7 +211,6 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertTrue(client.IPv6Enabled, @"Client IPv6Enabled should remain YES");
     XCTAssertTrue(client.useTcp, @"Client useTcp should remain YES");
     XCTAssertEqual(client.tcpTimeout, 3, @"Client tcpTimeout should remain 3");
-    XCTAssertEqual(client.readChunkSize, 1024, @"Client readChunkSize should remain 1024");
     XCTAssertEqualObjects(client.userData, @"some user data", @"Client userData should remain 'some user data'");
 }
 
@@ -237,7 +232,6 @@ NS_ASSUME_NONNULL_BEGIN
     client.IPv6Enabled = YES;
     client.useTcp = YES;
     client.tcpTimeout = 12.5;
-    client.readChunkSize = 2048;
     client.userData = @{@"test": @"data"};
 
     NSError *error = nil;
@@ -260,7 +254,6 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqual(unarchivedClient.isIPv6Enabled, client.isIPv6Enabled, @"IPv6 setting should be preserved");
     XCTAssertEqual(unarchivedClient.useTcp, client.useTcp, @"TCP setting should be preserved");
     XCTAssertEqualWithAccuracy(unarchivedClient.tcpTimeout, client.tcpTimeout, 0.01, @"TCP timeout should be preserved");
-    XCTAssertEqual(unarchivedClient.readChunkSize, client.readChunkSize, @"Read chunk size should be preserved");
     XCTAssertEqualObjects(unarchivedClient.userData, client.userData, @"User data should be preserved");
 }
 
@@ -334,58 +327,6 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqualObjects(client.interface, @"nonexistent_interface_999", @"Invalid interface name should still be stored");
 }
 
-- (void)testThat_clientReadChunkSizeHandlesEdgeValues
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    // Test very small chunk size.
-    client.readChunkSize = 1;
-    XCTAssertEqual(client.readChunkSize, 1, @"Should handle very small chunk size");
-
-    // Test large chunk size.
-    client.readChunkSize = 1048576; // 1MB
-    XCTAssertEqual(client.readChunkSize, 1048576, @"Should handle large chunk size");
-
-    // Test maximum NSUInteger (implementation should handle this).
-    NSUInteger maxSize = NSUIntegerMax;
-    client.readChunkSize = maxSize;
-    XCTAssertEqual(client.readChunkSize, maxSize, @"Should handle maximum chunk size");
-}
-
-- (void)testThat_clientReadChunkSizeAffectsTCPConnections
-{
-    UInt16 port = PORT_BASE + 20;
-
-    F53OSCServer *server = [self basicServerWithPort:port];
-    F53OSCClient *client = [self basicClientWithPort:port];
-
-    NSError *error = nil;
-    BOOL isListening = [server startListening:&error];
-    XCTAssertTrue(isListening, @"Server should start listening on port %hu", port);
-    XCTAssertNil(error, @"Server should start listening without error");
-
-    // Configure client for partial reads.
-    client.readChunkSize = 512;
-    client.useTcp = YES; // readChunkSize only affects TCP
-
-    XCTestExpectation *connectionExpectation = [[XCTestExpectation alloc] initWithDescription:@"TCP connection with chunk size"];
-    self.connectionExpectation = connectionExpectation;
-    [client connect];
-
-    XCTWaiterResult result = [XCTWaiter waitForExpectations:@[connectionExpectation] timeout:2.0];
-    XCTAssertEqual(result, XCTWaiterResultCompleted, @"Should connect with readChunkSize configured");
-
-    // Send a message to test chunked reading.
-    XCTestExpectation *chunkedMessageExpectation = [[XCTestExpectation alloc] initWithDescription:@"Message with chunked reading"];
-    self.chunkedMessageExpectation = chunkedMessageExpectation;
-
-    F53OSCMessage *message = [F53OSCMessage messageWithAddressPattern:@"/chunk/test" arguments:@[@"chunked_reading"]];
-    [client sendPacket:message];
-
-    result = [XCTWaiter waitForExpectations:@[chunkedMessageExpectation] timeout:2.0];
-    XCTAssertEqual(result, XCTWaiterResultCompleted, @"Should receive message with chunked reading");
-}
-
 - (void)testThat_clientCanStoreUserData
 {
     F53OSCClient *client = [[F53OSCClient alloc] init];
@@ -432,6 +373,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     F53OSCServer *server = [self basicServerWithPort:port];
     F53OSCClient *client = [self basicClientWithPort:port];
+    client.tcpTimeout = 2.0; // 2s is plenty for localhost, vs the production-default 30s
 
     NSError *error = nil;
     BOOL isListening = [server startListening:&error];
@@ -647,7 +589,6 @@ NS_ASSUME_NONNULL_BEGIN
     client.host = @"10.0.0.1";
     XCTAssertFalse(client.hostIsLocal, @"'10.0.0.1' should not be local");
 }
-
 
 #pragma mark - Encryption tests
 
@@ -957,7 +898,6 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertEqualObjects(receivedMessage.arguments.lastObject, @(42), @"Message argument should match");
 }
 
-
 #pragma mark - Control message handling tests
 
 - (void)testThat_clientHandlesControlMessageWithValidMessage
@@ -1011,161 +951,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic pop
 }
 
-
 #pragma mark - Socket delegate method tests
 
-- (void)testThat_clientNewSocketQueueForConnectionFromAddress
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Test new socket queue method
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnonnull"
-    dispatch_queue_t resultQueue = [client newSocketQueueForConnectionFromAddress:nil onSocket:socket];
-#pragma clang diagnostic pop
-
-    XCTAssertNotNil(resultQueue, @"Should return a dispatch queue");
-    // The method should return the client's socket delegate queue
-    XCTAssertEqual(resultQueue, client.socketDelegateQueue, @"Should return the client's socket delegate queue");
-}
-
-- (void)testThat_clientSocketDidAcceptNewSocket
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-    GCDAsyncSocket *newSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Test socket acceptance - should handle gracefully
-    XCTAssertNoThrow([client socket:socket didAcceptNewSocket:newSocket], @"Should handle new socket acceptance gracefully");
-}
-
-- (void)testThat_clientSocketDidReadDataWithTag
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-    NSData *testData = [@"test data" dataUsingEncoding:NSUTF8StringEncoding];
-
-    // Test data reading - should handle gracefully
-    XCTAssertNoThrow([client socket:socket didReadData:testData withTag:0], @"Should handle socket data reading gracefully");
-}
-
-- (void)testThat_clientSocketDidReadPartialDataOfLengthTag
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Test partial data reading - should handle gracefully
-    XCTAssertNoThrow([client socket:socket didReadPartialDataOfLength:100 tag:0], @"Should handle partial data reading gracefully");
-}
-
-- (void)testThat_clientSocketDidWritePartialDataOfLengthTag
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Test partial data writing - should handle gracefully
-    XCTAssertNoThrow([client socket:socket didWritePartialDataOfLength:50 tag:0], @"Should handle partial data writing gracefully");
-}
-
-- (void)testThat_clientSocketShouldTimeoutWriteWithTag
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Test write timeout - should return NO to continue
-    BOOL shouldTimeout = [client socket:socket shouldTimeoutWriteWithTag:0 elapsed:5.0 bytesDone:100];
-    XCTAssertFalse(shouldTimeout, @"Should not timeout write operations by default");
-}
-
-- (void)testThat_clientSocketDidCloseReadStream
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Test read stream closing - should handle gracefully
-    XCTAssertNoThrow([client socketDidCloseReadStream:socket], @"Should handle read stream closing gracefully");
-}
-
-- (void)testThat_clientSocketDidSecure
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncSocket *socket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Test socket securing - should handle gracefully
-    XCTAssertNoThrow([client socketDidSecure:socket], @"Should handle socket securing gracefully");
-}
-
-
 #pragma mark - UDP socket delegate method tests
-
-- (void)testThat_clientUdpSocketDidConnectToAddress
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-
-    // Create an address (localhost)
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    addr.sin_port = htons(8080);
-    NSData *addressData = [NSData dataWithBytes:&addr length:sizeof(addr)];
-
-    // Test UDP connection - should handle gracefully
-    XCTAssertNoThrow([client udpSocket:udpSocket didConnectToAddress:addressData], @"Should handle UDP connection gracefully");
-}
-
-- (void)testThat_clientUdpSocketDidNotConnect
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-    NSError *mockError = [NSError errorWithDomain:@"TestErrorDomain" code:100 userInfo:@{NSLocalizedDescriptionKey: @"Test connection error"}];
-
-    // Test UDP connection failure - should handle gracefully
-    XCTAssertNoThrow([client udpSocket:udpSocket didNotConnect:mockError], @"Should handle UDP connection failure gracefully");
-}
-
-- (void)testThat_clientUdpSocketDidNotSendDataWithTag
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-    NSError *mockError = [NSError errorWithDomain:@"TestErrorDomain" code:200 userInfo:@{NSLocalizedDescriptionKey: @"Test send error"}];
-
-    // Test UDP send failure - should handle gracefully
-    XCTAssertNoThrow([client udpSocket:udpSocket didNotSendDataWithTag:0 dueToError:mockError], @"Should handle UDP send failure gracefully");
-}
-
-- (void)testThat_clientUdpSocketDidReceiveDataFromAddress
-{
-    F53OSCClient *client = [[F53OSCClient alloc] init];
-
-    GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-    NSData *testData = [@"test udp data" dataUsingEncoding:NSUTF8StringEncoding];
-
-    // Create an address
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    addr.sin_port = htons(8080);
-    NSData *addressData = [NSData dataWithBytes:&addr length:sizeof(addr)];
-
-    // Test UDP data reception - should handle gracefully
-    XCTAssertNoThrow([client udpSocket:udpSocket didReceiveData:testData fromAddress:addressData withFilterContext:nil], @"Should handle UDP data reception gracefully");
-}
-
 
 #pragma mark - Socket delegate queue tests
 
@@ -1224,7 +1012,6 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNoThrow([client sendPacket:message], @"Should send message after queue change");
 }
 
-
 #pragma mark - F53OSCServerDelegate
 
 - (void)takeMessage:(nullable F53OSCMessage *)message
@@ -1240,7 +1027,6 @@ NS_ASSUME_NONNULL_BEGIN
     else if ([message.addressPattern hasPrefix:@"/udp/encrypted"])
         [self.udpAttemptedEncryptedMessageExpectation fulfill];
 }
-
 
 #pragma mark - F53OSCClientDelegate
 

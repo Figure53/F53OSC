@@ -45,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong) NSMutableDictionary<NSNumber *, NSMutableData *> *activeData;        // NSMutableData keyed by index; buffers the incoming data.
 @property (strong) NSMutableDictionary<NSNumber *, NSMutableDictionary *> *activeState; // NSMutableDictionary keyed by index; stores state of incoming data.
 @property (assign) long activeIndex;
+@property (strong) NSMapTable<F53OSCSocket *, NSNumber *> *socketToKey;                 // weak-keyed map from accepted F53OSCSocket to its activeIndex key.
+
+@property (strong, nullable) dispatch_source_t udpSweepTimer;
 
 @end
 
@@ -142,17 +145,20 @@ NS_ASSUME_NONNULL_BEGIN
         self.port = 0;
         self.udpReplyPort = 0;
         self.IPv6Enabled = NO;
+        self.udpFlowIdleTimeout = 30.0;
+        self.udpFlowSweepInterval = 5.0;
+        self.tcpIdleTimeout = 0.0; // disabled by default
 
         if ( !queue )
             queue = dispatch_get_main_queue();
         self.queue = queue;
         
-        GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:queue];
-        self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket];
+        self.tcpSocket = [F53OSCSocket tcpListenerWithCallbackQueue:queue];
+        self.tcpSocket.delegate = self;
         self.tcpSocket.IPv6Enabled = self.isIPv6Enabled;
 
-        GCDAsyncUdpSocket *rawUdpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:queue];
-        self.udpSocket = [F53OSCSocket socketWithUdpSocket:rawUdpSocket];
+        self.udpSocket = [F53OSCSocket udpListenerWithCallbackQueue:queue];
+        self.udpSocket.delegate = self;
         self.udpSocket.IPv6Enabled = self.isIPv6Enabled;
         
         // NOTE: after init, only read/write to these on the delegate queue
@@ -160,6 +166,9 @@ NS_ASSUME_NONNULL_BEGIN
         self.activeData = [NSMutableDictionary dictionaryWithCapacity:1];
         self.activeState = [NSMutableDictionary dictionaryWithCapacity:1];
         self.activeIndex = 0;
+
+        self.socketToKey = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsWeakMemory
+                                                 valueOptions:NSPointerFunctionsStrongMemory];
     }
     return self;
 }
@@ -193,27 +202,107 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL) startListening:(out NSError **)outError
 {
-    // delegateQueue must be set before starting listening
-    [self.tcpSocket.tcpSocket synchronouslySetDelegateQueue:self.queue];
-    [self.udpSocket.udpSocket synchronouslySetDelegateQueue:self.queue];
+    self.tcpSocket.port = self.port;
+    self.udpSocket.port = self.port;
     
-    BOOL success;
-    success = [self.tcpSocket startListening:outError];
-    if ( success )
-        success = [self.udpSocket startListening:outError];
-    return success;
+    BOOL tcpStarted = [self.tcpSocket startListening:outError];
+    BOOL udpStarted = [self.udpSocket startListening:outError];
+
+    if ( tcpStarted && udpStarted )
+        [self startUdpSweepTimer];
+
+    return ( tcpStarted && udpStarted );
+}
+
+- (void) startUdpSweepTimer
+{
+    // cancel any existing timer first
+    if ( self.udpSweepTimer )
+    {
+        dispatch_source_cancel( self.udpSweepTimer );
+        self.udpSweepTimer = nil;
+    }
+
+    // Sweep is needed if EITHER UDP-flow expiry OR TCP idle-disconnect is enabled.
+    if ( self.udpFlowIdleTimeout <= 0 && self.tcpIdleTimeout <= 0 )
+        return;
+
+    NSTimeInterval intervalSec = self.udpFlowSweepInterval > 0 ? self.udpFlowSweepInterval : 5.0;
+    uint64_t intervalNs = (uint64_t)(intervalSec * NSEC_PER_SEC);
+    dispatch_source_t timer = dispatch_source_create( DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue );
+    dispatch_source_set_timer( timer,
+                               dispatch_time( DISPATCH_TIME_NOW, intervalNs ),
+                               intervalNs,
+                               (uint64_t)(intervalSec * 0.1 * NSEC_PER_SEC) ); // 10% leeway
+    __weak typeof(self) weakSelf = self;
+    dispatch_source_set_event_handler( timer, ^{
+        [weakSelf sweepIdleFlows];
+    } );
+    dispatch_resume( timer );
+    self.udpSweepTimer = timer;
 }
 
 - (void) stopListening
 {
+    if ( self.udpSweepTimer )
+    {
+        dispatch_source_cancel( self.udpSweepTimer );
+        self.udpSweepTimer = nil;
+    }
+
     [self.tcpSocket stopListening];
     [self.udpSocket stopListening];
     
-    // unset delegate queue
-    // - this prevents the socket from holding a strong reference to this object. If the socket holds the final reference, this object will dealloc on the delegateQueue which could be a background thread.
-    // - one way this can happen is with a retain cycle caused by the socket capturing a strong reference to its delegate (which here is `self`) inside a block dispatched to the delegate queue, i.e. -[GCDAsyncUdpSocket closeAfterSending:] captures `closeWithError:` -> `notifyDidCloseWithError:` which casts `__strong id theDelegate = delegate;` and then captures theDelegate inside another dispatch_async() block on delegateQueue
-    [self.tcpSocket.tcpSocket synchronouslySetDelegateQueue:nil];
-    [self.udpSocket.udpSocket synchronouslySetDelegateQueue:nil];
+    [self.activeTcpSockets removeAllObjects];
+    [self.activeData removeAllObjects];
+    [self.activeState removeAllObjects];
+    [self.socketToKey removeAllObjects];
+}
+
+- (void) sweepIdleFlows
+{
+    NSDate *now = [NSDate date];
+    NSTimeInterval udpThreshold = self.udpFlowIdleTimeout;
+    NSTimeInterval tcpThreshold = self.tcpIdleTimeout;
+
+    // collect keys to remove first to avoid mutating activeTcpSockets during enumeration
+    NSMutableArray<NSNumber *> *idleKeys = [NSMutableArray array];
+    NSMutableArray<F53OSCSocket *> *idleSockets = [NSMutableArray array];
+
+    for ( NSNumber *key in self.activeTcpSockets )
+    {
+        F53OSCSocket *socket = self.activeTcpSockets[key];
+        NSTimeInterval threshold = socket.isUdpSocket ? udpThreshold : tcpThreshold;
+        if ( threshold <= 0 )
+            continue; // sweep disabled for this transport
+
+        NSDate *lastActivity = socket.lastActivityDate;
+        if ( !lastActivity )
+            continue; // no activity yet — protect newborn connections from the sweep
+
+        if ( [now timeIntervalSinceDate:lastActivity] >= threshold )
+        {
+            [idleKeys addObject:key];
+            [idleSockets addObject:socket];
+        }
+    }
+
+    for ( NSUInteger i = 0; i < idleKeys.count; i++ )
+    {
+        F53OSCSocket *socket = idleSockets[i];
+        NSNumber *key = idleKeys[i];
+
+#if F53_OSC_SERVER_DEBUG
+        NSLog( @"[F53OSCServer] sweeping idle %@ flow %@:%hu",
+               socket.isUdpSocket ? @"UDP" : @"TCP", socket.host, socket.port );
+#endif
+
+        [socket disconnect];
+        [self.socketToKey removeObjectForKey:socket];
+        [self.activeTcpSockets removeObjectForKey:key];
+        [self.activeData removeObjectForKey:key];
+        [self.activeState removeObjectForKey:key];
+    }
 }
 
 - (void) handleF53OSCControlMessage:(F53OSCMessage *)message
@@ -254,37 +343,38 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-#pragma mark - GCDAsyncSocketDelegate
+#pragma mark - F53OSCSocketDelegate
 
-- (nullable dispatch_queue_t) newSocketQueueForConnectionFromAddress:(NSData *)address onSocket:(GCDAsyncSocket *)sock
+- (void) socketDidConnect:(F53OSCSocket *)socket
 {
-    return self.queue;
+    // Server-side listener sockets do not initiate outbound connections.
+    // accepted connections are surfaced via socket:didAcceptConnection: instead.
+    // This callback is a no-op on the server.
 }
 
-- (void) socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
+- (void) socket:(F53OSCSocket *)listener didAcceptConnection:(F53OSCSocket *)acceptedSocket
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didAcceptNewSocket %p", sock, newSocket );
+    NSLog( @"server socket %p didAcceptConnection %p", listener, acceptedSocket );
 #endif
 
-    F53OSCSocket *activeSocket = [F53OSCSocket socketWithTcpSocket:newSocket];
-    activeSocket.host = newSocket.connectedHost;
-    activeSocket.port = newSocket.connectedPort;
-
     NSNumber *key = [NSNumber numberWithLong:self.activeIndex];
-    [self.activeTcpSockets setObject:activeSocket forKey:key];
-    [self.activeData setObject:[NSMutableData data] forKey:key];
-    [self.activeState setObject:[NSMutableDictionary dictionaryWithDictionary:@{ @"socket" : activeSocket,
-                                                                                 @"dangling_ESC" : @NO }] forKey:key];
 
-    [newSocket readDataWithTimeout:-1 tag:self.activeIndex];
+    acceptedSocket.delegate = self;
+    [self.activeTcpSockets setObject:acceptedSocket forKey:key];
+    [self.activeData setObject:[NSMutableData data] forKey:key];
+    [self.activeState setObject:[NSMutableDictionary dictionaryWithDictionary:@{
+        @"socket"       : acceptedSocket,
+        @"dangling_ESC" : @NO
+    }] forKey:key];
+    [self.socketToKey setObject:key forKey:acceptedSocket];
 
     self.activeIndex++;
     
     if ( [self.delegate respondsToSelector:@selector(serverDidConnect:toSocket:)] )
     {
         dispatch_block_t block = ^{
-            [self.delegate serverDidConnect:self toSocket:activeSocket];
+            [self.delegate serverDidConnect:self toSocket:acceptedSocket];
         };
         
         if ( [NSThread isMainThread] )
@@ -294,90 +384,58 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void) socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
+- (void) socket:(F53OSCSocket *)socket didReceiveData:(NSData *)data
 {
 #if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didConnectToHost %@:%hu", sock, host, port );
-#endif
-}
-
-- (void) socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
-{
-#if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
+    NSLog( @"server socket %p didReceiveData of length %lu", socket, [data length] );
 #endif
     
-    NSNumber *key = [NSNumber numberWithLong:tag];
+    if ( socket.isTcpSocket )
+    {
+        NSNumber *key = [self.socketToKey objectForKey:socket];
+        if ( key == nil )
+            return; // stale callback after disconnect
+
     NSMutableData *activeData = [self.activeData objectForKey:key];
     NSMutableDictionary<NSString *, id> *activeState = [self.activeState objectForKey:key];
     if ( activeData && activeState )
     {
-        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate controlHandler:self];
-        [sock readDataWithTimeout:-1 tag:tag];
-    }
-}
-
-- (void) socket:(GCDAsyncSocket *)sock didReadPartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
-{
-#if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didReadPartialDataOfLength %lu. tag: %li", sock, partialLength, tag );
-#endif
-}
-
-- (void) socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
-{
-#if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didWriteDataWithTag: %li", sock, tag );
-#endif
-}
-
-- (void) socket:(GCDAsyncSocket *)sock didWritePartialDataOfLength:(NSUInteger)partialLength tag:(long)tag
-{
-#if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didWritePartialDataOfLength %lu", sock, partialLength );
-#endif
-}
-
-- (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
-{
-    NSLog( @"Warning: F53OSCServer timed out after %0.2f seconds when reading TCP data.", elapsed );
-    return 0;
-}
-
-- (NSTimeInterval) socket:(GCDAsyncSocket *)sock shouldTimeoutWriteWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length
-{
-    NSLog( @"Warning: F53OSCServer timed out after %0.2f seconds when writing TCP data.", elapsed );
-    return 0;
-}
-
-- (void) socketDidCloseReadStream:(GCDAsyncSocket *)sock
-{
-#if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didCloseReadStream", sock );
-#endif
-}
-
-- (void) socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
-{
-#if F53_OSC_SERVER_DEBUG
-    NSLog( @"server socket %p didDisconnect withError: %@", sock, err );
-#endif
-
-    F53OSCSocket *socket = nil;
-    NSNumber *keyOfDyingSocket = nil;
-    for ( NSNumber *key in [self.activeTcpSockets allKeys] )
-    {
-        socket = [self.activeTcpSockets objectForKey:key];
-        if ( socket.tcpSocket == sock )
-        {
-            socket.isEncrypting = NO;
-            keyOfDyingSocket = key;
-            break;
+            [F53OSCParser translateSlipData:data
+                                     toData:activeData
+                                  withState:activeState
+                                destination:self.delegate
+                             controlHandler:self];
         }
     }
-
-    if ( keyOfDyingSocket != nil )
+    else // UDP — one accepted flow per source endpoint
     {
+        [self.udpSocket.stats addBytes:[data length]];
+
+        // Apply udpReplyPort if configured. The accepted UDP socket itself serves as the reply socket.
+        if ( self.udpReplyPort != 0 )
+            socket.port = self.udpReplyPort;
+
+        [F53OSCParser processOscData:data
+                      forDestination:self.delegate
+                       replyToSocket:socket
+                      controlHandler:nil
+                        wasEncrypted:NO];
+    }
+}
+
+- (void) socket:(F53OSCSocket *)socket didDisconnectWithError:(nullable NSError *)error
+{
+#if F53_OSC_SERVER_DEBUG
+    NSLog( @"server socket %p didDisconnectWithError: %@", socket, error );
+#endif
+
+    NSNumber *key = [self.socketToKey objectForKey:socket];
+    if ( key == nil )
+        return;
+
+            socket.isEncrypting = NO;
+    [self.socketToKey removeObjectForKey:socket];
+
         if ( [self.delegate respondsToSelector:@selector(serverDidDisconnect:fromSocket:)] )
         {
             dispatch_block_t block = ^{
@@ -390,53 +448,9 @@ NS_ASSUME_NONNULL_BEGIN
                 dispatch_async( dispatch_get_main_queue(), block );
         }
         
-        [self.activeTcpSockets removeObjectForKey:keyOfDyingSocket];
-        [self.activeData removeObjectForKey:keyOfDyingSocket];
-        [self.activeState removeObjectForKey:keyOfDyingSocket];
-    }
-    else
-    {
-        NSLog( @"Error: F53OSCServer couldn't find the F53OSCSocket associated with the disconnecting TCP socket." );
-    }
-}
-
-- (void) socketDidSecure:(GCDAsyncSocket *)sock
-{
-}
-
-#pragma mark - GCDAsyncUdpSocketDelegate
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didConnectToAddress:(NSData *)address
-{
-}
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(nullable NSError *)error
-{
-}
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
-{
-}
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(nullable NSError *)error
-{
-}
-
-- (void) udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data fromAddress:(NSData *)address withFilterContext:(nullable id)filterContext
-{
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:self.udpSocket.udpSocket.delegateQueue];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
-    replySocket.host = [GCDAsyncUdpSocket hostFromAddress:address];
-    replySocket.port = self.udpReplyPort;
-    replySocket.IPv6Enabled = self.isIPv6Enabled;
-
-    [self.udpSocket.stats addBytes:[data length]];
-
-    [F53OSCParser processOscData:data forDestination:self.delegate replyToSocket:replySocket controlHandler:nil wasEncrypted:NO];
-}
-
-- (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(nullable NSError *)error
-{
+    [self.activeTcpSockets removeObjectForKey:key];
+    [self.activeData removeObjectForKey:key];
+    [self.activeState removeObjectForKey:key];
 }
 
 @end
