@@ -35,8 +35,11 @@
 #elif SWIFT_PACKAGE // Swift Package Manager
 @import F53OSCEncrypt;
 #endif
+#import "F53OSCBundle.h"
 #import "F53OSCMessage.h"
+#import "F53OSCPacket.h"
 #import "F53OSCSocket.h"
+#import "F53OSCTimeTag.h"
 #import "F53OSCFoundationAdditions.h"
 
 
@@ -51,6 +54,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void) processMessageData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 + (void) processBundleData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
+
+// Walks the envelope of an OSC bundle, calling `handler` once per top-level
+// element with a pointer into `data` and the element's length. The handler
+// returns NO to abort traversal. If `outTimeTag` is non-NULL, the parsed time
+// tag (or immediate if extraction fails) is written through it. Returns NO if
+// the envelope is malformed. The handler receives the raw pointer rather than
+// a pre-wrapped NSData so that the discriminator-byte read on zero-length
+// elements matches the original processBundleData: behavior (read past element
+// boundary into outer buffer) instead of dereferencing a potentially-NULL
+// NSData.bytes.
++ (BOOL) walkBundleData:(NSData *)data
+                timeTag:(F53OSCTimeTag * _Nullable __strong * _Nullable)outTimeTag
+         elementHandler:(BOOL (^)(const void *elementBytes, NSUInteger elementLength))handler;
 
 @end
 
@@ -68,6 +84,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void) processBundleData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket;
 {
+    [self walkBundleData:data
+                 timeTag:NULL
+          elementHandler:^BOOL(const void *elementBytes, NSUInteger elementLength) {
+        const char *bytes = elementBytes;
+        if ( bytes[0] == '/' )
+        {
+            [self processMessageData:[NSData dataWithBytesNoCopy:(void *)bytes length:elementLength freeWhenDone:NO]
+                      forDestination:destination
+                       replyToSocket:socket];
+            return YES;
+        }
+        if ( bytes[0] == '#' )
+        {
+            [self processBundleData:[NSData dataWithBytesNoCopy:(void *)bytes length:elementLength freeWhenDone:NO]
+                     forDestination:destination
+                      replyToSocket:socket];
+            return YES;
+        }
+        NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", (unsigned int)elementLength );
+        return NO;
+    }];
+}
+
++ (BOOL) walkBundleData:(NSData *)data
+                timeTag:(F53OSCTimeTag * _Nullable __strong * _Nullable)outTimeTag
+         elementHandler:(BOOL (^)(const void *elementBytes, NSUInteger elementLength))handler
+{
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
     
@@ -77,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
     if ( bundlePrefix == nil || bytesRead == 0 || bytesRead > length )
     {
         NSLog( @"Error: Unable to parse OSC bundle prefix." );
-        return;
+        return NO;
     }
     
     if ( [bundlePrefix isEqualToString:@"#bundle"] )
@@ -87,8 +130,12 @@ NS_ASSUME_NONNULL_BEGIN
         
         if ( lengthOfRemainingBuffer > 8 )
         {
-            //F53OSCTimeTag *timetag = [F53OSCTimeTag timeTagWithOSCTimeBytes:buffer];
-            buffer += 8; // We're not currently using the time tag so we just skip it.
+            if ( outTimeTag )
+            {
+                F53OSCTimeTag *parsed = [F53OSCTimeTag timeTagWithOSCTimeBytes:(char *)buffer];
+                *outTimeTag = parsed ?: [F53OSCTimeTag immediateTimeTag];
+            }
+            buffer += 8;
             lengthOfRemainingBuffer -= 8;
             
             while ( lengthOfRemainingBuffer > sizeof( UInt32 ) )
@@ -101,39 +148,30 @@ NS_ASSUME_NONNULL_BEGIN
                 if ( elementLength > lengthOfRemainingBuffer )
                 {
                     NSLog( @"Error: A message in the OSC bundle claimed to be larger than the bundle itself." );
-                    return;
+                    return NO;
                 }
                 
-                if ( buffer[0] == '/' ) // OSC message
-                {
-                    [self processMessageData:[NSData dataWithBytesNoCopy:(void *)buffer length:elementLength freeWhenDone:NO]
-                              forDestination:destination
-                               replyToSocket:socket];
-                }
-                else if ( buffer[0] == '#' ) // OSC bundle
-                {
-                    [self processBundleData:[NSData dataWithBytesNoCopy:(void *)buffer length:elementLength freeWhenDone:NO]
-                             forDestination:destination
-                              replyToSocket:socket];
-                }
-                else
-                {
-                    NSLog( @"Error: Bundle contained unrecognized OSC message of length %u.", (unsigned int)elementLength );
-                    return;
-                }
-                
+                if ( !handler(buffer, elementLength) )
+                    return NO;
+
                 buffer += elementLength;
                 lengthOfRemainingBuffer -= elementLength;
             }
+
+            return YES;
         }
         else
         {
             NSLog( @"Warning: Received an empty OSC bundle message." );
+            if ( outTimeTag )
+                *outTimeTag = [F53OSCTimeTag immediateTimeTag];
+            return YES; // well-formed but empty
         }
     }
     else
     {
         NSLog( @"Error: Received an invalid OSC bundle message." );
+        return NO;
     }
 }
 
@@ -145,7 +183,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSUInteger length = [data length];
     const char *buffer = [data bytes];
-    
+
     NSUInteger lengthOfRemainingBuffer = length;
     NSUInteger bytesRead = 0;
     NSString *addressPattern = [NSString stringWithOSCStringBytes:buffer maxLength:lengthOfRemainingBuffer bytesRead:&bytesRead];
@@ -154,10 +192,10 @@ NS_ASSUME_NONNULL_BEGIN
         NSLog( @"Error: Unable to parse OSC method address." );
         return nil;
     }
-    
+
     buffer += bytesRead;
     lengthOfRemainingBuffer -= bytesRead;
-    
+
     NSMutableArray<id> *args = [NSMutableArray array];
     BOOL hasArguments = (lengthOfRemainingBuffer > 0);
     if ( hasArguments && buffer[0] == ',' )
@@ -296,6 +334,44 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     return [F53OSCMessage messageWithAddressPattern:addressPattern arguments:args replySocket:nil];
+}
+
++ (nullable F53OSCBundle *) parseOscBundleData:(NSData *)data
+{
+    NSMutableArray<NSData *> *elements = [NSMutableArray array];
+
+    BOOL walked = [self walkBundleData:data
+                                timeTag:NULL // match +processBundleData:; time tag is discarded on receive
+                         elementHandler:^BOOL(const void *elementBytes, NSUInteger elementLength) {
+        // The bundle keeps the element bytes, so copy out of the outer buffer.
+        NSData *elementData = [NSData dataWithBytes:elementBytes length:elementLength];
+        // Recursively decode the inner element so the work done here matches
+        // what +processOscData: does on the same input. The decoded value is
+        // discarded; F53OSCBundle stores raw element NSData.
+        if ( ![self packetFromData:elementData] )
+            return NO;
+        [elements addObject:elementData];
+        return YES;
+    }];
+    if ( !walked )
+        return nil;
+
+    return [F53OSCBundle bundleWithTimeTag:[F53OSCTimeTag immediateTimeTag] elements:elements];
+}
+
++ (nullable F53OSCPacket *) packetFromData:(NSData *)data
+{
+    if ( data.length == 0 )
+        return nil;
+
+    const char *buffer = data.bytes;
+    if ( buffer[0] == '/' )
+        return [self parseOscMessageData:data];
+
+    if ( buffer[0] == '#' )
+        return [self parseOscBundleData:data];
+
+    return nil;
 }
 
 + (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket controlHandler:(nullable id<F53OSCControlHandler>)controlHandler wasEncrypted:(BOOL)wasEncrypted
