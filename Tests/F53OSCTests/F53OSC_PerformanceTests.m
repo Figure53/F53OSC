@@ -424,13 +424,13 @@ static NSString * _Nullable RoutableHostIPv4(void)
 - (void) measureThroughputUDPWithPayloadSize:(NSUInteger)payloadBytes
                                             N:(NSUInteger)N
 {
-    // What this measures: F53OSC's UDP send path throughput at the given
-    // payload size. The receive count is logged so the delivery rate is
-    // visible, but we don't fail on packet loss — UDP makes no delivery
-    // guarantee, and a burst of large packets will overflow macOS's default
-    // UDP receive socket buffer (~41 KB). That's a kernel concern, not an
-    // F53OSC defect. We only fail on zero delivery, which would indicate
-    // the send path itself is broken.
+    // What this measures: F53OSC's UDP send-path throughput at the given
+    // payload size on localhost. The credit-based send pipeline (depth 1 for
+    // UDP) gates each nw_connection_send on the prior send's completion,
+    // which back-pressures the sender when the kernel buffer fills.
+    // Localhost delivery is therefore ~100% even at large payload sizes that
+    // would otherwise overflow net.inet.udp.recvspace. Anything materially
+    // below 100% on this test points at a send-path regression.
     F53OSCTestCounter *counter = [[F53OSCTestCounter alloc] init];
 
     F53OSCServer *server = nil;
@@ -453,18 +453,15 @@ static NSString * _Nullable RoutableHostIPv4(void)
         counter.targetCount = N;
         for ( NSUInteger i = 0; i < N; i++ )
             [client sendPacket:MakeMessageOfSize( payloadBytes, (NSInteger)i )];
-        // Bounded wait — receivers don't get a 10s grace if UDP dropped half
-        // the burst, since they'll never arrive. 2s is enough for normal
-        // localhost delivery of what survives.
-        [counter waitForCount:N timeout:2.0];
+        [counter waitForCount:N timeout:10.0];
 
         double rate = (double)counter.receivedCount / (double)N * 100.0;
         NSLog(@"UDP %lu-byte payload: %ld of %lu delivered (%.1f%%)",
               (unsigned long)payloadBytes, (long)counter.receivedCount, (unsigned long)N, rate);
 
-        if ( counter.receivedCount == 0 )
-            XCTFail(@"UDP %lu-byte payload: zero delivery indicates send path broken",
-                    (unsigned long)payloadBytes);
+        XCTAssertGreaterThanOrEqual( (double)counter.receivedCount, 0.99 * (double)N,
+                                     @"UDP %lu-byte payload should deliver near-100%% on localhost",
+                                     (unsigned long)payloadBytes );
     }];
 }
 
@@ -525,13 +522,11 @@ static NSString * _Nullable RoutableHostIPv4(void)
 {
     // What this measures: F53OSC's send-side serialization under producer
     // contention. 16 concurrent producers call sendPacket: on one client.
-    //
-    // What we do NOT assert: full delivery. UDP makes no delivery guarantee,
-    // and 16 × 1000 = 16k packets in a burst will exceed macOS's default UDP
-    // receive socket buffer (~41 KB) on localhost — the kernel drops the
-    // overflow. That's expected, not an F53OSC bug. We log the delivery rate
-    // so the number is visible in CI output, and only fail on catastrophic
-    // loss or a crash (which would indicate a real send-path defect).
+    // The credit-based send pipeline (depth 1 for UDP) keeps in-flight sends
+    // bounded, which back-pressures the producers when the kernel buffer
+    // would otherwise fill. Localhost delivery is therefore ~100% even at 16k
+    // datagrams in a burst that would overflow net.inet.udp.recvspace without
+    // the pacing.
     F53OSCTestCounter *counter = [[F53OSCTestCounter alloc] init];
 
     F53OSCServer *server = nil;
@@ -564,74 +559,16 @@ static NSString * _Nullable RoutableHostIPv4(void)
         }
         dispatch_group_wait( group, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(30 * NSEC_PER_SEC)) );
 
-        [counter waitForCount:(NSInteger)N timeout:3.0];
+        [counter waitForCount:(NSInteger)N timeout:10.0];
 
         double rate = (double)counter.receivedCount / (double)N * 100.0;
         NSLog(@"Multi-sender UDP burst: %ld of %lu delivered (%.1f%%)",
               (long)counter.receivedCount, (unsigned long)N, rate);
 
-        if ( counter.receivedCount == 0 )
-            XCTFail(@"Multi-sender UDP: zero delivery indicates send path is broken");
+        XCTAssertGreaterThanOrEqual( (double)counter.receivedCount, 0.99 * (double)N,
+                                     @"Multi-sender UDP should deliver near-100%% under send pacing" );
     }];
 }
-
-// Controlled-burst UDP multi-sender. Same contention shape as
-// testMultiSender_UDP_16Producers but the total burst is sized to fit under
-// the kernel receive buffer ceiling so delivery is near-100%. Confirms the
-// send path is the bottleneck-free part — any UDP losses in the bursty test
-// are kernel concerns, not F53OSC concerns.
-//
-// Why this isn't "pace the producers": sendPacket: is async. Producer-side
-// pacing just shifts buffering into F53OSC's internal serial queue, which
-// then drains to the kernel at full speed. The only reliable knob is the
-// total burst size. 16 × 200 = 3200 datagrams, well under the ~4099 small-
-// datagram kernel ceiling. Contention on F53OSC's internal queue is still
-// fully exercised (16 concurrent producers).
-- (void) testMultiSender_UDP_16Producers_ControlledBurst
-{
-    F53OSCTestCounter *counter = [[F53OSCTestCounter alloc] init];
-
-    F53OSCServer *server = nil;
-    UInt16 port = [self bringUpUDPServer:&server withDelegate:counter];
-
-    F53OSCClient *client = [self bringUpClientWithHost:@"127.0.0.1"
-                                                    port:port
-                                                  useTcp:NO
-                                                delegate:nil];
-
-    NSUInteger const kProducers = 16;
-    NSUInteger const kPerProducer = 200;  // total 3200 < ~4099 buffer
-    NSUInteger const N = kProducers * kPerProducer;
-
-    [counter reset];
-    counter.targetCount = (NSInteger)N;
-
-    dispatch_group_t group = dispatch_group_create();
-    for ( NSUInteger p = 0; p < kProducers; p++ )
-    {
-        dispatch_queue_t q = dispatch_queue_create("f53osc.perf.producer.cb", DISPATCH_QUEUE_SERIAL);
-        dispatch_group_async( group, q, ^{
-            for ( NSUInteger i = 0; i < kPerProducer; i++ )
-            {
-                F53OSCMessage *msg = MakeMessageOfSize( 24, (NSInteger)(p * kPerProducer + i) );
-                [client sendPacket:msg];
-            }
-        });
-    }
-    dispatch_group_wait( group, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(30 * NSEC_PER_SEC)) );
-
-    [counter waitForCount:(NSInteger)N timeout:5.0];
-
-    double rate = (double)counter.receivedCount / (double)N * 100.0;
-    NSLog(@"Controlled-burst UDP multi-sender: %ld of %lu delivered (%.1f%%)",
-          (long)counter.receivedCount, (unsigned long)N, rate);
-
-    // ≥99% delivery expected. Falling below this is an F53OSC send-path
-    // defect, not a kernel concern, because the burst fits under the ceiling.
-    XCTAssertGreaterThanOrEqual( (double)counter.receivedCount, 0.99 * (double)N,
-                                 @"Controlled-burst UDP should deliver near-100%%" );
-}
-
 
 // TCP multi-sender contention. Producers concurrently call sendPacket: on a
 // single F53OSCClient over a TCP+SLIP connection. Compared to UDP, TCP

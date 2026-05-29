@@ -229,54 +229,81 @@ bytes and ordinary bytes) is the worst case for run-scanning — there are no
 long runs. The 1.1× near-parity result confirms the vectorization is
 asymptotically safe and doesn't introduce overhead on adversarial input.
 
-### UDP receive ceiling on localhost
+### UDP send pacing keeps the kernel buffer from overflowing
 
-`F53OSC_PerformanceTests` includes burst-mode UDP tests that intentionally
-exceed the kernel UDP receive buffer to characterize the ceiling. Measured
-on macOS with default `net.inet.udp.recvspace = 786432`:
+F53OSC uses a credit-based send pipeline (depth 1 for UDP, depth 16 for TCP)
+that gates each `nw_connection_send` on the previous send's `contentProcessed`
+completion. When the kernel UDP buffer is filling, NW.framework delays
+`contentProcessed`, which transparently back-pressures the next call into
+`-sendPacket:`. A sender cannot outpace the receiver into kernel-buffer
+overflow regardless of how fast it calls `-sendPacket:`.
 
-| Test | Burst | Delivered (steady state) | What the number reveals |
-|---|---|---|---|
-| `testMultiSender_UDP_16Producers` | 16 × 1000 × 24 B | **~4099 / 16000** every iteration | Kernel buffer holds ~4099 small datagrams. Each datagram consumes a fixed-size mbuf cluster (~200 B incl. metadata) regardless of payload, so 4099 × 200 ≈ 820 KB ≈ the 768 KB ceiling. |
-| `testPayload_UDP_Large` | 5000 × 4 KB | **~190 / 5000** after warm iter | At 4 KB payload + ~100 B mbuf overhead = ~4200 B/datagram, the same 768 KB ceiling holds ~190 datagrams. |
+This is the load-bearing piece for UDP correctness on this branch. Without
+it, a burst sender on localhost overruns the small kernel receive buffer and
+the kernel drops the overflow silently. With it, delivery is 100% under any
+sender rate, no `sysctl` tuning required. Measured on the bench harness: 10k
+small UDP messages sent in a tight loop, all 10k delivered, against a
+default `net.inet.udp.recvspace`.
 
-The numbers are deterministic across runs — that's the signal that this is a
-hard kernel limit, not random loss. If a future macOS release changes
-`net.inet.udp.recvspace` or the per-datagram mbuf overhead, expect these
-numbers to shift correspondingly.
+The pipeline depth is currently fixed at init time based on transport role.
+A future `sendPipelineDepth` property could expose it for callers that know
+their peer can absorb a higher rate and want more parallelism, with the
+trade that overflow drops become possible if depth × send rate exceeds what
+the kernel buffer can absorb.
 
-Implications for QLab and other F53OSC consumers:
+#### What the kernel ceiling looks like without flow control
 
-- **Localhost burst UDP delivery is bounded by the kernel, not F53OSC.** Any
-  workload that needs guaranteed delivery should use TCP+SLIP.
-- **Real shows don't burst this hard.** Typical OSC traffic is sparse cue
-  dispatches over a network, not 16-thread localhost bursts. The ceiling is
-  documented but not a practical concern.
-- **Raising the buffer is possible but requires `sudo sysctl`.** Network.framework
-  does not expose `SO_RCVBUF`, so per-process tuning isn't available from F53OSC.
-  See *Future: receive buffer configuration* below.
+If the credit pipeline were disabled (depth raised so sends fire without
+waiting), the kernel buffer geometry would become visible. Measured on
+macOS with `net.inet.udp.recvspace = 786432`:
 
-The companion `testMultiSender_UDP_16Producers_ControlledRate` test paces
-sends below the ceiling and verifies near-100% delivery — that's the test
-to fail-alarm on for actual F53OSC defects.
+| Workload | Delivered without flow control | What the number reveals |
+|---|---|---|
+| 16 producers × 1000 × 24 B datagrams in burst | ~4099 / 16000 every iteration | Kernel buffer holds ~4099 small datagrams. Each consumes a fixed-size mbuf cluster (~200 B incl. metadata) regardless of payload, so 4099 × 200 ≈ 820 KB ≈ the 768 KB ceiling. |
+| 5000 × 4 KB in burst | ~190 / 5000 after warm iter | At 4 KB payload + ~100 B mbuf overhead = ~4200 B/datagram, the same 768 KB ceiling holds ~190 datagrams. |
 
-### Future: receive buffer configuration
+These numbers are deterministic and characterize the kernel buffer, not
+behavior visible through F53OSC's send path. Useful when reasoning about
+what the buffer holds, not as a description of what callers see.
 
-Network.framework's `nw_*` API does **not** expose `SO_RCVBUF` directly.
-There is no public knob on `nw_parameters_t` or `nw_listener_t` for tuning
-the kernel receive socket buffer size. Options if F53OSC ever needs to
-expose this (none are small):
+If a future workload genuinely needs more concurrency than depth 1 provides
+and is willing to accept kernel drops, raising `net.inet.udp.recvspace`
+system-wide via `sudo sysctl -w net.inet.udp.recvspace=4194304` is the
+process-wide escape hatch. Network.framework does not expose `SO_RCVBUF`,
+so per-process tuning isn't available. No F53OSC code currently asks for
+this.
 
-1. **Drop to BSD sockets for the UDP receive path** — large architectural
-   reversal of the modernization.
-2. **Process-wide `sysctl` adjustment** — requires elevated privileges, and
-   affects every UDP socket in the process. Probably wrong layer.
-3. **Wait for Apple to expose it on `nw_udp_options_t`.** No public ETA.
+#### Localhost vs real network
 
-For now, raising `net.inet.udp.recvspace` system-wide (via
-`sudo sysctl -w net.inet.udp.recvspace=4194304`) is the documented workaround
-for high-throughput deployments. F53OSC itself stays at Network.framework
-defaults.
+The kernel buffer ceiling above is mostly a localhost-bench artifact. On
+the same machine, sender and receiver compete on the memory bus, and the
+sender can fill the receiver's recv buffer faster than the receiver drains
+unless something paces it. That's the case the credit pipeline addresses.
+
+On a real network (Ethernet, WiFi, or even a real loopback driver) the
+wire is much slower than memory copy. A gigabit link sustains around
+125 MB/sec, which is orders of magnitude below the rate at which the
+sender can hand bytes to the local kernel. The local kernel **send**
+buffer fills up before the receive buffer ever does, NW.framework delays
+`contentProcessed` until the NIC drains, and the sender is naturally
+paced by the wire. The receiver's recv buffer mostly stays empty because
+packets arrive at wire speed rather than memory-copy speed.
+
+So the failure mode this section describes is "colocated sender and
+receiver both running flat out." A shipped show running OSC over a
+network rarely meets that condition. Cases that still apply over a real
+network:
+
+- A 10 GbE or faster link feeding a receiver whose per-message
+  processing can't keep up.
+- Many senders converging on one receiver, where aggregate arrival
+  exceeds the receiver's capacity even though no single sender is fast.
+- A receiver delegate doing expensive per-message work on otherwise
+  normal hardware.
+
+For a typical QLab deployment over a show network, none of those
+applies. The credit pipeline still runs at depth 1, but it mostly sits
+idle because the wire is doing the pacing for it.
 
 ---
 

@@ -321,6 +321,13 @@ static void applyIPVersionToParams( nw_parameters_t params, BOOL IPv6Enabled, BO
     // in that case. mach_continuous_time is monotonic and counts through
     // system sleep, which is what we want for idle-flow tracking.
     _Atomic(uint64_t) _atomicLastActivityTicks;
+
+    // Credit-based flow control for outbound nw_connection_send calls. The
+    // semaphore is seeded to the per-transport depth (UDP=1, TCP=16). Each send
+    // takes a permit, each completion handler returns one. Prevents the caller
+    // from outpacing what NW.framework and the kernel can accept, which on UDP
+    // otherwise overflows net.inet.udp.recvspace silently.
+    dispatch_semaphore_t _sendPipelineSemaphore;
 }
 
 #pragma mark - Factory methods
@@ -384,6 +391,21 @@ static void applyIPVersionToParams( nw_parameters_t params, BOOL IPv6Enabled, BO
         _lastConnectionState = nw_connection_state_invalid;
         _connectTimeout = F53OSC_CONNECT_TIMEOUT_SEC;
         atomic_init( &_atomicLastActivityTicks, 0 );
+
+        // UDP gets one in-flight send because the kernel recvbuf is small and
+        // drops overflow without notice. `contentProcessed` fires when the kernel
+        // accepts the bytes, not when the receiver consumes them, so raising the
+        // depth lets the sender outrun the receiver's drain rate and overflow
+        // the recvbuf. On some machines, depth 2 currently works while depth 3
+        // races ahead and drops packets. 1 is the only value we can guarantee.
+        //
+        // TCP gets a deeper pipeline because the kernel sendbuf is much larger
+        // and TCP handles retransmission: large enough to keep the wire fed across
+        // completion-callback round trips, small enough to bound runaway producer
+        // queueing. Anywhere from ~4 to ~64 would behave similarly.
+        NSInteger depth = ( role == F53OSCSocketRoleUDPClient ||
+                            role == F53OSCSocketRoleUDPAccepted ) ? 1 : 16;
+        _sendPipelineSemaphore = dispatch_semaphore_create( depth );
     }
     return self;
 }
@@ -1128,8 +1150,11 @@ static NSTimeInterval secondsFromMachTickDelta( uint64_t deltaTicks )
         dispatch_data_t sendData = dispatch_data_create( [data bytes], [data length],
                                                          _callbackQueue,
                                                          DISPATCH_DATA_DESTRUCTOR_DEFAULT );
+        dispatch_semaphore_t sema = _sendPipelineSemaphore;
+        dispatch_semaphore_wait( sema, DISPATCH_TIME_FOREVER );
         nw_connection_send( _connection, sendData, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT,
                             true, ^( nw_error_t _Nullable error ) {
+            dispatch_semaphore_signal( sema );
 #if F53_OSC_SOCKET_DEBUG
             if ( error )
                 NSLog( @"[F53OSCSocket] TCP send error: %@", nwErrorToNSError(error) );
@@ -1151,8 +1176,11 @@ static NSTimeInterval secondsFromMachTickDelta( uint64_t deltaTicks )
         dispatch_data_t sendData = dispatch_data_create( [data bytes], [data length],
                                                          _callbackQueue,
                                                          DISPATCH_DATA_DESTRUCTOR_DEFAULT );
+        dispatch_semaphore_t sema = _sendPipelineSemaphore;
+        dispatch_semaphore_wait( sema, DISPATCH_TIME_FOREVER );
         nw_connection_send( _connection, sendData, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT,
                             true, ^( nw_error_t _Nullable error ) {
+            dispatch_semaphore_signal( sema );
 #if F53_OSC_SOCKET_DEBUG
             if ( error )
                 NSLog( @"[F53OSCSocket] UDP send error: %@", nwErrorToNSError(error) );
@@ -1174,8 +1202,11 @@ static NSTimeInterval secondsFromMachTickDelta( uint64_t deltaTicks )
     dispatch_data_t sendData = dispatch_data_create( bytes.bytes, bytes.length,
                                                      _callbackQueue,
                                                      DISPATCH_DATA_DESTRUCTOR_DEFAULT );
+    dispatch_semaphore_t sema = _sendPipelineSemaphore;
+    dispatch_semaphore_wait( sema, DISPATCH_TIME_FOREVER );
     nw_connection_send( _connection, sendData, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT,
                         true, ^( nw_error_t _Nullable error ) {
+        dispatch_semaphore_signal( sema );
 #if F53_OSC_SOCKET_DEBUG
         if ( error )
             NSLog( @"[F53OSCSocket] sendRawBytes error: %@", nwErrorToNSError(error) );
