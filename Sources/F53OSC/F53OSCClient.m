@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.IPv6Enabled = NO;
         self.useTcp = NO;
         self.tcpTimeout = -1;   // no timeout
-        self.connectTimeout = 30.0; // matches Swift OSCClient.Configuration.connectionTimeout default
+        self.connectTimeout = 30.0;
         self.userData = nil;
         self.socket = nil;
         self.readData = [NSMutableData data];

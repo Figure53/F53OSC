@@ -370,9 +370,11 @@ NS_ASSUME_NONNULL_BEGIN
             controlHandler:(nullable id<F53OSCControlHandler>)controlHandler
 {
     // Incoming OSC messages are framed using the SLIP protocol: http://www.rfc-editor.org/rfc/rfc1055.txt
-    // Hard cap on frame size guards against a misbehaving peer streaming non-END bytes forever.
-    // 16 MB matches Swift's SLIPDecoder default. Overflow resets the accumulator and continues
-    // scanning, so the next valid END boundary recovers cleanly.
+    // Hard cap on frame size guards against a misbehaving peer streaming non-END bytes
+    // forever. Overflow resets the accumulator and continues scanning, so the next valid
+    // END boundary recovers cleanly. 16 MB is a round number well above any realistic
+    // OSC payload (cue dispatches are bytes, audio blobs are typically KB-scale) while
+    // still small enough to bound runaway accumulator growth from a hostile peer.
     static const NSUInteger kF53OSCSlipMaxFrameBytes = 16 * 1024 * 1024;
     
     F53OSCSocket *socket = [state objectForKey:@"socket"];

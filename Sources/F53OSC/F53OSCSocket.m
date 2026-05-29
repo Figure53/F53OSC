@@ -813,7 +813,7 @@ static void applyIPVersionToParams( nw_parameters_t params, BOOL IPv6Enabled, BO
         // Async watchdog: if the connection hasn't reached .ready by connectTimeout,
         // cancel it. The state handler then fires .cancelled and we deliver disconnect.
         // nw_connection_state_waiting can otherwise persist indefinitely with no
-        // failure callback. Matches Swift's OSCClient.Configuration.connectionTimeout.
+        // failure callback.
         NSTimeInterval timeout = _connectTimeout;
         if ( timeout > 0 )
         {

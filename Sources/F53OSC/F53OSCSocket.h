@@ -114,8 +114,10 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 
 // Seconds the TCP connect attempt is allowed to sit in nw_connection_state_waiting
 // before we cancel it and deliver a disconnect. Default 30.0, set to 0 to disable
-// (lets nw_connection retry indefinitely). UDP ignores this — there's no handshake.
-// Matches Swift's OSCClient.Configuration.connectionTimeout.
+// (lets nw_connection retry indefinitely). UDP ignores this, there's no handshake.
+// 30s is arbitrary within a range: long enough to absorb a slow handshake, short
+// enough to surface an unresponsive peer during setup. No measurement currently
+// argues for a different value.
 @property (nonatomic, assign)                   NSTimeInterval connectTimeout;
 
 @property (strong, readonly, nullable) F53OSCStats *stats;
