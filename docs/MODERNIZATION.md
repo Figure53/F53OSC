@@ -63,9 +63,10 @@ The Network.framework swap itself is documented in the commit message at
 
 ### F53OSCSocket
 
-- `lastActivityDate` (atomic, readonly nullable NSDate *) — updated on every
-  receive. Drives the UDP idle-flow sweep; also useful for callers that want to
-  diagnose stuck connections.
+- `secondsSinceLastActivity` (readonly NSTimeInterval), backed by a lock-free
+  atomic CFAbsoluteTime. Returns `-1.0` if no data has arrived yet, so callers
+  can distinguish a newborn connection from a stale one. Drives the UDP
+  idle-flow sweep, also useful for callers that want to diagnose stuck connections.
 
 ### F53OSCParser
 
@@ -328,8 +329,8 @@ configuration knobs QLab doesn't use:
   Swift's `OSCClient.Configuration.connectionTimeout`.
 - **TCP idle disconnect** — New `F53OSCServer.tcpIdleTimeout` property
   (default 0 = disabled). The existing UDP-flow sweep timer now also walks
-  accepted TCP connections and cancels any whose `lastActivityDate` is older
-  than `tcpIdleTimeout`. Useful for clearing dead clients in QLab's
+  accepted TCP connections and cancels any whose `secondsSinceLastActivity`
+  exceeds `tcpIdleTimeout`. Useful for clearing dead clients in QLab's
   long-running state-server use case.
 
 ## Remaining gaps (intentionally deferred)

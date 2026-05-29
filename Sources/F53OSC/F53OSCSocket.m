@@ -30,6 +30,7 @@
 
 #import <Network/Network.h>
 #import <Foundation/Foundation.h>
+#import <mach/mach_time.h>
 #import <stdatomic.h>
 
 #import "F53OSCSocket.h"
@@ -186,9 +187,6 @@ typedef NS_ENUM( NSInteger, F53OSCSocketRole ) {
 // mutable backing store for the publicly readonly stats property
 @property (strong, readwrite, nullable) F53OSCStats *stats;
 
-// mutable backing store for the publicly readonly lastActivityDate property
-@property (atomic, strong, readwrite, nullable) NSDate *lastActivityDate;
-
 // private serial queue: all nw_*_set_queue calls use this; delegate calls dispatch to _callbackQueue
 @property (nonatomic, strong, readonly) dispatch_queue_t internalQueue;
 
@@ -315,6 +313,15 @@ static void applyIPVersionToParams( nw_parameters_t params, BOOL IPv6Enabled, BO
 #pragma mark - F53OSCSocket
 
 @implementation F53OSCSocket
+{
+    // Lock-free atomic mach-tick timestamp updated on every receive. The
+    // public -secondsSinceLastActivity getter subtracts this from
+    // mach_continuous_time() and converts the tick delta to seconds via the
+    // process timebase. 0 means "no activity yet" and the getter reports -1.0
+    // in that case. mach_continuous_time is monotonic and counts through
+    // system sleep, which is what we want for idle-flow tracking.
+    _Atomic(uint64_t) _atomicLastActivityTicks;
+}
 
 #pragma mark - Factory methods
 
@@ -376,8 +383,34 @@ static void applyIPVersionToParams( nw_parameters_t params, BOOL IPv6Enabled, BO
         _listener = nil;
         _lastConnectionState = nw_connection_state_invalid;
         _connectTimeout = F53OSC_CONNECT_TIMEOUT_SEC;
+        atomic_init( &_atomicLastActivityTicks, 0 );
     }
     return self;
+}
+
+// Converts a mach-tick delta to seconds via the process timebase. Timebase is
+// constant for the life of the process so we fetch it once.
+static NSTimeInterval secondsFromMachTickDelta( uint64_t deltaTicks )
+{
+    static mach_timebase_info_data_t timebase;
+    static dispatch_once_t once;
+    dispatch_once( &once, ^{
+        mach_timebase_info( &timebase );
+    });
+    
+    // 1 tick = numer/denom nanoseconds. Then divide by NSEC_PER_SEC for seconds.
+    // (We multiply first then divide to preserve higher floating point precision.)
+    return ( (NSTimeInterval)deltaTicks * (NSTimeInterval)timebase.numer )
+         / ( (NSTimeInterval)timebase.denom * (NSTimeInterval)NSEC_PER_SEC );
+}
+
+- (NSTimeInterval) secondsSinceLastActivity
+{
+    uint64_t t = atomic_load_explicit( &_atomicLastActivityTicks, memory_order_relaxed );
+    if ( t == 0 )
+        return -1.0;
+
+    return secondsFromMachTickDelta( mach_continuous_time() - t );
 }
 
 // satisfy the unavailable designated init declared in the header
@@ -960,7 +993,9 @@ static void applyIPVersionToParams( nw_parameters_t params, BOOL IPv6Enabled, BO
                 } );
 
                 // stamp activity before yielding to the delegate
-                strongSelf.lastActivityDate = [NSDate date];
+                atomic_store_explicit( &strongSelf->_atomicLastActivityTicks,
+                                       mach_continuous_time(),
+                                       memory_order_relaxed );
 
                 dispatch_async( strongSelf->_callbackQueue, ^{
                     if ( [strongSelf.delegate respondsToSelector:@selector(socket:didReceiveData:)] )
@@ -1014,7 +1049,9 @@ static void applyIPVersionToParams( nw_parameters_t params, BOOL IPv6Enabled, BO
                 } );
 
                 // stamp activity before yielding to the delegate (used by idle-sweep in F53OSCServer)
-                strongSelf.lastActivityDate = [NSDate date];
+                atomic_store_explicit( &strongSelf->_atomicLastActivityTicks,
+                                      mach_continuous_time(),
+                                      memory_order_relaxed );
 
                 dispatch_async( strongSelf->_callbackQueue, ^{
                     if ( [strongSelf.delegate respondsToSelector:@selector(socket:didReceiveData:)] )

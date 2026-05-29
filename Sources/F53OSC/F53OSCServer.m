@@ -261,7 +261,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) sweepIdleFlows
 {
-    NSDate *now = [NSDate date];
     NSTimeInterval udpThreshold = self.udpFlowIdleTimeout;
     NSTimeInterval tcpThreshold = self.tcpIdleTimeout;
 
@@ -276,11 +275,11 @@ NS_ASSUME_NONNULL_BEGIN
         if ( threshold <= 0 )
             continue; // sweep disabled for this transport
 
-        NSDate *lastActivity = socket.lastActivityDate;
-        if ( !lastActivity )
-            continue; // no activity yet — protect newborn connections from the sweep
+        NSTimeInterval secondsSinceLastActivity = socket.secondsSinceLastActivity;
+        if ( secondsSinceLastActivity < 0 )
+            continue; // no activity yet, protect newborn connections from the sweep
 
-        if ( [now timeIntervalSinceDate:lastActivity] >= threshold )
+        if ( secondsSinceLastActivity >= threshold )
         {
             [idleKeys addObject:key];
             [idleSockets addObject:socket];

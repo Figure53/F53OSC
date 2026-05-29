@@ -233,8 +233,8 @@ static NSUInteger ActiveUDPFlowCount( F53OSCServer *server )
 - (void) testActiveUDPFlowSurvivesSweep
 {
     // A sender that keeps sending at intervals shorter than udpFlowIdleTimeout should
-    // not be evicted. Each delivery bumps lastActivityDate, preventing the idle check
-    // from triggering a removal.
+    // not be evicted. Each delivery resets secondsSinceLastActivity, preventing the
+    // idle check from triggering a removal.
 
     F53OSCServer *server = [[F53OSCServer alloc] initWithDelegateQueue:dispatch_get_main_queue()];
     server.port = UDP_FLOW_PORT;
@@ -258,7 +258,7 @@ static NSUInteger ActiveUDPFlowCount( F53OSCServer *server )
         [counter waitForCount:(i + 1) timeout:3.0];
         XCTAssertEqual( counter.receivedCount, (i + 1), @"Message %ld should be received", (long)(i + 1) );
 
-        // Sleep well within the idle timeout so lastActivityDate stays fresh.
+        // Sleep well within the idle timeout so secondsSinceLastActivity stays small.
         [NSThread sleepForTimeInterval:0.1];
 
         // TODO: replace KVC introspection with a public -activeUDPFlowCount property.

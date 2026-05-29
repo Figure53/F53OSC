@@ -122,8 +122,10 @@ typedef NS_ENUM( NSInteger, F53TCPDataFraming ) {
 
 @property (strong, readonly, nullable) F53OSCStats *stats;
 
-// updated on every receive. Nil until first data arrives. Used by F53OSCServer to sweep idle UDP flows
-@property (atomic, strong, readonly, nullable)  NSDate *lastActivityDate;
+// Seconds since the last received byte. Returns -1.0 until first data arrives so
+// callers can distinguish a newborn connection from a stale one. Used by F53OSCServer
+// to sweep idle UDP flows.
+@property (readonly)                            NSTimeInterval secondsSinceLastActivity;
 
 @property (strong, nullable) F53OSCEncrypt *encrypter;
 @property (assign) BOOL isEncrypting;

@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Seconds of inactivity before an accepted TCP connection is force-cancelled
 // and removed from activeTcpSockets. Default is 0 (disabled — TCP connections
 // stay open indefinitely until the client disconnects). Set to a positive
-// value to enable. Idle is measured against F53OSCSocket.lastActivityDate,
+// value to enable. Idle is measured against F53OSCSocket.secondsSinceLastActivity,
 // which is updated on every receive.
 @property (nonatomic, assign)               NSTimeInterval tcpIdleTimeout;
 
