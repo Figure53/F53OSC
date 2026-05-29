@@ -170,8 +170,9 @@ NS_ASSUME_NONNULL_BEGIN
         }
         buffer += bytesRead;
         lengthOfRemainingBuffer -= bytesRead;
-        
-        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+
+        BOOL debugIncomingOSC = [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"];
+        if ( debugIncomingOSC )
         {
             NSLog( @"Incoming OSC message:" );
             NSLog( @"  %@", addressPattern );
@@ -180,7 +181,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSInteger numArgs = [typeTag length] - 1;
         if ( numArgs > 0 )
         {
-            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+            if ( debugIncomingOSC )
                 NSLog( @"  arguments:" );
             
             for ( int i = 1; i < numArgs + 1; i++ )
@@ -201,7 +202,7 @@ NS_ASSUME_NONNULL_BEGIN
                             buffer += bytesRead;
                             lengthOfRemainingBuffer -= bytesRead;
                             
-                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            if ( debugIncomingOSC )
                                 NSLog( @"    string: \"%@\"", stringArg );
                         }
                         else
@@ -219,7 +220,7 @@ NS_ASSUME_NONNULL_BEGIN
                             buffer += bytesRead;
                             lengthOfRemainingBuffer -= bytesRead;
                             
-                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            if ( debugIncomingOSC )
                                 NSLog( @"    blob: %@", dataArg );
                         }
                         else
@@ -236,7 +237,7 @@ NS_ASSUME_NONNULL_BEGIN
                             buffer += 4;
                             lengthOfRemainingBuffer -= 4;
                             
-                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            if ( debugIncomingOSC )
                                 NSLog( @"    int: %@", numberArg );
                         }
                         else
@@ -253,7 +254,7 @@ NS_ASSUME_NONNULL_BEGIN
                             buffer += 4;
                             lengthOfRemainingBuffer -= 4;
                             
-                            if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                            if ( debugIncomingOSC )
                                 NSLog( @"    float: %@", numberArg );
                         }
                         else
@@ -265,25 +266,25 @@ NS_ASSUME_NONNULL_BEGIN
                     case 'T':
                         [args addObject:[F53OSCValue oscTrue]]; // no data - do not advance the buffer
                         
-                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                        if ( debugIncomingOSC )
                             NSLog( @"    TRUE" );
                         break;
                     case 'F':
                         [args addObject:[F53OSCValue oscFalse]]; // no data - do not advance the buffer
                         
-                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                        if ( debugIncomingOSC )
                             NSLog( @"    FALSE" );
                         break;
                     case 'N':
                         [args addObject:[F53OSCValue oscNull]]; // no data - do not advance the buffer
                         
-                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                        if ( debugIncomingOSC )
                             NSLog( @"    NULL" );
                         break;
                     case 'I':
                         [args addObject:[F53OSCValue oscImpulse]]; // no data - do not advance the buffer
                         
-                        if ( [[NSUserDefaults standardUserDefaults] boolForKey:@"debugIncomingOSC"] )
+                        if ( debugIncomingOSC )
                             NSLog( @"    IMPLUSE" );
                         break;
                     default:
