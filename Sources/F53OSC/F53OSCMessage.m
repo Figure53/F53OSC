@@ -118,8 +118,10 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
         STRING_FORMATTER.minimumIntegerDigits = 1;
         STRING_FORMATTER.minimumFractionDigits = 1; // ensure values are sent as floats, not ints
         STRING_FORMATTER.maximumFractionDigits = 6;
+#if TARGET_OS_OSX
         STRING_FORMATTER.hasThousandSeparators = NO; // ensure this remains the default, see #4794
         STRING_FORMATTER.thousandSeparator = @"";
+#endif
         STRING_FORMATTER.usesGroupingSeparator = NO;
         STRING_FORMATTER.groupingSeparator = @"";
     }
