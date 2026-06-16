@@ -1,9 +1,9 @@
 //
-//  F53OSC.h
-//  F53OSC
+//  F53OSCBrowser+Internal.h
+//  F53OSC Tests
 //
-//  Created by Siobhán Dougall on 1/17/11.
-//  Copyright (c) 2011-2025 Figure 53 LLC, https://figure53.com
+//  Created by Christopher Cahoon on 5/23/26.
+//  Copyright (c) 2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,39 +24,31 @@
 //  THE SOFTWARE.
 //
 
-// F53OSC-Swift.h only exists when building F53OSC as a framework.
-// If not building as a framework, the Swift compatibility header is not required.
-#define F53OSC_BUILT_AS_FRAMEWORK __has_include(<F53OSC/F53OSC-Swift.h>)
-
-// Set this to agree with your GCC_WARN_CHECK_SWITCH_STATEMENTS build setting.
-// If GCC_WARN_CHECK_SWITCH_STATEMENTS is "No", set to 0. Otherwise leave set to 1
-// which omits several `default:` cases and allows the compiler to verify all cases.
-#define F53OSC_EXHAUSTIVE_SWITCH_ENABLED    1
-
+//  Internal category exposing seam methods for testing. Tests call
+//  _addDiscoveredService: / _removeDiscoveredService: directly with synthetic
+//  F53OSCServiceRef inputs. Production callers are inside F53OSCBrowser.m.
 
 #if F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSCBrowser.h>
-#import <F53OSC/F53OSCEncryptHandshake.h>
-#import <F53OSC/F53OSCParser.h>
 #import <F53OSC/F53OSCServiceRef.h>
-#import <F53OSC/F53OSCSocket.h>
-#import <F53OSC/F53OSCPacket.h>
-#import <F53OSC/F53OSCMessage.h>
-#import <F53OSC/F53OSCBundle.h>
-#import <F53OSC/F53OSCClient.h>
-#import <F53OSC/F53OSCServer.h>
-#import <F53OSC/F53OSCTimeTag.h>
 #else
 #import "F53OSCBrowser.h"
-#import "F53OSCEncryptHandshake.h"
-#import "F53OSCParser.h"
 #import "F53OSCServiceRef.h"
-#import "F53OSCSocket.h"
-#import "F53OSCPacket.h"
-#import "F53OSCMessage.h"
-#import "F53OSCBundle.h"
-#import "F53OSCClient.h"
-#import "F53OSCServer.h"
-#import "F53OSCTimeTag.h"
 #endif
 
+NS_ASSUME_NONNULL_BEGIN
+
+@interface F53OSCBrowser (Internal)
+
+// Filters the service through the delegate and, if accepted, adds an F53OSCClientRecord
+// to clientRecords and calls `browser:didAddClientRecord:`.
+// Must be on the main thread (or dispatches there internally). Tests may call directly.
+- (void) _addDiscoveredService:(F53OSCServiceRef *)service;
+
+// Removes the F53OSCClientRecord for the given service and calls `browser:didRemoveClientRecord:`.
+// Must be on the main thread (or dispatches there internally). Tests may call directly.
+- (void) _removeDiscoveredService:(F53OSCServiceRef *)service;
+
+@end
+
+NS_ASSUME_NONNULL_END

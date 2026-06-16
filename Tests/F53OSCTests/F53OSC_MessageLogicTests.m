@@ -100,8 +100,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
 {
     F53OSCMessage *message = [[F53OSCMessage alloc] init];
 
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:nil];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    F53OSCSocket *replySocket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:nil];
     message.replySocket = replySocket;
     XCTAssertEqualObjects(message.replySocket, replySocket, @"Message replySocket should be %@", replySocket);
 
@@ -141,8 +140,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
 {
     F53OSCMessage *original = [[F53OSCMessage alloc] init];
 
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:nil];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    F53OSCSocket *replySocket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:nil];
     original.replySocket = replySocket;
 
     original.addressPattern = @"/test/copy";
@@ -169,8 +167,7 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     F53OSCMessage *message = [[F53OSCMessage alloc] init];
 
     // Configure message with non-default values.
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:nil];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    F53OSCSocket *replySocket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:nil];
     message.replySocket = replySocket;
 
     message.addressPattern = @"/test/secure/coding";

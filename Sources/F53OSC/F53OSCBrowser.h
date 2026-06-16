@@ -4,7 +4,7 @@
 //
 //  Created by Brent Lord on 8/27/20.
 //  Adapted from QLKBrowser by Zach Waugh.
-//  Copyright (c) 2013-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,12 @@
 
 #import <Foundation/Foundation.h>
 
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSCServiceRef.h>
+#else
+#import "F53OSCServiceRef.h"
+#endif
+
 @protocol F53OSCBrowserDelegate;
 
 
@@ -41,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic)                   UInt16 port;
 @property (nonatomic)                   BOOL useTCP; // default NO
 @property (nonatomic, copy)             NSArray<NSString *> *hostAddresses;
-@property (nonatomic, strong, nullable) NSNetService *netService;
+@property (nonatomic, strong, nullable) F53OSCServiceRef *service;
 
 @end
 
@@ -71,7 +77,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)browser:(F53OSCBrowser *)browser didRemoveClientRecord:(F53OSCClientRecord *)clientRecord;
 
 @optional
-- (BOOL)browser:(F53OSCBrowser *)browser shouldAcceptNetService:(NSNetService *)netService;
+
+// return NO to reject a discovered service before a client record is created
+- (BOOL)browser:(F53OSCBrowser *)browser shouldAcceptService:(F53OSCServiceRef *)service;
 
 @end
 

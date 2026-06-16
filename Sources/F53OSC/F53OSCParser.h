@@ -26,7 +26,9 @@
 
 #import <Foundation/Foundation.h>
 
+@class F53OSCBundle;
 @class F53OSCMessage;
+@class F53OSCPacket;
 @class F53OSCSocket;
 @protocol F53OSCPacketDestination;
 @protocol F53OSCControlHandler;
@@ -38,10 +40,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable F53OSCMessage *) parseOscMessageData:(NSData *)data;
 
+// Decode raw OSC bytes into a packet object without delivering to a destination.
+// Returns an F53OSCMessage for messages, F53OSCBundle for bundles, nil if malformed.
+// Inner bundle elements are recursively validated to match the work +processOscData:
+// performs, but no delegate dispatch occurs. Use when measuring decode cost or when
+// the caller wants the decoded structure directly.
++ (nullable F53OSCPacket *) packetFromData:(NSData *)data;
+
 + (void) processOscData:(NSData *)data forDestination:(id<F53OSCPacketDestination>)destination replyToSocket:(F53OSCSocket *)socket controlHandler:(nullable id<F53OSCControlHandler>)controlHandler wasEncrypted:(BOOL)wasEncrypted;
 
 + (void) translateSlipData:(NSData *)slipData toData:(NSMutableData *)data withState:(NSMutableDictionary<NSString *, id> *)state destination:(id<F53OSCPacketDestination>)destination
     controlHandler:(nullable id<F53OSCControlHandler>)controlHandler;
+
+// Frame an arbitrary payload as a double-END SLIP packet. Pure transformation, no
+// network. Exposed for benchmarks and integration tests. Production also uses this
+// via F53OSCSocket -sendPacket:.
++ (NSData *) slipFrameData:(NSData *)data;
 
 @end
 

@@ -84,9 +84,7 @@ NS_ASSUME_NONNULL_BEGIN
     // F53OSCParser's processOscData API requires a non-nil socket to reply
     // through. None of these tests actually send anything, but we give it a
     // real socket object to satisfy the contract.
-    dispatch_queue_t delegateQueue = dispatch_get_main_queue();
-    GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:delegateQueue];
-    self.mockSocket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+    self.mockSocket = [F53OSCSocket outboundTcpSocketWithCallbackQueue:dispatch_get_main_queue()];
 }
 
 

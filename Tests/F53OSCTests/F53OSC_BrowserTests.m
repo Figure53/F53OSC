@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 8/5/25.
-//  Copyright (c) 2025 Figure 53. All rights reserved.
+//  Copyright (c) 2020-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -28,70 +28,116 @@
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
+#import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
+#import <Network/Network.h>
 
+#if F53OSC_BUILT_AS_FRAMEWORK
+#import <F53OSC/F53OSCBrowser.h>
+#import "F53OSCBrowser+Internal.h"
+#import <F53OSC/F53OSCServiceRef.h>
+#else
 #import "F53OSCBrowser.h"
+#import "F53OSCBrowser+Internal.h"
+#import "F53OSCServiceRef.h"
+#endif
 
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface F53OSCBrowser (F53OSC_BrowserTestsAccess) <NSNetServiceBrowserDelegate, NSNetServiceDelegate>
-@property (nonatomic, strong, nullable)         NSNetServiceBrowser *netServiceDomainsBrowser;
-@property (nonatomic, strong, nullable)         NSNetServiceBrowser *netServiceBrowser;
-- (void)setNeedsBeginResolvingNetServices;
-- (void)beginResolvingNetServices;
-- (nullable F53OSCClientRecord *)clientRecordForHost:(NSString *)host port:(UInt16)port;
-- (nullable F53OSCClientRecord *)clientRecordForNetService:(NSNetService *)netService;
-+ (nullable NSString *)IPAddressFromData:(NSData *)data resolveIPv6Addresses:(BOOL)resolveIPv6Addresses;
+#pragma mark - BrowserDelegateRecorder
+
+/// Test delegate that records all browser callbacks and supports optional filter blocks.
+@interface BrowserDelegateRecorder : NSObject <F53OSCBrowserDelegate>
+
+@property (nonatomic, strong) NSMutableArray<F53OSCClientRecord *> *addedRecords;
+@property (nonatomic, strong) NSMutableArray<F53OSCClientRecord *> *removedRecords;
+
+/// When non-nil, returned value is used by -browser:shouldAcceptService:.
+@property (nonatomic, copy, nullable) BOOL (^acceptServiceFilter)(F53OSCServiceRef *service);
+
+@end
+
+@implementation BrowserDelegateRecorder
+
+- (instancetype) init
+{
+    self = [super init];
+    if ( self )
+    {
+        _addedRecords = [NSMutableArray array];
+        _removedRecords = [NSMutableArray array];
+    }
+    return self;
+}
+
+- (void) browser:(F53OSCBrowser *)browser didAddClientRecord:(F53OSCClientRecord *)clientRecord
+{
+    [self.addedRecords addObject:clientRecord];
+}
+
+- (void) browser:(F53OSCBrowser *)browser didRemoveClientRecord:(F53OSCClientRecord *)clientRecord
+{
+    [self.removedRecords addObject:clientRecord];
+}
+
+- (BOOL) browser:(F53OSCBrowser *)browser shouldAcceptService:(F53OSCServiceRef *)service
+{
+    if ( self.acceptServiceFilter )
+        return self.acceptServiceFilter( service );
+    return YES;
+}
+
 @end
 
 
-#pragma mark -
+#pragma mark - Helper
 
-@interface F53OSC_BrowserTests : XCTestCase <F53OSCBrowserDelegate>
+/// Convenience factory for synthetic F53OSCServiceRef values used throughout tests.
+static F53OSCServiceRef * MakeServiceRef( NSString *name, NSString *type, NSString *domain,
+                                          NSString * _Nullable host, UInt16 port )
+{
+    return [[F53OSCServiceRef alloc] initWithName:name
+                                            type:type
+                                          domain:domain
+                                            host:host
+                                            port:port
+                                   hostAddresses:@[]
+                                       txtRecord:nil];
+}
+
+
+#pragma mark - F53OSC_BrowserTests
+
+@interface F53OSC_BrowserTests : XCTestCase
 @end
-
 
 @implementation F53OSC_BrowserTests
 
-//- (void)setUp
-//{
-//    [super setUp];
-//}
+#pragma mark - Sanity
 
-//- (void)tearDown
-//{
-//    [super tearDown];
-//}
-
-
-#pragma mark - Basic configuration tests
-
-- (void)testThat__setupWorks
+- (void) testThat__setupWorks
 {
-    // given
-    // - state created by `+setUp` and `-setUp`
-
-    // when
-    // - triggered by running this test
-
-    // then
     XCTAssertTrue(YES);
 }
 
-- (void)testThat_clientRecordHasCorrectDefaults
+
+#pragma mark - F53OSCClientRecord defaults and copying
+
+- (void) testThat_clientRecordHasCorrectDefaults
 {
     F53OSCClientRecord *record = [[F53OSCClientRecord alloc] init];
 
     XCTAssertNotNil(record, @"Client record should not be nil");
     XCTAssertEqual(record.port, 0, @"Default port should be 0");
-    XCTAssertFalse(record.useTCP, @"Default should not use TCP");
+    XCTAssertFalse(record.useTCP, @"Default useTCP should be NO");
     XCTAssertNotNil(record.hostAddresses, @"Default hostAddresses should not be nil");
-    XCTAssertEqual(record.hostAddresses.count, 0, @"Default hostAddresses should initially be empty");
-    XCTAssertNil(record.netService, @"Default netService should be nil");
+    XCTAssertEqual(record.hostAddresses.count, 0u, @"Default hostAddresses should initially be empty");
+    XCTAssertNil(record.service, @"Default service should be nil");
+    XCTAssertNil(record.service, @"Default service should be nil");
 }
 
-- (void)testThat_clientRecordCanBeCopied
+- (void) testThat_clientRecordCanBeCopied
 {
     F53OSCClientRecord *original = [[F53OSCClientRecord alloc] init];
     original.port = 8000;
@@ -103,114 +149,128 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertNotNil(copy, @"Copy should not be nil");
     XCTAssertNotEqual(copy, original, @"Copy should be a different object");
     XCTAssertEqual(copy.port, original.port, @"port should be copied");
-    XCTAssertEqual(copy.useTCP, original.useTCP, @"useTCP setting should be copied");
+    XCTAssertEqual(copy.useTCP, original.useTCP, @"useTCP should be copied");
     XCTAssertEqualObjects(copy.hostAddresses, original.hostAddresses, @"hostAddresses should be copied");
-    XCTAssertNil(copy.netService, @"Copy netService should be nil");
+    XCTAssertNil(copy.service, @"service should be nil on copy when original had nil");
 }
 
-- (void)testThat_browserHasCorrectDefaults
+- (void) testThat_clientRecordCopyPreservesService
+{
+    F53OSCServiceRef *ref = MakeServiceRef( @"TestService", @"_osc._tcp.", @"local.", @"myhost.local.", 53000 );
+    F53OSCClientRecord *original = [[F53OSCClientRecord alloc] init];
+    original.service = ref;
+    original.port = 53000;
+
+    F53OSCClientRecord *copy = [original copy];
+
+    XCTAssertNotNil(copy.service, @"service should be preserved on copy");
+    XCTAssertEqualObjects(copy.service.name, @"TestService", @"service.name should be preserved");
+    XCTAssertEqual(copy.port, 53000, @"port should be preserved");
+}
+
+
+#pragma mark - F53OSCBrowser defaults
+
+- (void) testThat_browserHasCorrectDefaults
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
     XCTAssertNotNil(browser, @"Browser should not be nil");
     XCTAssertNotNil(browser.clientRecords, @"Default clientRecords should not be nil");
-    XCTAssertEqual(browser.clientRecords.count, 0, @"Default clientRecords should be empty");
+    XCTAssertEqual(browser.clientRecords.count, 0u, @"Default clientRecords should be empty");
     XCTAssertFalse(browser.running, @"Default should not be running");
     XCTAssertTrue(browser.useTCP, @"Default useTCP should be YES");
-    XCTAssertFalse(browser.resolveIPv6Addresses, @"Default resolveIPv6Addresses be NO");
+    XCTAssertFalse(browser.resolveIPv6Addresses, @"Default resolveIPv6Addresses should be NO");
     XCTAssertEqualObjects(browser.domain, @"local.", @"Default domain should be 'local.'");
-    XCTAssertEqualObjects(browser.serviceType, @"", @"Default serviceType should be empty");
+    XCTAssertEqualObjects(browser.serviceType, @"", @"Default serviceType should be empty string");
     XCTAssertNil(browser.delegate, @"Default delegate should be nil");
-
-    XCTAssertNil(browser.netServiceDomainsBrowser.delegate, @"Browser netServiceDomainsBrowser delegate should be nil util started");
-    XCTAssertNil(browser.netServiceBrowser.delegate, @"Browser netServiceBrowser delegate should be nil until netServiceBrowser finds a domain");
 }
 
-- (void)testThat_browserCanConfigureProperties
-{
-    F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
-
-    [self addTeardownBlock:^{
-        [browser stop];
-    }];
-
-    browser.useTCP = NO;
-    XCTAssertFalse(browser.useTCP, @"Browser useTCP should be NO");
-
-    browser.resolveIPv6Addresses = YES;
-    XCTAssertTrue(browser.resolveIPv6Addresses, @"Browser resolveIPv6Addresses should be YES");
-
-    browser.domain = @"some_domain.";
-    XCTAssertEqualObjects(browser.domain, @"some_domain.", @"Browser domain should be 'some_domain.'");
-
-    browser.serviceType = @"_osc._tcp.";
-    XCTAssertEqualObjects(browser.serviceType, @"_osc._tcp.", @"Browser serviceType should be '_osc._tcp.'");
-
-    browser.delegate = self;
-    XCTAssertEqualObjects(browser.delegate, self, @"Browser delegate should be self");
-
-    // Test that properties remain unchanged when browser starts.
-    [browser start];
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
-    XCTAssertTrue(browser.running, @"Browser should be running");
-
-    XCTAssertFalse(browser.useTCP, @"Browser useTCP should remain NO");
-    XCTAssertTrue(browser.resolveIPv6Addresses, @"Browser resolveIPv6Addresses should remain YES");
-    XCTAssertEqualObjects(browser.domain, @"some_domain.", @"Browser domain should remain 'some_domain.'");
-    XCTAssertEqualObjects(browser.serviceType, @"_osc._tcp.", @"Browser serviceType should remain '_osc._tcp.'");
-    XCTAssertEqualObjects(browser.delegate, self, @"Browser delegate should remain self");
-
-    // Test toggling useTCP while running
-    browser.useTCP = YES;
-    XCTAssertTrue(browser.useTCP, @"Browser useTCP should be YES");
-
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
-    XCTAssertTrue(browser.running, @"Browser should still be running");
-
-    browser.useTCP = NO;
-    XCTAssertFalse(browser.useTCP, @"Browser useTCP should be NO");
-
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
-    XCTAssertTrue(browser.running, @"Browser should still be running");
-}
-
-- (void)testThat_browserCannotBeCopied
+- (void) testThat_browserCannotBeCopied
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
     XCTAssertThrows(browser.copy, @"Browser does not conform to NSCopying");
 }
 
-- (void)testThat_browserHandlesIPv6Configuration
+
+#pragma mark - Browser configuration
+
+- (void) testThat_browserCanConfigureProperties
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
-    // Test IPv4 only (default).
-    browser.serviceType = @"_osc._tcp.";
-    browser.resolveIPv6Addresses = NO;
+    [self addTeardownBlock:^{
+        [browser stop];
+    }];
 
+    browser.useTCP = NO;
+    XCTAssertFalse(browser.useTCP, @"useTCP should be NO");
+
+    browser.resolveIPv6Addresses = YES;
+    XCTAssertTrue(browser.resolveIPv6Addresses, @"resolveIPv6Addresses should be YES");
+
+    browser.domain = @"some_domain.";
+    XCTAssertEqualObjects(browser.domain, @"some_domain.", @"domain should be 'some_domain.'");
+
+    browser.serviceType = @"_osc._tcp.";
+    XCTAssertEqualObjects(browser.serviceType, @"_osc._tcp.", @"serviceType should be '_osc._tcp.'");
+
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
+    XCTAssertEqualObjects(browser.delegate, recorder, @"delegate should be recorder");
+
+    // Properties should remain unchanged when browser starts.
+    [browser start];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    XCTAssertTrue(browser.running, @"Browser should be running");
+
+    XCTAssertFalse(browser.useTCP, @"useTCP should remain NO");
+    XCTAssertTrue(browser.resolveIPv6Addresses, @"resolveIPv6Addresses should remain YES");
+    XCTAssertEqualObjects(browser.domain, @"some_domain.", @"domain should remain 'some_domain.'");
+    XCTAssertEqualObjects(browser.serviceType, @"_osc._tcp.", @"serviceType should remain '_osc._tcp.'");
+    XCTAssertEqualObjects(browser.delegate, recorder, @"delegate should remain recorder");
+
+    // Toggle useTCP while running.
+    browser.useTCP = YES;
+    XCTAssertTrue(browser.useTCP, @"useTCP should be YES");
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    XCTAssertTrue(browser.running, @"Browser should still be running");
+
+    browser.useTCP = NO;
+    XCTAssertFalse(browser.useTCP, @"useTCP should be NO again");
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    XCTAssertTrue(browser.running, @"Browser should still be running");
+}
+
+- (void) testThat_browserHandlesIPv6Configuration
+{
+    F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = @"_osc._tcp.";
+
+    // IPv4 only (default).
+    browser.resolveIPv6Addresses = NO;
     [browser start];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Should work with IPv4 only");
-
-    XCTAssertFalse(browser.resolveIPv6Addresses, @"Initial resolveIPv6Addresses should remain disabled");
-
+    XCTAssertFalse(browser.resolveIPv6Addresses, @"resolveIPv6Addresses should remain NO");
     [browser stop];
 
-    // Test IPv6 enabled.
+    // IPv6 enabled.
     browser.resolveIPv6Addresses = YES;
-
     [browser start];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Should work with IPv6 enabled");
-
-    XCTAssertTrue(browser.resolveIPv6Addresses, @"Initial resolveIPv6Addresses should remain enabled");
+    XCTAssertTrue(browser.resolveIPv6Addresses, @"resolveIPv6Addresses should remain YES");
+    [browser stop];
 }
 
 
-#pragma mark - Domain tests
+#pragma mark - Domain validation
 
-- (void)testThat_browserCanChangeDomains
+- (void) testThat_browserCanChangeDomains
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
@@ -220,14 +280,11 @@ NS_ASSUME_NONNULL_BEGIN
 
     browser.serviceType = @"_osc._tcp.";
 
-    // Test default domain.
     XCTAssertEqualObjects(browser.domain, @"local.", @"Should have default domain");
     XCTAssertFalse(browser.running, @"Browser should not be running");
 
-    // Test custom domain.
     browser.domain = @"example.local.";
     XCTAssertEqualObjects(browser.domain, @"example.local.", @"Should accept custom domain");
-    XCTAssertFalse(browser.running, @"Browser should not be running");
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
@@ -235,7 +292,6 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma clang diagnostic pop
     XCTAssertEqualObjects(browser.domain, @"example.local.", @"nil domain should be rejected");
 
-    // Test that changing domain while running restarts browser.
     [browser start];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Browser should be running");
@@ -243,11 +299,10 @@ NS_ASSUME_NONNULL_BEGIN
     browser.domain = @"test.local.";
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Browser should still be running after domain change");
-
     XCTAssertEqualObjects(browser.domain, @"test.local.", @"Domain should be updated");
 }
 
-- (void)testThat_browserCannotStartWithoutDomain
+- (void) testThat_browserCannotStartWithoutDomain
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
@@ -256,27 +311,22 @@ NS_ASSUME_NONNULL_BEGIN
     }];
 
     browser.serviceType = @"_osc._tcp.";
-
     browser.domain = @"";
-    XCTAssertEqualObjects(browser.domain, @"", @"Browser domain should be empty string");
-    XCTAssertFalse(browser.running, @"Browser should not be running");
+    XCTAssertEqualObjects(browser.domain, @"", @"Domain should be empty string");
 
-    // Should not start with empty domain.
     [browser start];
     XCTAssertFalse(browser.running, @"Browser should not start without a domain");
 
     browser.domain = @"local.";
-
-    // Test that browser starts with a valid domain.
     [browser start];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Browser should start with a valid domain");
 }
 
 
-#pragma mark - Service type tests
+#pragma mark - Service type validation
 
-- (void)testThat_browserHandlesOSCServiceTypes
+- (void) testThat_browserHandlesOSCServiceTypes
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
@@ -284,7 +334,6 @@ NS_ASSUME_NONNULL_BEGIN
         [browser stop];
     }];
 
-    // Test common OSC service types.
     NSArray<NSString *> *serviceTypes = @[
         @"_qlab._tcp.",
         @"_qlab._udp.",
@@ -294,7 +343,7 @@ NS_ASSUME_NONNULL_BEGIN
         @"_osc._udp.",
     ];
 
-    for (NSString *serviceType in serviceTypes)
+    for ( NSString *serviceType in serviceTypes )
     {
         [browser stop];
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
@@ -310,20 +359,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)testThat_browserCannotStartWithoutServiceType
+- (void) testThat_browserCannotStartWithoutServiceType
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
     XCTAssertEqualObjects(browser.serviceType, @"", @"Default serviceType should be empty");
     XCTAssertFalse(browser.running, @"Browser should not be running");
 
-    // Should not start with empty service type.
     [browser start];
     XCTAssertFalse(browser.running, @"Browser should not start without a service type");
 
     browser.serviceType = @"_osc._tcp.";
-
-    // Test that browser starts with a valid service type.
     [browser start];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Browser should start with a valid service type");
@@ -333,7 +379,7 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse(browser.running, @"Browser should stop when requested");
 }
 
-- (void)testThat_browserRestartsWhenServiceTypeChanges
+- (void) testThat_browserRestartsWhenServiceTypeChanges
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
@@ -342,52 +388,74 @@ NS_ASSUME_NONNULL_BEGIN
     }];
 
     browser.serviceType = @"_osc._tcp.";
-    XCTAssertFalse(browser.running, @"Browser should not be running");
-
     [browser start];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Browser should be running");
 
-    // Change service type - should restart automatically.
     browser.serviceType = @"_osc._udp.";
-
-    // Wait for restart.
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Browser should still be running after service type change");
-    XCTAssertEqualObjects(browser.serviceType, @"_osc._udp.", @"Service type should be updated to '_osc._udp.'");
+    XCTAssertEqualObjects(browser.serviceType, @"_osc._udp.", @"serviceType should be updated");
 }
 
-
-#pragma mark - F53OSCBrowserDelegate tests
-
-- (void)testThat_browserDelegateMethodsAreOptional
+- (void) testThat_browserHandlesEmptyServiceType
 {
-    // Test that we can create a browser without implementing optional delegate methods.
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
 
     [self addTeardownBlock:^{
         [browser stop];
     }];
 
-    browser.delegate = self; // We implement the required methods.
+    browser.serviceType = @"";
+    [browser start];
+    XCTAssertFalse(browser.running, @"Should not start with an empty service type");
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+    browser.serviceType = nil;
+#pragma clang diagnostic pop
+    [browser start];
+    XCTAssertFalse(browser.running, @"Should not start with a nil service type");
+
+    browser.serviceType = @"_osc._tcp.";
+    [browser start];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    XCTAssertTrue(browser.running, @"Should start with valid service type");
+}
+
+
+#pragma mark - Delegate optionality
+
+- (void) testThat_browserDelegateMethodsAreOptional
+{
+    // BrowserDelegateRecorder implements only the required methods; the optional
+    // shouldAcceptService: will not be invoked because we override it, but a
+    // bare XCTestCase-self delegate (below) omits both optionals.
+    F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+
+    [self addTeardownBlock:^{
+        [browser stop];
+    }];
+
+    // Use self as delegate — XCTestCase does NOT implement optional delegate methods.
+    browser.delegate = (id<F53OSCBrowserDelegate>)self;
     browser.serviceType = @"_osc._tcp.";
 
-    // This should not crash even though we don't implement `browser:shouldAcceptNetService:`.
+    // Must not crash.
     [browser start];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Browser should start without optional delegate methods");
 }
 
 
-#pragma mark - Performance / edge case tests
+#pragma mark - Lifecycle edge cases
 
-- (void)testThat_browserHandlesRapidStartStop
+- (void) testThat_browserHandlesRapidStartStop
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
     browser.serviceType = @"_osc._tcp.";
 
-    // Test rapid start/stop cycles.
-    for (int i = 0; i < 5; i++)
+    for ( int i = 0; i < 5; i++ )
     {
         [browser start];
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
@@ -399,19 +467,17 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)testThat_browserHandlesMultipleStarts
+- (void) testThat_browserHandlesMultipleStarts
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
     browser.serviceType = @"_osc._tcp.";
 
-    // Multiple start calls should be safe.
     [browser start];
     [browser start];
     [browser start];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     XCTAssertTrue(browser.running, @"Browser should be running after multiple starts");
 
-    // Multiple stop calls should be safe.
     [browser stop];
     [browser stop];
     [browser stop];
@@ -419,220 +485,318 @@ NS_ASSUME_NONNULL_BEGIN
     XCTAssertFalse(browser.running, @"Browser should be stopped after multiple stops");
 }
 
-- (void)testThat_browserHandlesEmptyServiceType
+- (void) testThat_browserCleansUpProperly
 {
-    F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
-
-    [self addTeardownBlock:^{
-        [browser stop];
-    }];
-
-    // Empty service type should prevent starting.
-    browser.serviceType = @"";
-    [browser start];
-    XCTAssertFalse(browser.running, @"Should not start with an empty service type");
-
-    // Nil service type should also prevent starting.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnonnull"
-    browser.serviceType = nil;
-#pragma clang diagnostic pop
-    [browser start];
-    XCTAssertFalse(browser.running, @"Should not start with a nil service type");
-
-    // Setting valid service type should allow starting.
-    browser.serviceType = @"_osc._tcp.";
-    [browser start];
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
-    XCTAssertTrue(browser.running, @"Should start with valid service type");
-}
-
-
-#pragma mark - Memory management tests
-
-- (void)testThat_browserCleansUpProperly
-{
-    // Create browser in separate scope to test cleanup.
     @autoreleasepool {
         F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+        BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
 
-        browser.delegate = self;
+        browser.delegate = recorder;
         browser.serviceType = @"_osc._tcp.";
 
         [browser start];
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
         XCTAssertTrue(browser.running, @"Browser should be running");
 
-        // Proper cleanup should happen automatically when browser is deallocated
         [browser stop];
     }
 
-    // Force memory cleanup.
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
 
-    // If we get here without crashing, cleanup worked properly.
+    // If we reach this line without crashing, cleanup worked.
     XCTAssertTrue(YES, @"Browser cleanup completed without crashes");
 }
 
 
-#pragma mark - Service discovery and resolution tests
+#pragma mark - Seam-based: adding a discovered service
 
-- (void)testThat_browserHandlesServiceResolution
+- (void) testThat_addDiscoveredServiceCreatesClientRecord
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
-    browser.delegate = self;
+    browser.serviceType = @"_osc._tcp.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
 
-    // Test needs begin resolving net services method
-    XCTAssertNoThrow([browser setNeedsBeginResolvingNetServices], @"Should handle setNeedsBeginResolvingNetServices gracefully");
+    XCTAssertEqual(browser.clientRecords.count, 0u, @"No records before discovery");
 
-    // Test begin resolving net services method
-    XCTAssertNoThrow([browser beginResolvingNetServices], @"Should handle beginResolvingNetServices gracefully");
+    F53OSCServiceRef *ref = MakeServiceRef( @"MyService", @"_osc._tcp.", @"local.", @"myhost.local.", 53000 );
+    [browser _addDiscoveredService:ref];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+
+    XCTAssertEqual(browser.clientRecords.count, 1u, @"One record should be present after add");
+    XCTAssertEqual(recorder.addedRecords.count, 1u, @"Delegate should have received one add callback");
+    XCTAssertEqual(recorder.removedRecords.count, 0u, @"No remove callbacks expected");
+
+    F53OSCClientRecord *record = recorder.addedRecords.firstObject;
+    XCTAssertNotNil(record, @"Added record should not be nil");
+    XCTAssertEqualObjects(record.service.name, @"MyService", @"record.service.name should match");
+    XCTAssertEqualObjects(record.service.type, @"_osc._tcp.", @"record.service.type should match");
+    XCTAssertEqualObjects(record.service.domain, @"local.", @"record.service.domain should match");
+    XCTAssertEqual(record.service.port, 53000, @"record.service.port should match");
 }
 
-- (void)testThat_browserHandlesClientRecordLookup
+- (void) testThat_addDiscoveredServicePropagatesUseTCP
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = @"_osc._tcp.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
 
-    // Test client record lookup by host and port
-    F53OSCClientRecord *record1 = [browser clientRecordForHost:@"localhost" port:8000];
-    XCTAssertNil(record1, @"Should return nil for non-existent client record");
+    // useTCP = YES (default)
+    browser.useTCP = YES;
+    F53OSCServiceRef *ref1 = MakeServiceRef( @"TCPService", @"_osc._tcp.", @"local.", nil, 1234 );
+    [browser _addDiscoveredService:ref1];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 
-    // Test client record lookup by net service
-    NSNetService *netService = [[NSNetService alloc] initWithDomain:@"local." type:@"_osc._udp" name:@"TestService" port:8001];
-    F53OSCClientRecord *record2 = [browser clientRecordForNetService:netService];
-    XCTAssertNil(record2, @"Should return nil for non-existent net service");
+    F53OSCClientRecord *tcpRecord = recorder.addedRecords.lastObject;
+    XCTAssertNotNil(tcpRecord, @"TCP record should be present");
+    XCTAssertTrue(tcpRecord.useTCP, @"record.useTCP should be YES when browser.useTCP is YES");
+
+    // useTCP = NO
+    browser.useTCP = NO;
+    F53OSCServiceRef *ref2 = MakeServiceRef( @"UDPService", @"_osc._udp.", @"local.", nil, 5678 );
+    [browser _addDiscoveredService:ref2];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+
+    F53OSCClientRecord *udpRecord = recorder.addedRecords.lastObject;
+    XCTAssertNotNil(udpRecord, @"UDP record should be present");
+    XCTAssertFalse(udpRecord.useTCP, @"record.useTCP should be NO when browser.useTCP is NO");
 }
 
-- (void)testThat_browserHandlesBrowserDelegateCallbacks
+
+#pragma mark - Seam-based: removing a discovered service
+
+- (void) testThat_removeDiscoveredServiceRemovesClientRecord
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = @"_osc._tcp.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
 
-    NSNetServiceBrowser *netServiceBrowser = [[NSNetServiceBrowser alloc] init];
+    F53OSCServiceRef *ref = MakeServiceRef( @"GoingService", @"_osc._tcp.", @"local.", nil, 7000 );
 
-    XCTAssertNoThrow([browser netServiceBrowserDidStopSearch:netServiceBrowser], @"Should handle netServiceBrowserDidStopSearch gracefully");
+    [browser _addDiscoveredService:ref];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    XCTAssertEqual(browser.clientRecords.count, 1u, @"One record after add");
 
-    NSError *searchError = [NSError errorWithDomain:@"TestErrorDomain" code:300 userInfo:@{NSLocalizedDescriptionKey: @"Test search error"}];
-    NSDictionary *errorDict = @{NSNetServicesErrorCode: @(searchError.code)};
-    XCTAssertNoThrow([browser netServiceBrowser:netServiceBrowser didNotSearch:errorDict], @"Should handle didNotSearch error gracefully");
+    [browser _removeDiscoveredService:ref];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    XCTAssertEqual(browser.clientRecords.count, 0u, @"No records after remove");
+    XCTAssertEqual(recorder.removedRecords.count, 1u, @"Delegate should have received one remove callback");
+
+    F53OSCClientRecord *removed = recorder.removedRecords.firstObject;
+    XCTAssertEqualObjects(removed.service.name, @"GoingService", @"Removed record should carry the service ref");
 }
 
-- (void)testThat_browserHandlesServiceDiscoveryCallbacks
+- (void) testThat_removeDiscoveredServiceForUnknownServiceIsNoOp
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = @"_osc._tcp.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
 
-    NSNetServiceBrowser *netServiceBrowser = [[NSNetServiceBrowser alloc] init];
-    NSNetService *netService = [[NSNetService alloc] initWithDomain:@"local." type:@"_osc._udp" name:@"TestOSCService" port:8002];
+    // Remove a service that was never added — should not crash and should not call delegate.
+    F53OSCServiceRef *unknown = MakeServiceRef( @"NeverAdded", @"_osc._tcp.", @"local.", nil, 9999 );
+    XCTAssertNoThrow([browser _removeDiscoveredService:unknown],
+                     @"Removing unknown service should not throw");
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 
-    XCTAssertNoThrow([browser netServiceBrowser:netServiceBrowser didFindService:netService moreComing:NO], @"Should handle didFindService gracefully");
-    XCTAssertNoThrow([browser netServiceBrowser:netServiceBrowser didRemoveService:netService moreComing:NO], @"Should handle didRemoveService gracefully");
+    XCTAssertEqual(recorder.removedRecords.count, 0u, @"No remove callbacks expected for unknown service");
 }
 
-- (void)testThat_browserHandlesNetServiceResolutionCallbacks
+
+#pragma mark - Seam-based: shouldAcceptService filter
+
+- (void) testThat_shouldAcceptServiceFilterRejectsService
 {
     F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = @"_osc._tcp.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
 
-    NSNetService *netService = [[NSNetService alloc] initWithDomain:@"local." type:@"_osc._udp" name:@"ResolveTestService" port:8003];
+    // Reject everything.
+    recorder.acceptServiceFilter = ^BOOL( F53OSCServiceRef *service ) {
+        return NO;
+    };
 
-    XCTAssertNoThrow([browser netServiceDidResolveAddress:netService], @"Should handle netServiceDidResolveAddress gracefully");
+    F53OSCServiceRef *ref = MakeServiceRef( @"RejectedService", @"_osc._tcp.", @"local.", nil, 1111 );
+    [browser _addDiscoveredService:ref];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 
-    NSError *resolveError = [NSError errorWithDomain:@"TestErrorDomain" code:400 userInfo:@{NSLocalizedDescriptionKey: @"Test resolve error"}];
-    NSDictionary *errorDict = @{NSNetServicesErrorCode: @(resolveError.code)};
-    XCTAssertNoThrow([browser netService:netService didNotResolve:errorDict], @"Should handle didNotResolve error gracefully");
+    XCTAssertEqual(browser.clientRecords.count, 0u, @"Rejected service should not appear in clientRecords");
+    XCTAssertEqual(recorder.addedRecords.count, 0u, @"didAddClientRecord should not be called for rejected service");
 }
 
-
-#pragma mark - IPAddressFromData:resolveIPv6Addresses: tests
-
-- (void)testThat_browserIPAddressFromDataHandlesValidData
+- (void) testThat_shouldAcceptServiceFilterAcceptsMatchingService
 {
-    NSData *data;
-    NSString *address;
+    F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = @"_osc._tcp.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
 
-    // Test IPv4 address parsing
-    struct sockaddr_in ipv4Addr;
-    memset(&ipv4Addr, 0, sizeof(ipv4Addr));
-    ipv4Addr.sin_family = AF_INET;
-    ipv4Addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // 127.0.0.1
-    ipv4Addr.sin_port = htons(8004);
-    data = [NSData dataWithBytes:&ipv4Addr length:sizeof(ipv4Addr)];
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:NO];
-    XCTAssertNotNil(address, @"Should parse IPv4 address");
-    XCTAssertTrue([address containsString:@"127.0.0.1"], @"Should contain localhost address");
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:YES];
-    XCTAssertNotNil(address, @"Should parse IPv4 address even when resolveIPv6Addresses is YES");
+    // Accept only services named "Accepted".
+    recorder.acceptServiceFilter = ^BOOL( F53OSCServiceRef *service ) {
+        return [service.name isEqualToString:@"Accepted"];
+    };
 
-    // Test IPv6 address parsing
-    struct sockaddr_in6 ipv6Addr;
-    memset(&ipv6Addr, 0, sizeof(ipv6Addr));
-    ipv6Addr.sin6_family = AF_INET6;
-    ipv6Addr.sin6_addr = in6addr_loopback; // ::1
-    ipv6Addr.sin6_port = htons(8005);
-    data = [NSData dataWithBytes:&ipv6Addr length:sizeof(ipv6Addr)];
+    F53OSCServiceRef *rejected = MakeServiceRef( @"NotAccepted", @"_osc._tcp.", @"local.", nil, 2000 );
+    F53OSCServiceRef *accepted = MakeServiceRef( @"Accepted", @"_osc._tcp.", @"local.", nil, 2001 );
 
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:NO];
-    XCTAssertNil(address, @"Should not parse IPv6 address when resolveIPv6Addresses is NO");
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:YES];
-    XCTAssertNotNil(address, @"Should parse IPv6 address when resolveIPv6Addresses is YES");
+    [browser _addDiscoveredService:rejected];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    [browser _addDiscoveredService:accepted];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+
+    XCTAssertEqual(browser.clientRecords.count, 1u, @"Only accepted service should be in clientRecords");
+    XCTAssertEqual(recorder.addedRecords.count, 1u, @"Only one add callback expected");
+    XCTAssertEqualObjects(recorder.addedRecords.firstObject.service.name, @"Accepted",
+                          @"The accepted record should have name 'Accepted'");
 }
 
-- (void)testThat_browserIPAddressFromDataHandlesInvalidData
+
+#pragma mark - Seam-based: multiple services
+
+- (void) testThat_multipleServicesCanBeAddedAndRemoved
 {
-    // Test with nil data
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnonnull"
-    NSString *nilAddress = [F53OSCBrowser IPAddressFromData:nil resolveIPv6Addresses:NO];
-#pragma clang diagnostic pop
-    XCTAssertNil(nilAddress, @"Should return nil for nil data");
+    F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = @"_osc._tcp.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
 
-    NSData *data;
-    NSString *address;
+    F53OSCServiceRef *ref1 = MakeServiceRef( @"Service1", @"_osc._tcp.", @"local.", nil, 4001 );
+    F53OSCServiceRef *ref2 = MakeServiceRef( @"Service2", @"_osc._tcp.", @"local.", nil, 4002 );
+    F53OSCServiceRef *ref3 = MakeServiceRef( @"Service3", @"_osc._tcp.", @"local.", nil, 4003 );
 
-    // Test with malformed data
-    data = [@"not_an_address" dataUsingEncoding:NSUTF8StringEncoding];
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:NO];
-    XCTAssertNil(address, @"Should return nil for malformed IPv4 data");
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:YES];
-    XCTAssertNil(address, @"Should return nil for malformed IPv6 data");
+    [browser _addDiscoveredService:ref1];
+    [browser _addDiscoveredService:ref2];
+    [browser _addDiscoveredService:ref3];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 
-    // Test with empty data
-    data = [NSData data];
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:NO];
-    XCTAssertNil(address, @"Should return nil for malformed IPv4 data");
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:YES];
-    XCTAssertNil(address, @"Should return nil for malformed IPv6 data");
+    XCTAssertEqual(browser.clientRecords.count, 3u, @"Three records expected after three adds");
+    XCTAssertEqual(recorder.addedRecords.count, 3u, @"Three add callbacks expected");
 
-    // Test with truncated sockaddr_in structure
-    // Too short - missing required fields
-    data = [NSData dataWithBytes:(char[]){AF_INET, 0} length:2];
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:NO];
-    XCTAssertNil(address, @"Should return nil for truncated sockaddr_in structure");
+    [browser _removeDiscoveredService:ref2];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 
-    // Misaligned data that doesn't properly represent a sockaddr_in
-    // Leave rest uninitialized or with invalid values
-    char bytes[sizeof(struct sockaddr_in)] = {AF_INET};
-    data = [NSData dataWithBytes:bytes length:sizeof(bytes)];
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:NO];
-    XCTAssertNil(address, @"Should return nil for misaligned data");
-
-    // Test with truncated sockaddr_in6 structure
-    data = [NSData dataWithBytes:(char[]){0, 0, AF_INET6} length:3];
-    address = [F53OSCBrowser IPAddressFromData:data resolveIPv6Addresses:YES];
-    XCTAssertNil(address, @"Should return nil for truncated sockaddr_in structure");
+    XCTAssertEqual(browser.clientRecords.count, 2u, @"Two records expected after one remove");
+    XCTAssertEqual(recorder.removedRecords.count, 1u, @"One remove callback expected");
+    XCTAssertEqualObjects(recorder.removedRecords.firstObject.service.name, @"Service2",
+                          @"Service2 should have been removed");
 }
 
-
-#pragma mark - F53OSCBrowserDelegate
-
-- (void)browser:(F53OSCBrowser *)browser didAddClientRecord:(F53OSCClientRecord *)clientRecord
+- (void) testThat_clientRecordsAreEmptyAfterStop
 {
+    F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = @"_osc._tcp.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
+
+    F53OSCServiceRef *ref = MakeServiceRef( @"TransientService", @"_osc._tcp.", @"local.", nil, 5000 );
+    [browser _addDiscoveredService:ref];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    XCTAssertEqual(browser.clientRecords.count, 1u, @"One record before stop");
+
+    [browser stop];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+
+    XCTAssertEqual(browser.clientRecords.count, 0u, @"clientRecords should be empty after stop");
 }
 
-- (void)browser:(F53OSCBrowser *)browser didRemoveClientRecord:(F53OSCClientRecord *)clientRecord
+
+#pragma mark - Integration: discovers advertised service via nw_listener
+
+- (void) testIntegration_DiscoversAdvertisedService
 {
+    // Pick a unique service name per run to avoid stale mDNS caches.
+    NSString *serviceName = [NSString stringWithFormat:@"F53OSCTest-%@", [[NSUUID UUID] UUIDString]];
+    NSString *serviceType = @"_f53osctest._udp";
+
+    // Stand up an nw_listener advertising the service.
+    nw_parameters_t params = nw_parameters_create_secure_udp(
+        NW_PARAMETERS_DISABLE_PROTOCOL,
+        NW_PARAMETERS_DEFAULT_CONFIGURATION
+    );
+    nw_listener_t listener = nw_listener_create(params);
+    nw_advertise_descriptor_t advert = nw_advertise_descriptor_create_bonjour_service(
+        [serviceName UTF8String],
+        [serviceType UTF8String],
+        NULL  // domain — defaults to local.
+    );
+    nw_listener_set_advertise_descriptor(listener, advert);
+    nw_listener_set_queue(listener, dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0));
+
+    dispatch_semaphore_t listenerReady = dispatch_semaphore_create(0);
+    nw_listener_set_state_changed_handler(listener, ^(nw_listener_state_t state, nw_error_t _Nullable error) {
+        if ( state == nw_listener_state_ready )
+            dispatch_semaphore_signal(listenerReady);
+    });
+    nw_listener_set_new_connection_handler(listener, ^(nw_connection_t conn) {
+        // Discard inbound connections — we only care about advertisement.
+        nw_connection_cancel(conn);
+    });
+    nw_listener_start(listener);
+
+    long listenerResult = dispatch_semaphore_wait(listenerReady,
+                                                  dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+    if ( listenerResult != 0 )
+    {
+        nw_listener_cancel(listener);
+        XCTFail(@"nw_listener did not reach ready state within 5 seconds — cannot run integration test");
+        return;
+    }
+
+    // Create an F53OSCBrowser and wait for discovery.
+    F53OSCBrowser *browser = [[F53OSCBrowser alloc] init];
+    browser.serviceType = serviceType;
+    browser.domain = @"local.";
+    BrowserDelegateRecorder *recorder = [[BrowserDelegateRecorder alloc] init];
+    browser.delegate = recorder;
+    [browser start];
+
+    // Spin the run loop for up to 10 s, polling clientRecords.
+    NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow:10.0];
+    BOOL found = NO;
+    while ( [deadline timeIntervalSinceNow] > 0 )
+    {
+        for ( F53OSCClientRecord *r in browser.clientRecords )
+        {
+            if ( [r.service.name isEqualToString:serviceName] )
+            {
+                found = YES;
+                break;
+            }
+        }
+        if ( found )
+            break;
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    }
+
+    [browser stop];
+    nw_listener_cancel(listener);
+
+    // mDNS in xctest sandboxes can be unreliable (entitlements, daemon scope).
+    // Skip rather than fail if discovery didn't complete — the seam-based tests
+    // cover the browser logic; this integration test is best-effort.
+    if ( !found )
+        XCTSkip(@"mDNS did not surface the advertised service within 10s (xctest sandbox?)");
 }
 
-// NOTE: By not implementing `browser:shouldAcceptNetService:`,
-// we can test that the browser works without optional delegate methods.
+
+#pragma mark - F53OSCBrowserDelegate stubs (required by protocol)
+
+- (void) browser:(F53OSCBrowser *)browser didAddClientRecord:(F53OSCClientRecord *)clientRecord
+{
+    // Used by testThat_browserDelegateMethodsAreOptional (self is delegate).
+    // No-op.
+}
+
+- (void) browser:(F53OSCBrowser *)browser didRemoveClientRecord:(F53OSCClientRecord *)clientRecord
+{
+    // No-op.
+}
+
+// NOTE: by not implementing `browser:shouldAcceptService:` on self/XCTestCase,
+// we exercise the path where the optional delegate method is absent.
 
 @end
 

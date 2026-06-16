@@ -71,8 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
     self.mockDestination = [[MockPacketDestination alloc] init];
     self.mockControlHandler = [[MockControlHandler alloc] init];
 
-    GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:nil delegateQueue:dispatch_get_main_queue()];
-    self.mockSocket = [F53OSCSocket socketWithTcpSocket:tcpSocket];
+    self.mockSocket = [F53OSCSocket outboundTcpSocketWithCallbackQueue:dispatch_get_main_queue()];
 }
 
 //- (void)tearDown

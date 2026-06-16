@@ -90,8 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     F53OSCBundle *bundle = [[F53OSCBundle alloc] init];
 
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:nil];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    F53OSCSocket *replySocket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:nil];
     bundle.replySocket = replySocket;
     XCTAssertEqualObjects(bundle.replySocket, replySocket, @"Bundle replySocket should be %@", replySocket);
 
@@ -119,8 +118,7 @@ NS_ASSUME_NONNULL_BEGIN
     F53OSCBundle *original = [[F53OSCBundle alloc] init];
 
     // Configure original bundle with test data.
-    GCDAsyncUdpSocket *rawReplySocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:nil delegateQueue:nil];
-    F53OSCSocket *replySocket = [F53OSCSocket socketWithUdpSocket:rawReplySocket];
+    F53OSCSocket *replySocket = [F53OSCSocket outboundUdpSocketWithCallbackQueue:nil];
     original.replySocket = replySocket;
 
     F53OSCTimeTag *timeTag = [F53OSCTimeTag timeTagWithDate:[NSDate dateWithTimeIntervalSince1970:1609459200]]; // Jan 1, 2021 UTC

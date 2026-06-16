@@ -29,7 +29,14 @@
 #endif
 
 #import <XCTest/XCTest.h>
+
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSC-Swift.h>
+#elif __has_include("F53OSC-Swift.h")
+#import "F53OSC-Swift.h"
+#elif SWIFT_PACKAGE
+@import F53OSCEncrypt;
+#endif
 
 #import "F53OSC.h"
 
