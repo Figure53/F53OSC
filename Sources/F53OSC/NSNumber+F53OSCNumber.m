@@ -52,8 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
     if ( buf == NULL || maxLength < sizeof( SInt32 ) )
         return nil;
     
-    SInt32 intValue = *((SInt32 *)buf);
-    intValue = OSSwapBigToHostInt32( intValue );
+    SInt32 intValue = OSReadBigInt32( buf, 0 );
     Float32 floatValue = *((Float32 *)&intValue);
     return [NSNumber numberWithFloat:floatValue];
 }
@@ -63,8 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
     if ( buf == NULL || maxLength < sizeof( SInt32 ) )
         return nil;
     
-    SInt32 intValue = *((SInt32 *)buf);
-    intValue = OSSwapBigToHostInt32( intValue );
+    SInt32 intValue = OSReadBigInt32( buf, 0 );
     return [NSNumber numberWithInteger:intValue];
 }
 

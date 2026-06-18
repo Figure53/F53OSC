@@ -298,7 +298,7 @@ NS_ASSUME_NONNULL_BEGIN
         NSLog( @"[browser] netServiceBrowserWillSearch: %@", browser );
 #endif
     
-    if ( browser == self.netServiceDomainsBrowser )
+    if ( self.netServiceDomainsBrowser == browser )
         self.running = YES;
 }
 
@@ -313,14 +313,14 @@ NS_ASSUME_NONNULL_BEGIN
         NSLog( @"[browser] netServiceBrowserDidStopSearch: %@", browser );
 #endif
     
-    if ( browser == self.netServiceDomainsBrowser )
+    if ( self.netServiceDomainsBrowser == browser )
     {
         self.running = NO;
         
         self.netServiceDomainsBrowser.delegate = nil;
         self.netServiceDomainsBrowser = nil;
     }
-    else if ( browser == self.netServiceBrowser )
+    else if ( self.netServiceBrowser == browser )
     {
         self.netServiceBrowser.delegate = nil;
         self.netServiceBrowser = nil;
@@ -388,7 +388,7 @@ NS_ASSUME_NONNULL_BEGIN
 #if DEBUG_BROWSER
     NSLog( @"[browser] netServiceDidResolveAddress: %@", netService );
 #endif
-#if !RELEASE
+#if !defined(RELEASE) || !RELEASE
     NSAssert( [NSThread isMainThread], @"[browser] netServiceDidResolveAddress: is not thread-safe and expects to be called on the main thread." );
 #endif
     
@@ -432,7 +432,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)netService:(NSNetService *)netService didNotResolve:(NSDictionary<NSString *, NSNumber *> *)error
 {
-#if !RELEASE
+#if !defined(RELEASE) || !RELEASE
     NSAssert( [NSThread isMainThread], @"[browser] netService:didNotResolve: is not thread-safe and expects to be called on the main thread." );
 #endif
     
@@ -453,7 +453,7 @@ NS_ASSUME_NONNULL_BEGIN
         struct sockaddr_in6 ipv6;
     } ip_socket_address;
     
-    ip_socket_address *socketAddress = (ip_socket_address *)data.bytes;
+    const ip_socket_address *socketAddress = (const ip_socket_address *)data.bytes;
     
     if ( socketAddress && AF_INET == socketAddress->sa.sa_family )
     {
@@ -461,7 +461,7 @@ NS_ASSUME_NONNULL_BEGIN
         memset( buffer, 0, INET_ADDRSTRLEN );
         
         const char *formatted = inet_ntop( AF_INET,
-                                          (void *)&(socketAddress->ipv4.sin_addr),
+                                          (const void *)&(socketAddress->ipv4.sin_addr),
                                           buffer,
                                           (socklen_t)sizeof( buffer ) );
         if ( formatted == NULL )
@@ -475,7 +475,7 @@ NS_ASSUME_NONNULL_BEGIN
         memset( buffer, 0, INET6_ADDRSTRLEN );
         
         const char *formatted = inet_ntop( AF_INET6,
-                                          (void *)&(socketAddress->ipv6.sin6_addr),
+                                          (const void *)&(socketAddress->ipv6.sin6_addr),
                                           buffer,
                                           (socklen_t)sizeof( buffer ) );
         if ( formatted == NULL )

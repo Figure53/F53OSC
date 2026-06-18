@@ -106,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         char *charType = @encode(char);
         if ( *type == *charType )
-            self.oscTypeTag = *(char *)value;
+            self.oscTypeTag = *(const char *)value;
         else
             [[NSException exceptionWithName:@"Invalid parameter"
                                      reason:[NSString stringWithFormat:@"F53OSCValue: objCType type '%s' is unsupported, must be char type 'c'", type]

@@ -26,7 +26,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if F53OSC_BUILT_AS_FRAMEWORK
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/GCDAsyncSocket.h>
 #import <F53OSC/GCDAsyncUdpSocket.h>
 #else

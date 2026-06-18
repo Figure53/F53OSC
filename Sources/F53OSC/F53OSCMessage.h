@@ -26,7 +26,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if F53OSC_BUILT_AS_FRAMEWORK
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSCPacket.h>
 #import <F53OSC/F53OSCFoundationAdditions.h>
 #else
@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // The address is the first whitespace-delimited component in the string.
 // Optionally returns the remainder (arguments portion) by reference.
-+ (nullable NSString *) addressWithString:(NSString *)qscString argumentsString:(out NSString * _Nullable * _Nullable)outArgumentsString;
++ (nullable NSString *) addressWithString:(NSString *)qscString argumentsString:(out NSString * _Nullable __autoreleasing * _Nullable)outArgumentsString;
 
 // Arguments should be space-delimited following the address.
 // Arguments enclosed in quotes are parsed as string arguments.

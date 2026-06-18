@@ -38,9 +38,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // Not trying to be perfect here; we just use unlikely characters.
-NSString * const QUOTE_CHAR_TOKEN_PLAIN = @"⍁";        // QUOTATION MARK " (U+0022)
-NSString * const QUOTE_CHAR_TOKEN_LEFT_DOUBLE = @"⍃";  // LEFT DOUBLE QUOTATION MARK “ (U+201C)
-NSString * const QUOTE_CHAR_TOKEN_RIGHT_DOUBLE = @"⍄"; // RIGHT DOUBLE QUOTATION MARK ” (U+201D)
+static NSString * const QUOTE_CHAR_TOKEN_PLAIN = @"⍁";        // QUOTATION MARK " (U+0022)
+static NSString * const QUOTE_CHAR_TOKEN_LEFT_DOUBLE = @"⍃";  // LEFT DOUBLE QUOTATION MARK “ (U+201C)
+static NSString * const QUOTE_CHAR_TOKEN_RIGHT_DOUBLE = @"⍄"; // RIGHT DOUBLE QUOTATION MARK ” (U+201D)
 
 #pragma mark - NSString category
 
@@ -137,7 +137,7 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
     if ( addressComponent == nil )
         return NO;
     
-    if ( [LEGAL_ADDRESS_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:addressComponent]] )
+    if ( [LEGAL_ADDRESS_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:(NSString * _Nonnull)addressComponent]] )
     {
         if ( [addressComponent length] >= 1 )
             return YES;
@@ -151,7 +151,7 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
     if ( address == nil )
         return NO;
     
-    if ( [LEGAL_ADDRESS_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:address]] )
+    if ( [LEGAL_ADDRESS_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:(NSString * _Nonnull)address]] )
     {
         if ( [address length] >= 1 && [address characterAtIndex:0] == '/' )
             return YES;
@@ -165,13 +165,13 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
     if ( method == nil || method.length == 0 )
         return NO;
     
-    if ( [LEGAL_METHOD_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:method]] )
+    if ( [LEGAL_METHOD_CHARACTERS isSupersetOfSet:[NSCharacterSet characterSetWithCharactersInString:(NSString * _Nonnull)method]] )
         return YES;
     else
         return NO;
 }
 
-+ (nullable NSString *) addressWithString:(NSString *)qscString argumentsString:(out NSString * _Nullable * _Nullable)outArgumentsString
++ (nullable NSString *) addressWithString:(NSString *)qscString argumentsString:(out NSString * _Nullable __autoreleasing * _Nullable)outArgumentsString
 {
     if ( outArgumentsString )
         *outArgumentsString = nil;
@@ -396,9 +396,15 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
     self = [super init];
     if ( self )
     {
-        [self setAddressPattern:[coder decodeObjectOfClass:[NSString class] forKey:@"addressPattern"]];
-        [self setTypeTagString:[coder decodeObjectOfClass:[NSString class] forKey:@"typeTagString"]];
-        [self setArguments:[coder decodeObjectOfClasses:[NSSet setWithObjects:[NSArray class], [NSString class], [NSNumber class], [NSData class], [F53OSCValue class], nil] forKey:@"arguments"]];
+        NSString *addressPattern = [coder decodeObjectOfClass:[NSString class] forKey:@"addressPattern"];
+        if ( addressPattern )
+            [self setAddressPattern:addressPattern];
+        NSString *typeTagString = [coder decodeObjectOfClass:[NSString class] forKey:@"typeTagString"];
+        if ( typeTagString )
+            [self setTypeTagString:typeTagString];
+        NSArray<id> *arguments = [coder decodeObjectOfClasses:[NSSet setWithObjects:[NSArray class], [NSString class], [NSNumber class], [NSData class], [F53OSCValue class], nil] forKey:@"arguments"];
+        if ( arguments )
+            [self setArguments:arguments];
         // NOTE: `userData` is not archived.
     }
     return self;
@@ -529,7 +535,8 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
 
 - (NSArray<NSString *> *) addressParts
 {
-    if ( self.addressPartsCache == nil )
+    NSArray<NSString *> *addressPartsCache = self.addressPartsCache;
+    if ( addressPartsCache == nil )
     {
         if ( self.addressPattern.length > 0 && [self.addressPattern characterAtIndex:0] == '!' )
         {
@@ -538,10 +545,13 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
             NSLog(@"Error: trying to compute addressParts of an F53OSC control message is currently unsupported");
         }
         NSMutableArray<NSString *> *parts = [NSMutableArray arrayWithArray:[self.addressPattern componentsSeparatedByString:@"/"]];
-        [parts removeObjectAtIndex:0];
-        self.addressPartsCache = [NSArray arrayWithArray:parts];
+        if ( parts.count )
+            [parts removeObjectAtIndex:0];
+        addressPartsCache = [NSArray arrayWithArray:parts];
+
+        self.addressPartsCache = addressPartsCache;
     }
-    return self.addressPartsCache;
+    return addressPartsCache;
 }
 
 - (NSData *) packetData

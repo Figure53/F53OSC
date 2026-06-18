@@ -32,7 +32,7 @@
 
 #if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSC-Swift.h>
-#elif SWIFT_PACKAGE // Swift Package Manager
+#elif defined(SWIFT_PACKAGE) && SWIFT_PACKAGE // Swift Package Manager
 @import F53OSCEncrypt;
 #endif
 

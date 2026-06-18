@@ -26,7 +26,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if F53OSC_BUILT_AS_FRAMEWORK
+#if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSCSocket.h>
 #else
 #import "F53OSCSocket.h"

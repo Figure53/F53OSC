@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Siobhán Dougall on 1/20/11.
-//  Copyright (c) 2011-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2011-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -39,8 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface F53OSCClient ()
 
 @property (strong, nullable)    F53OSCSocket *socket;
-@property (strong, nullable)    NSMutableData *readData;
-@property (strong, nullable)    NSMutableDictionary<NSString *, id> *readState;
+@property (strong)              NSMutableData *readData;
+@property (strong)              NSMutableDictionary<NSString *, id> *readState;
 
 - (void) destroySocket;
 - (void) createSocket;
@@ -328,9 +328,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) handleF53OSCControlMessage:(F53OSCMessage *)message
 {
-    if ( self.socket.encrypter && [F53OSCEncryptHandshake isEncryptHandshakeMessage:message] )
+    F53OSCEncrypt *encrypter = self.socket.encrypter;
+    if ( encrypter && [F53OSCEncryptHandshake isEncryptHandshakeMessage:message] )
     {
-        F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
+        F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:encrypter];
         if ( [handshake processHandshakeMessage:message] )
         {
             if ( handshake.lastProcessedMessage == F53OSCEncryptionHandshakeMessageApprove )
@@ -375,9 +376,10 @@ NS_ASSUME_NONNULL_BEGIN
     else
         [sock readDataWithTimeout:self.tcpTimeout tag:0];
 
-    if ( self.socket.encrypter )
+    F53OSCEncrypt *encrypter = self.socket.encrypter;
+    if ( encrypter )
     {
-        F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:self.socket.encrypter];
+        F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:encrypter];
         F53OSCMessage *requestMessage = [handshake requestEncryptionMessage];
         if ( requestMessage )
         {
@@ -411,7 +413,9 @@ NS_ASSUME_NONNULL_BEGIN
     NSLog( @"client socket %p didReadData of length %lu. tag : %lu", sock, [data length], tag );
 #endif
 
-    [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:self.delegate controlHandler:self];
+    id<F53OSCClientDelegate> delegate = self.delegate;
+    if ( delegate )
+        [F53OSCParser translateSlipData:data toData:self.readData withState:self.readState destination:delegate controlHandler:self];
 
     if ( self.readChunkSize )
     {

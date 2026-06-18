@@ -68,13 +68,12 @@ NS_ASSUME_NONNULL_BEGIN
     if ( buf == NULL )
         return nil;
     
-    UInt32 seconds = *((UInt32 *)buf);
-    buf += sizeof( UInt32 );
-    UInt32 fraction = *((UInt32 *)buf);
-    
+    UInt32 seconds = OSReadBigInt32( buf, 0 );
+    UInt32 fraction = OSReadBigInt32( buf, sizeof( UInt32 ) );
+
     F53OSCTimeTag *result = [[F53OSCTimeTag alloc] init];
-    result.seconds = OSSwapBigToHostInt32( seconds );
-    result.fraction = OSSwapBigToHostInt32( fraction );
+    result.seconds = seconds;
+    result.fraction = fraction;
     return result;
 }
 

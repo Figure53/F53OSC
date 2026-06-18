@@ -66,8 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     UInt32 dataSize = 0;
     
-    dataSize = *((UInt32 *)buf);
-    dataSize = OSSwapBigToHostInt32( dataSize );
+    dataSize = OSReadBigInt32( buf, 0 );
     
     if ( dataSize + 4 > maxLength )
     {

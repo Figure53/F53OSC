@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Christopher Ashworth on 1/30/13.
-//  Copyright (c) 2013-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2013-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 
 #if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSC-Swift.h>
-#elif SWIFT_PACKAGE // Swift Package Manager
+#elif defined(SWIFT_PACKAGE) && SWIFT_PACKAGE // Swift Package Manager
 @import F53OSCEncrypt;
 #endif
 #import "F53OSCMessage.h"
@@ -93,8 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
             
             while ( lengthOfRemainingBuffer > sizeof( UInt32 ) )
             {
-                UInt32 elementLength = *((UInt32 *)buffer);
-                elementLength = OSSwapBigToHostInt32( elementLength );
+                UInt32 elementLength = OSReadBigInt32( buffer, 0 );
                 buffer += sizeof( UInt32 );
                 lengthOfRemainingBuffer -= sizeof( UInt32 );
                 
@@ -106,13 +105,13 @@ NS_ASSUME_NONNULL_BEGIN
                 
                 if ( buffer[0] == '/' ) // OSC message
                 {
-                    [self processMessageData:[NSData dataWithBytesNoCopy:(void *)buffer length:elementLength freeWhenDone:NO]
+                    [self processMessageData:[NSData dataWithBytesNoCopy:(void *)(uintptr_t)buffer length:elementLength freeWhenDone:NO]
                               forDestination:destination
                                replyToSocket:socket];
                 }
                 else if ( buffer[0] == '#' ) // OSC bundle
                 {
-                    [self processBundleData:[NSData dataWithBytesNoCopy:(void *)buffer length:elementLength freeWhenDone:NO]
+                    [self processBundleData:[NSData dataWithBytesNoCopy:(void *)(uintptr_t)buffer length:elementLength freeWhenDone:NO]
                              forDestination:destination
                               replyToSocket:socket];
                 }

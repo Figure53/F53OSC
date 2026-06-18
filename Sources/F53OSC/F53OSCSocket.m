@@ -32,7 +32,7 @@
 
 #if __has_include(<F53OSC/F53OSC-Swift.h>) // F53OSC_BUILT_AS_FRAMEWORK
 #import <F53OSC/F53OSC-Swift.h>
-#elif SWIFT_PACKAGE // Swift Package Manager
+#elif defined(SWIFT_PACKAGE) && SWIFT_PACKAGE // Swift Package Manager
 @import F53OSCEncrypt;
 #endif
 #import "F53OSCPacket.h"
@@ -289,8 +289,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if ( self.tcpSocket )
     {
-        if ( self.host && self.port )
-            return [self.tcpSocket connectToHost:self.host onPort:self.port viaInterface:self.interface withTimeout:-1 error:nil]; // NOTE: this returns NO if the GCDAsyncSocket is already connected
+        NSString *host = self.host;
+        UInt16 port = self.port;
+        if ( host && port )
+            return [self.tcpSocket connectToHost:host onPort:port viaInterface:self.interface withTimeout:-1 error:nil]; // NOTE: this returns NO if the GCDAsyncSocket is already connected
         else
             return NO;
     }
@@ -396,9 +398,10 @@ NS_ASSUME_NONNULL_BEGIN
             NSString *errString = error ? [error localizedDescription] : @"(unknown error)";
             NSLog( @"Warning: %@ unable to enable UDP broadcast - %@", self, errString );
         }
-        
-        if ( self.host )
-            [self.udpSocket sendData:data toHost:(NSString * _Nonnull)self.host port:self.port withTimeout:-1 tag:0];
+
+        NSString *host = self.host;
+        if ( host )
+            [self.udpSocket sendData:data toHost:host port:self.port withTimeout:-1 tag:0];
         
         [self.udpSocket closeAfterSending];
     }

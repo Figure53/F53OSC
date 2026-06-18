@@ -145,8 +145,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         if ( !queue )
             queue = dispatch_get_main_queue();
-        self.queue = queue;
-        
+        self.queue = (dispatch_queue_t _Nonnull)queue;
+
         GCDAsyncSocket *rawTcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:queue];
         self.tcpSocket = [F53OSCSocket socketWithTcpSocket:rawTcpSocket];
         self.tcpSocket.IPv6Enabled = self.isIPv6Enabled;
@@ -220,11 +220,17 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if ( [F53OSCEncryptHandshake isEncryptHandshakeMessage:message] )
     {
-        if ( self.keyPair )
+        NSData *keyPair = self.keyPair;
+        if ( keyPair )
         {
-            if ( !message.replySocket.encrypter )
-                [message.replySocket setKeyPair:self.keyPair];
-            F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:message.replySocket.encrypter];
+            F53OSCEncrypt *encrypter = message.replySocket.encrypter;
+            if ( !encrypter )
+            {
+                [message.replySocket setKeyPair:keyPair];
+                encrypter = message.replySocket.encrypter;
+            }
+
+            F53OSCEncryptHandshake *handshake = [F53OSCEncryptHandshake handshakeWithEncrypter:encrypter];
             if ( [handshake processHandshakeMessage:message] )
             {
                 if ( handshake.lastProcessedMessage == F53OSCEncryptionHandshakeMessageRequest )
@@ -312,7 +318,9 @@ NS_ASSUME_NONNULL_BEGIN
     NSMutableDictionary<NSString *, id> *activeState = [self.activeState objectForKey:key];
     if ( activeData && activeState )
     {
-        [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:self.delegate controlHandler:self];
+        id<F53OSCServerDelegate> delegate = self.delegate;
+        if ( delegate )
+            [F53OSCParser translateSlipData:data toData:activeData withState:activeState destination:delegate controlHandler:self];
         [sock readDataWithTimeout:-1 tag:tag];
     }
 }
@@ -432,7 +440,9 @@ NS_ASSUME_NONNULL_BEGIN
 
     [self.udpSocket.stats addBytes:[data length]];
 
-    [F53OSCParser processOscData:data forDestination:self.delegate replyToSocket:replySocket controlHandler:nil wasEncrypted:NO];
+    id<F53OSCServerDelegate> delegate = self.delegate;
+    if ( delegate )
+        [F53OSCParser processOscData:data forDestination:delegate replyToSocket:replySocket controlHandler:nil wasEncrypted:NO];
 }
 
 - (void) udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(nullable NSError *)error
