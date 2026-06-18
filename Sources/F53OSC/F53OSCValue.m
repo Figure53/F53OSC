@@ -3,7 +3,7 @@
 //  F53OSC
 //
 //  Created by Brent Lord on 2/19/20.
-//  Copyright (c) 2020-2025 Figure 53 LLC, https://figure53.com
+//  Copyright (c) 2020-2026 Figure 53 LLC, https://figure53.com
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -33,11 +33,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static F53OSCValue *_oscTrue;
-static F53OSCValue *_oscFalse;
-static F53OSCValue *_oscNull;
-static F53OSCValue *_oscImpulse;
-
 
 @interface F53OSCValue ()
 
@@ -56,42 +51,46 @@ static F53OSCValue *_oscImpulse;
 
 + (instancetype) oscTrue
 {
+    static F53OSCValue *oscTrue;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         const char value = 'T';
-        _oscTrue = [F53OSCValue valueWithBytes:&value objCType:@encode(char)];
+        oscTrue = [F53OSCValue valueWithBytes:&value objCType:@encode(char)];
     });
-    return _oscTrue;
+    return oscTrue;
 }
 
 + (instancetype) oscFalse
 {
+    static F53OSCValue *oscFalse;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         const char value = 'F';
-        _oscFalse = [F53OSCValue valueWithBytes:&value objCType:@encode(char)];
+        oscFalse = [F53OSCValue valueWithBytes:&value objCType:@encode(char)];
     });
-    return _oscFalse;
+    return oscFalse;
 }
 
 + (instancetype) oscNull
 {
+    static F53OSCValue *oscNull;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         const char value = 'N';
-        _oscNull = [F53OSCValue valueWithBytes:&value objCType:@encode(char)];
+        oscNull = [F53OSCValue valueWithBytes:&value objCType:@encode(char)];
     });
-    return _oscNull;
+    return oscNull;
 }
 
 + (instancetype) oscImpulse
 {
+    static F53OSCValue *oscImpulse;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         const char value = 'I';
-        _oscImpulse = [F53OSCValue valueWithBytes:&value objCType:@encode(char)];
+        oscImpulse = [F53OSCValue valueWithBytes:&value objCType:@encode(char)];
     });
-    return _oscImpulse;
+    return oscImpulse;
 }
 
 #pragma mark - subclassing
