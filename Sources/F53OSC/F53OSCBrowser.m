@@ -423,7 +423,7 @@ NS_ASSUME_NONNULL_BEGIN
     [self.unresolvedNetServices removeObject:netService];
     
 #if DEBUG_BROWSER
-    NSLog( @"[browser] adding client: %@", client );
+    NSLog( @"[browser] adding client: %@ (%hu)", [clientRecord.hostAddresses componentsJoinedByString:@", "], clientRecord.port );
 #endif
     
     [self.mutableClientRecords addObject:clientRecord];
