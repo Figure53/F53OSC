@@ -393,7 +393,7 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
 
 - (nullable instancetype) initWithCoder:(NSCoder *)coder
 {
-    self = [super init];
+    self = [self init]; // loads defaults above
     if ( self )
     {
         NSString *addressPattern = [coder decodeObjectOfClass:[NSString class] forKey:@"addressPattern"];
@@ -403,8 +403,7 @@ static NSNumberFormatter *STRING_FORMATTER = nil;
         if ( typeTagString )
             [self setTypeTagString:typeTagString];
         NSArray<id> *arguments = [coder decodeObjectOfClasses:[NSSet setWithObjects:[NSArray class], [NSString class], [NSNumber class], [NSData class], [F53OSCValue class], nil] forKey:@"arguments"];
-        if ( arguments )
-            [self setArguments:arguments];
+        [self setArguments:(arguments ?: @[])]; // rebuilds `typeTagString` from the arguments
         // NOTE: `userData` is not archived.
     }
     return self;

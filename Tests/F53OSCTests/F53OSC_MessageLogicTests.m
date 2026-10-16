@@ -202,6 +202,40 @@ static NSString *legalWildcardCharacters = @"/*?[]{,}";
     XCTAssertNil(unarchivedMessage.userData, @"userData should be nil");// transient, not archived
 }
 
+- (void)testThat_messageDecodesIncompleteArchiveWithDefaults
+{
+    NSError *error = nil;
+
+    // Archive with no keys.
+    NSKeyedArchiver *emptyArchiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    NSKeyedUnarchiver *emptyUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:[emptyArchiver encodedData] error:&error];
+    XCTAssertNotNil(emptyUnarchiver, @"Unarchiver should not be nil");
+    XCTAssertNil(error, @"Error should be nil");
+
+    F53OSCMessage *emptyMessage = [[F53OSCMessage alloc] initWithCoder:emptyUnarchiver];
+    XCTAssertNotNil(emptyMessage, @"Decoded message should not be nil");
+    XCTAssertEqualObjects(emptyMessage.addressPattern, @"/", @"addressPattern should be the default '/'");
+    XCTAssertEqualObjects(emptyMessage.typeTagString, @",", @"typeTagString should be the default ','");
+    XCTAssertEqualObjects(emptyMessage.arguments, @[], @"arguments should be the default empty array");
+    XCTAssertNoThrow([emptyMessage addressParts], @"addressParts should not throw");
+    XCTAssertEqualObjects([emptyMessage packetData], [[[F53OSCMessage alloc] init] packetData], @"packetData should match a default message");
+
+    // Archive with an address pattern and a type tag string, but no arguments.
+    NSKeyedArchiver *partialArchiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    [partialArchiver encodeObject:@"/test/partial" forKey:@"addressPattern"];
+    [partialArchiver encodeObject:@",si" forKey:@"typeTagString"];
+    NSKeyedUnarchiver *partialUnarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:[partialArchiver encodedData] error:&error];
+    XCTAssertNotNil(partialUnarchiver, @"Unarchiver should not be nil");
+    XCTAssertNil(error, @"Error should be nil");
+
+    F53OSCMessage *partialMessage = [[F53OSCMessage alloc] initWithCoder:partialUnarchiver];
+    XCTAssertNotNil(partialMessage, @"Decoded message should not be nil");
+    XCTAssertEqualObjects(partialMessage.addressPattern, @"/test/partial", @"addressPattern should be preserved");
+    XCTAssertEqualObjects(partialMessage.typeTagString, @",", @"typeTagString should describe the empty arguments");
+    XCTAssertEqualObjects(partialMessage.arguments, @[], @"arguments should be the default empty array");
+    XCTAssertEqualObjects([partialMessage packetData], [[F53OSCMessage messageWithAddressPattern:@"/test/partial" arguments:@[]] packetData], @"packetData should match a message with no arguments");
+}
+
 - (void)testThat_messageIsEqualComparesCorrectly
 {
     F53OSCMessage *message1 = [F53OSCMessage messageWithAddressPattern:@"/test" arguments:@[@"arg1", @(53)]];
