@@ -1,7 +1,10 @@
-## x.x.x - ???
+## [1.3.2 - October 16, 2026](https://github.com/Figure53/F53OSC/releases/tag/1.3.2)
 
-- Reorganizes project file, with several fixes to the SPM package manifest.
+- Reorganizes the project file, with several fixes to the SPM package manifest.
+  - F53OSCEncrypt.swift is moved from `Sources/F53OSC/` to `Sources/F53OSCEncrypt/`. Projects that integrate the source file manually will need to update their file reference.
+  - `module.modulemap` and the `GCDAsyncSocket.h` and `GCDAsyncUdpSocket.h` symlinks in `Sources/F53OSC/` are removed. Instead, CocoaAsyncSocket is now its own SPM target, which allows SPM to generate the module map from the umbrella header.
 - Additional test cases and several fixes to existing tests.
+- Fixes misc compiler warnings.
 
 ### F53OSCServer
 - Adds a version of `-startListening:` that returns an error, if any.
@@ -10,13 +13,23 @@
 - Adds a version of `-startListening:` that returns an error, if any.
 
 ### F53OSCMessage
+- Fixes `-initWithCoder:` to set default values, in case the archive is missing a value or a value fails to decode.
 - Fixes `+legalMethod:` to return NO for empty string.
 - `+messageWithString:` and `-asQSC` are deprecated in favor of new locale-aware versions that make clear which locale will be used for parsing/number conversion. Pass `nil` locale to use the current machine locale. This fixes a mismatch between legacy `+messageWithString:` which uses the `currentLocale` and `asQSC` which uses implicit `en_US_POSIX` formatting (by way of `appendFormat:` and the `%@` string format specifier, aka `[arg description]`). The new methods `+messageWithString:locale:` and `asQSC:` now support round-trip formatting of string to message and back in all locales.
-- The `description` method now displays float, string, and blob arguments more acurately, equivalent to `asQSC:` using the `en_US_POSIX` locale.
+- The `description` method now displays float, string, and blob arguments more accurately, equivalent to `asQSC:` using the `en_US_POSIX` locale.
 - Adds utility method `+addressWithString:argumentsString:` which uses the same logic as `+messageWithString:locale:` to split a string into address/arguments components but without creating a message object.
 
+### F53OSCPacket
+- `-asQSC` is deprecated in favor of locale-aware `-asQSC:`.
+
+### F53OSCBundle
+- `-asQSC` is deprecated in favor of locale-aware `-asQSC:`.
+
 ### F53OSCEncryptHandshake
-- Fixes `keyPair` property nullable annotation.
+- Fixes `peerKey` property nullable annotation.
+
+### F53OSCEncrypt
+- `generateKeyPair()` and `beginEncrypting(peerKey:)` are now marked `@discardableResult`.
 
 ## [1.3.1 - September 29, 2025](https://github.com/Figure53/F53OSC/releases/tag/1.3.1)
 
