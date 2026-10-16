@@ -38,6 +38,8 @@
 #import <F53OSC/F53OSC-Swift.h>
 #elif __has_include("F53OSC-Swift.h")
 #import "F53OSC-Swift.h"
+#elif defined(SWIFT_PACKAGE) && SWIFT_PACKAGE // Swift Package Manager
+@import F53OSCEncrypt;
 #endif
 
 

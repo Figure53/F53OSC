@@ -43,6 +43,7 @@ let package = Package(
             name: "F53OSCTests",
             dependencies: [
                 "F53OSC",
+                "F53OSCEncrypt",
             ]
         ),
     ]
